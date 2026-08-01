@@ -1,0 +1,12 @@
+name: digital-garden
+channels:
+  - openalea3
+  - conda-forge
+dependencies:
+  - python=3.10
+  - openalea.plantgl
+  - numpy
+  - pip
+  - pip:
+    - trimesh
+    - pytest

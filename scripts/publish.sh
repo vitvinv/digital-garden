@@ -1,6 +1,6 @@
 #!/bin/bash
 # publish.sh — commit changed garden GLB files and push to main.
-# The existing deploy.yml triggers on push and handles webpack build + Pages deploy.
+# Deploy workflow triggers on push and handles webpack build + Pages deploy.
 #
 # Usage: bash scripts/publish.sh [--dry-run]
 
@@ -8,6 +8,13 @@ set -euo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ROOT="$(dirname "$SCRIPT_DIR")"
+
+# Container auth: GITHUB_TOKEN available inside Docker CI container
+if [ -n "${GITHUB_TOKEN:-}" ] && [ -n "${GITHUB_REPOSITORY:-}" ]; then
+    git remote set-url origin \
+        "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+fi
+
 GARDENS_DIR="$ROOT/digital-garden-AR/src/assets/gardens"
 
 DRY_RUN=false

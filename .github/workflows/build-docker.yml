@@ -1,0 +1,73 @@
+name: Build and Publish Docker Image
+
+on:
+  push:
+    paths:
+      - "Dockerfile"
+      - "scripts/environment.yml"
+      - "scripts/generate.py"
+  workflow_dispatch:
+
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}-plantgl
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Log into registry
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Docker meta
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=latest
+            type=sha,prefix=sha-
+
+      - name: Build image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Dockerfile
+          push: false
+          load: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+
+      - name: Verify PlantGL in image
+        run: |
+          docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest \
+            python -c "
+          from openalea.plantgl.all import *; from openalea.plantgl.math import Vector3
+          profile = Polyline([Vector3(0,0,0), Vector3(0.5,0,0), Vector3(0,1,0)])
+          scene = Scene(); scene.add(Shape(AxialGeometry.sweep(profile, axis=(Vector3(0,0,0),Vector3(0,1,0)), angle=360), Material()))
+          print('Mesh:', len(Tesselator().process(scene)[0].geometry.pointList), 'verts')
+          "
+
+      - name: Push image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          file: Dockerfile
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

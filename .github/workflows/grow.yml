@@ -16,6 +16,13 @@ jobs:
   grow:
     runs-on: ubuntu-latest
     timeout-minutes: 10
+    container:
+      image: ghcr.io/vitvinv/digital-garden-plantgl:latest
+      credentials:
+        username: ${{ github.actor }}
+        password: ${{ secrets.GITHUB_TOKEN }}
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
     steps:
       - name: Checkout repo
@@ -23,23 +30,7 @@ jobs:
         with:
           lfs: true
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-
-      - name: Install Python dependencies
-        run: pip install -r scripts/requirements.txt
-
-      - name: Setup Node (for Draco compression)
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-      - name: Install gltf-transform
-        run: npm install -g @gltf-transform/cli
-
-      - name: Run grow script
+      - name: Run grow script (PlantGL)
         run: python scripts/grow.py
 
       - name: Publish (commit + push)
