@@ -60,7 +60,7 @@ jobs:
           scene = Scene()
           scene.add(Shape(Extrusion(Polyline([Vector3(0,0,0),Vector3(0,1,0)]), Polyline2D.Circle(0.3,8)), Material()))
           scene.add(Shape(Sphere(0.5), Material()))
-          Discretizer().apply(scene)
+          scene.apply(Discretizer())
           verts = sum(len(s.geometry.pointList) for s in scene if isinstance(s.geometry, TriangleSet))
           print('PlantGL OK:', verts, 'verts across', len(scene), 'shapes')
           "
