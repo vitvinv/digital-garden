@@ -15,11 +15,16 @@ import trimesh
 
 from species import SPECIES, growth_scale, apply_neighbor_discount
 
-# PlantGL imports — available only inside the Docker container
+# ── PlantGL imports (available inside Docker container) ──
+
 try:
-    from openalea.plantgl.all import (Scene, Shape, Material, Tesselator,
-                                       TriangleSet, Polyline, Extrusion,
-                                       Revolution, Vector3, Vector4)
+    from openalea.plantgl.all import (
+        Scene, Shape, Material, Discretizer,
+        TriangleSet, Extrusion, Revolution, Frustum,
+        Cylinder, Sphere, Translated, AxisRotated,
+        Polyline, Polyline2D, BezierCurve, BezierCurve2D,
+        Vector3, Vector2, Group,
+    )
     from openalea.plantgl.math import norm as pgl_norm
     HAS_PLANTGL = True
 except ImportError:
@@ -44,20 +49,34 @@ class DeterministicRNG:
         return self.rng.choice(seq)
 
 
-def _pgl_vec(x, y, z):
+def _vec3(x, y, z):
     return Vector3(float(x), float(y), float(z))
 
 
+def _vec2(x, y):
+    return Vector2(float(x), float(y))
+
+
+def _circle_profile(radius, segments=16):
+    """Create a 2D circle profile for extrusions/revolutions."""
+    return Polyline2D.Circle(float(radius), segments)
+
+
+def _line_path(start, end):
+    """Create a 3D path from start to end."""
+    return Polyline([_vec3(*start), _vec3(*end)])
+
+
 def _extract_mesh(scene):
-    """Tessellate a PlantGL scene and return vertices + faces as numpy arrays."""
-    tesselator = Tesselator()
-    tri_scene = tesselator.process(scene)
+    """Discretize a PlantGL scene and return a trimesh.Trimesh."""
+    disc = Discretizer()
+    scene.apply(disc)
 
     all_verts = []
     all_faces = []
     offset = 0
 
-    for shape in tri_scene:
+    for shape in scene:
         geom = shape.geometry
         if not isinstance(geom, TriangleSet):
             continue
@@ -77,25 +96,11 @@ def _extract_mesh(scene):
     )
 
 
-def _circle_profile(radius, segments=8):
-    """Return a Polyline approximating a circle in the XZ plane."""
-    pts = []
-    for i in range(segments):
-        angle = i * 2.0 * math.pi / segments
-        pts.append(_pgl_vec(math.cos(angle) * radius, 0, math.sin(angle) * radius))
-    pts.append(pts[0])
-    return Polyline(pts)
-
-
-def _tapered_profile(bottom_radius, top_radius, height, segments=8):
-    """Return a Polyline for a tapered cylinder profile."""
-    pts = []
-    for i in range(segments + 1):
-        angle = i * 2.0 * math.pi / segments
-        t = float(i) / segments
-        r = bottom_radius + (top_radius - bottom_radius) * t
-        pts.append(_pgl_vec(math.cos(angle) * r, t * height, math.sin(angle) * r))
-    return Polyline(pts)
+def _stem_shape(start, end, radius, segments=12):
+    """Create a cylinder-like stem between two 3D points."""
+    path = _line_path(start, end)
+    profile = _circle_profile(float(radius), segments)
+    return Shape(Extrusion(path, profile), Material())
 
 
 def build_fern(params, rng, scale):
@@ -105,10 +110,7 @@ def build_fern(params, rng, scale):
     frond_length = params.frond_length * scale
 
     scene = Scene()
-    stem_profile = _circle_profile(stem_radius, 8)
-    stem_path = Polyline([_pgl_vec(0, 0, 0), _pgl_vec(0, stem_height, 0)])
-    stem_shape = Shape(Extrusion(stem_profile, stem_path), Material())
-    scene.add(stem_shape)
+    scene.add(_stem_shape((0, 0, 0), (0, stem_height, 0), stem_radius, 12))
 
     frond_count = max(1, int(params.frond_count * scale))
 
@@ -116,27 +118,30 @@ def build_fern(params, rng, scale):
         y = stem_height * (0.15 + 0.7 * i / max(1, frond_count - 1))
         angle = (i / frond_count) * math.pi * 2.7 + rng.gauss(0, 0.12)
         spread = params.frond_angle_spread + rng.gauss(0, 0.08)
-        this_frond_len = frond_length * rng.uniform(0.85, 1.15)
+        this_fl = frond_length * rng.uniform(0.85, 1.15)
 
-        tip = _pgl_vec(
-            math.cos(angle) * this_frond_len * math.sin(spread),
-            y + this_frond_len * math.cos(spread),
-            math.sin(angle) * this_frond_len * math.sin(spread),
+        tip = (
+            math.cos(angle) * this_fl * math.sin(spread),
+            y + this_fl * math.cos(spread),
+            math.sin(angle) * this_fl * math.sin(spread),
         )
-        start = _pgl_vec(0, y, 0)
+        start = (0, y, 0)
 
-        rachis_profile = _circle_profile(stem_radius * 0.3, 5)
-        rachis_path = Polyline([start, tip])
-        scene.add(Shape(Extrusion(rachis_profile, rachis_path), Material()))
+        # Rachis as thin stem
+        scene.add(_stem_shape(start, tip, stem_radius * 0.25, 8))
 
-        # Leaflets
+        # Leaflets along rachis
         leaflet_pairs = max(2, int(params.leaflet_pairs * scale))
         leaflet_size = params.leaflet_size * scale
-        direction = (tip.x - start.x, tip.y - start.y, tip.z - start.z)
-        dir_len = math.sqrt(sum(d*d for d in direction))
-        if dir_len == 0:
+
+        sx, sy, sz = start
+        tx, ty, tz = tip
+        dx, dy, dz = tx - sx, ty - sy, tz - sz
+        dlen = math.sqrt(dx * dx + dy * dy + dz * dz)
+        if dlen < 1e-8:
             continue
-        dx, dy, dz = [d / dir_len for d in direction]
+        dx, dy, dz = dx / dlen, dy / dlen, dz / dlen
+
         perp_x = -dz
         perp_z = dx
         perp_len = math.sqrt(perp_x * perp_x + perp_z * perp_z)
@@ -146,9 +151,9 @@ def build_fern(params, rng, scale):
 
         for j in range(1, leaflet_pairs + 1):
             t = j / (leaflet_pairs + 1)
-            bx = start.x + t * (tip.x - start.x)
-            by = start.y + t * (tip.y - start.y)
-            bz = start.z + t * (tip.z - start.z)
+            bx = sx + t * (tx - sx)
+            by = sy + t * (ty - sy)
+            bz = sz + t * (tz - sz)
             half = 1.0 - 0.5 * abs(t - 0.5) * 2
             ll = leaflet_size * half * rng.uniform(0.9, 1.1)
 
@@ -156,11 +161,9 @@ def build_fern(params, rng, scale):
                 lx = bx + sign * perp_x * ll
                 ly = by + dy * leaflet_size * 0.3 * rng.uniform(0.8, 1.2)
                 lz = bz + sign * perp_z * ll
-                leaf_base = _pgl_vec(bx, by, bz)
-                leaf_tip = _pgl_vec(lx, ly, lz)
-                leaf_profile = _circle_profile(stem_radius * 0.06 * rng.uniform(0.7, 1.3), 4)
-                leaf_path = Polyline([leaf_base, leaf_tip])
-                scene.add(Shape(Extrusion(leaf_profile, leaf_path), Material()))
+                leaflet_path = _line_path((bx, by, bz), (lx, ly, lz))
+                lr = stem_radius * 0.06 * rng.uniform(0.7, 1.3)
+                scene.add(Shape(Extrusion(leaflet_path, _circle_profile(lr, 4)), Material()))
 
     return scene
 
@@ -178,62 +181,72 @@ def build_succulent(params, rng, scale):
     leaves_per_tier = max(2, leaf_count // tiers)
 
     for tier in range(tiers):
-        t = tier / max(1, tiers - 1)
+        ti = tier / max(1, tiers - 1)
         n = leaves_per_tier
-        tier_radius = leaf_length * 0.3 * t
-        tier_angle = spread * (1.0 - t * 0.6)
+        tier_radius = leaf_length * 0.3 * ti
+        tier_angle = spread * (1.0 - ti * 0.6)
 
         for j in range(n):
             rot_angle = (j / n) * math.pi * 2 + rng.uniform(-0.1, 0.1)
 
-            base = _pgl_vec(
+            base = (
                 math.cos(rot_angle) * tier_radius,
                 tier_radius * 0.1,
                 math.sin(rot_angle) * tier_radius,
             )
-            tip = _pgl_vec(
+            tip = (
                 math.cos(rot_angle) * (tier_radius + leaf_length * math.sin(tier_angle)),
                 leaf_length * math.cos(tier_angle),
                 math.sin(rot_angle) * (tier_radius + leaf_length * math.sin(tier_angle)),
             )
+            mid = (
+                (base[0] + tip[0]) / 2,
+                (base[1] + tip[1]) / 2 + leaf_thickness * 0.4,
+                (base[2] + tip[2]) / 2,
+            )
 
-            # Build a fleshy leaf with variable cross-section along its length
-            leaf_dir = _pgl_vec(tip.x - base.x, tip.y - base.y, tip.z - base.z)
-            leaf_len = math.sqrt(leaf_dir.x**2 + leaf_dir.y**2 + leaf_dir.z**2)
-            if leaf_len == 0:
-                continue
+            # Build a fleshy leaf using a 3-point 2D profile + Revolution
+            profile_2d = Polyline2D([
+                _vec2(0, 0),
+                _vec2(leaf_width * 0.5, leaf_thickness * 0.3),
+                _vec2(0, leaf_length),
+                _vec2(-leaf_width * 0.5, leaf_thickness * 0.3),
+                _vec2(0, 0),
+            ])
 
-            # Cross-section: diamond shape that tapers toward tip
-            nx, ny, nz = leaf_dir.x / leaf_len, leaf_dir.y / leaf_len, leaf_dir.z / leaf_len
-            hw = leaf_width * 0.5
-            ht = leaf_thickness * 0.5
+            # Revolution of the 2D profile creates a rotationally symmetric shape.
+            # Scale it to be flat (squash Z) and orient it correctly.
+            rev_geom = Revolution(profile_2d, slices=8)
 
-            # Build a simple diamond profile for each cross-section along the leaf
-            segments = 6
-            for s_idx in range(segments):
-                s = s_idx / segments
-                cur_hw = hw * (1.0 - s * 0.85) * (0.8 + rng.uniform(0, 0.4))
-                cur_ht = ht * (1.0 - s * 0.9) * (0.8 + rng.uniform(0, 0.4))
-                cur_x = base.x + nx * leaf_len * s
-                cur_y = base.y + ny * leaf_len * s
-                cur_z = base.z + nz * leaf_len * s
+            # Build the leaf geometry: a tapered frustum from base to tip
+            # Use Frustum for a tapered triangular shape
+            leaf_path = _line_path(base, tip)
+            base_r = leaf_width * 0.5 * rng.uniform(0.8, 1.2)
+            tip_r = leaf_width * 0.05 * rng.uniform(0.5, 1.5)
 
-                # Diamond cross-section in plane perpendicular to leaf direction
-                diamond = Polyline([
-                    _pgl_vec(cur_x + cur_hw, cur_y, cur_z),
-                    _pgl_vec(cur_x, cur_y + cur_ht, cur_z),
-                    _pgl_vec(cur_x - cur_hw, cur_y, cur_z),
-                    _pgl_vec(cur_x, cur_y - cur_ht, cur_z),
-                    _pgl_vec(cur_x + cur_hw, cur_y, cur_z),
-                ])
-                # Extrude diamond profile by a tiny amount along leaf direction
-                mini_path = Polyline([
-                    _pgl_vec(cur_x, cur_y, cur_z),
-                    _pgl_vec(cur_x + nx * leaf_len * (1.0 / segments + 0.01),
-                            cur_y + ny * leaf_len * (1.0 / segments + 0.01),
-                            cur_z + nz * leaf_len * (1.0 / segments + 0.01)),
-                ])
-                scene.add(Shape(Extrusion(diamond, mini_path), Material()))
+            # Create the leaf as a tapered extrusion
+            leaf_geom = Frustum(
+                radius=float(base_r),
+                height=float(leaf_length),
+                taper=float(tip_r / max(base_r, 0.001)),
+                slices=8,
+            )
+            # Position and orient the leaf
+            positioned = Translated(*base, leaf_geom)
+            # Orient toward tip direction
+            dx = tip[0] - base[0]
+            dy = tip[1] - base[1]
+            dz = tip[2] - base[2]
+            dlen = math.sqrt(dx * dx + dy * dy + dz * dz)
+            if dlen > 0:
+                axis = _vec3(-dz, 0, dx)  # perpendicular
+                axis_len = math.sqrt(axis.x**2 + axis.z**2)
+                if axis_len > 0:
+                    axis = _vec3(axis.x / axis_len, 0, axis.z / axis_len)
+                    angle = math.acos(max(-1, min(1, dy / dlen)))
+                    positioned = AxisRotated(axis, float(angle), positioned)
+
+            scene.add(Shape(positioned, Material()))
 
     return scene
 
@@ -247,69 +260,56 @@ def build_shrub(params, rng, scale):
     scene = Scene()
 
     for _ in range(stem_count):
-        d = _pgl_vec(rng.gauss(0, 0.15), 1.0, rng.gauss(0, 0.15))
-        mag = math.sqrt(d.x**2 + d.y**2 + d.z**2)
-        d = _pgl_vec(d.x / mag, d.y / mag, d.z / mag)
-
+        dx = rng.gauss(0, 0.15)
+        dz = rng.gauss(0, 0.15)
+        mag = math.sqrt(dx * dx + 1.0 + dz * dz)
+        d = (dx / mag, 1.0 / mag, dz / mag)
         ox = rng.gauss(0, 0.03)
         oz = rng.gauss(0, 0.03)
-        _build_shrub_branch(
-            scene, _pgl_vec(ox, 0, oz), d, stem_height, stem_radius,
-            params.branch_depth, params, rng, scale,
-        )
+        _build_shrub_branch(scene, (ox, 0, oz), d, stem_height, stem_radius,
+                            params.branch_depth, params, rng, scale)
 
     return scene
 
 
 def _build_shrub_branch(scene, start, direction, length, radius, depth,
                         params, rng, scale):
-    """Recursive branch building for shrub."""
-    tip = _pgl_vec(
-        start.x + direction.x * length,
-        start.y + direction.y * length,
-        start.z + direction.z * length,
-    )
+    """Recursive branch building for shrub using PlantGL primitives."""
+    sx, sy, sz = start
+    dx, dy, dz = direction
+    tx = sx + dx * length
+    ty = sy + dy * length
+    tz = sz + dz * length
+    tip = (tx, ty, tz)
 
-    profile = _circle_profile(float(radius), 6)
-    path = Polyline([start, tip])
-    scene.add(Shape(Extrusion(profile, path), Material()))
+    scene.add(_stem_shape(start, tip, float(radius), 8))
 
     if depth <= 0:
-        # Add leaves at tips
         leaf_size = params.leaf_size * scale * (0.5 + rng.uniform(0, 0.5))
         density = max(1, int(params.leaf_density * scale))
         for _ in range(density):
-            ld = _pgl_vec(rng.gauss(0, 0.5), rng.gauss(0.3, 0.3), rng.gauss(0, 0.5))
-            mag = math.sqrt(ld.x**2 + ld.y**2 + ld.z**2)
-            if mag == 0:
+            ldx = rng.gauss(0, 0.5)
+            ldy = rng.gauss(0.3, 0.3)
+            ldz = rng.gauss(0, 0.5)
+            lm = math.sqrt(ldx * ldx + ldy * ldy + ldz * ldz)
+            if lm < 1e-8:
                 continue
-            ld = _pgl_vec(ld.x / mag, ld.y / mag, ld.z / mag)
-            leaf_tip = _pgl_vec(
-                tip.x + ld.x * leaf_size,
-                tip.y + ld.y * leaf_size,
-                tip.z + ld.z * leaf_size,
-            )
-            leaf_profile = _circle_profile(float(radius) * 0.15, 4)
-            leaf_path = Polyline([tip, leaf_tip])
-            scene.add(Shape(Extrusion(leaf_profile, leaf_path), Material()))
+            ldx /= lm; ldy /= lm; ldz /= lm
+            leaf_tip = (tx + ldx * leaf_size, ty + ldy * leaf_size, tz + ldz * leaf_size)
+            scene.add(_stem_shape(tip, leaf_tip, float(radius) * 0.12, 4))
         return
 
     branch_count = rng.choice([2, 2, 3])
     for _ in range(branch_count):
-        cd = _pgl_vec(
-            direction.x + rng.gauss(0, params.branch_angle_spread),
-            direction.y + rng.uniform(0.1, 0.5),
-            direction.z + rng.gauss(0, params.branch_angle_spread),
-        )
-        mag = math.sqrt(cd.x**2 + cd.y**2 + cd.z**2)
-        cd = _pgl_vec(cd.x / mag, cd.y / mag, cd.z / mag)
-
+        cdx = dx + rng.gauss(0, params.branch_angle_spread)
+        cdy = dy + rng.uniform(0.1, 0.5)
+        cdz = dz + rng.gauss(0, params.branch_angle_spread)
+        cm = math.sqrt(cdx * cdx + cdy * cdy + cdz * cdz)
+        cd = (cdx / cm, cdy / cm, cdz / cm)
         child_len = length * params.branch_length_factor * rng.uniform(0.8, 1.2)
         child_radius = radius * 0.55
-        _build_shrub_branch(
-            scene, tip, cd, child_len, child_radius,
-            depth - 1, params, rng, scale,
-        )
+        _build_shrub_branch(scene, tip, cd, child_len, child_radius,
+                            depth - 1, params, rng, scale)
 
 
 BUILDERS = {
@@ -320,18 +320,7 @@ BUILDERS = {
 
 
 def generate(species, seed, day_n, neighbor_state=None):
-    """
-    Deterministic plant mesh generator using PlantGL geometry.
-
-    Args:
-        species: str, one of SPECIES keys
-        seed: int, genetic seed
-        day_n: int, days since planting
-        neighbor_state: dict or None, canopy overlap info
-
-    Returns:
-        dict: mesh (trimesh.Trimesh), vertices, faces, height, canopy_radius
-    """
+    """Deterministic plant mesh generator using PlantGL geometry."""
     if not HAS_PLANTGL:
         raise ImportError("PlantGL not available. Run inside the Docker container.")
 
@@ -490,7 +479,7 @@ TM_BUILDERS = {
 
 
 def generate_fallback(species, seed, day_n, neighbor_state=None):
-    """Trimesh-based fallback generator (used when PlantGL not available)."""
+    """Trimesh-based fallback generator."""
     if species not in SPECIES:
         raise ValueError(f"Unknown species '{species}'.")
     params = SPECIES[species]
@@ -510,8 +499,6 @@ def generate_fallback(species, seed, day_n, neighbor_state=None):
         ) * scale),
     }
 
-
-# ── smart dispatch ──
 
 _USE_PLANTGL = HAS_PLANTGL and (os.environ.get("PLANTGL_FALLBACK", "").lower() != "true")
 
