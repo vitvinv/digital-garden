@@ -6,6 +6,7 @@ on:
       - "Dockerfile"
       - "scripts/environment.yml"
       - "scripts/generate.py"
+      - ".github/workflows/build-docker.yml"
   workflow_dispatch:
 
 env:
@@ -55,10 +56,12 @@ jobs:
         run: |
           docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest \
             python -c "
-          from openalea.plantgl.all import *; from openalea.plantgl.math import Vector3
+          from openalea.plantgl.all import *
           profile = Polyline([Vector3(0,0,0), Vector3(0.5,0,0), Vector3(0,1,0)])
-          scene = Scene(); scene.add(Shape(AxialGeometry.sweep(profile, axis=(Vector3(0,0,0),Vector3(0,1,0)), angle=360), Material()))
-          print('Mesh:', len(Tesselator().process(scene)[0].geometry.pointList), 'verts')
+          geom = Revolution(profile, (Vector3(0,0,0), Vector3(0,1,0)))
+          scene = Scene(); scene.add(Shape(geom, Material()))
+          tri = Tesselator().process(scene)[0].geometry
+          print('Mesh OK:', len(tri.pointList), 'verts,', len(tri.indexList), 'faces')
           "
 
       - name: Push image
