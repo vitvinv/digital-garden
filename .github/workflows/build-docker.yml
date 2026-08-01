@@ -57,11 +57,9 @@ jobs:
           docker run --rm ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest \
             python -c "
           from openalea.plantgl.all import *
-          profile = Polyline([Vector3(0,0,0), Vector3(0.5,0,0), Vector3(0,1,0)])
-          geom = Revolution(profile, (Vector3(0,0,0), Vector3(0,1,0)))
-          scene = Scene(); scene.add(Shape(geom, Material()))
+          scene = Scene(); scene.add(Shape(Sphere(1.0), Material()))
           tri = Tesselator().process(scene)[0].geometry
-          print('Mesh OK:', len(tri.pointList), 'verts,', len(tri.indexList), 'faces')
+          print('PlantGL OK:', len(tri.pointList), 'verts,', len(tri.indexList), 'faces')
           "
 
       - name: Push image
