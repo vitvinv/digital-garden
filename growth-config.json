@@ -1,0 +1,41 @@
+{
+  "gardens": {
+    "fire-garden": {
+      "image_target": "20_Element_Fire",
+      "plants": [
+        {
+          "plant_slot": "fern-1",
+          "species": "fern",
+          "seed": 42,
+          "planted_date": "2026-06-01",
+          "mutation_strength": 0.0,
+          "position": [0.0, 0.0, 0.0],
+          "canopy_radius": null
+        },
+        {
+          "plant_slot": "shrub-1",
+          "species": "shrub",
+          "seed": 77,
+          "planted_date": "2026-06-15",
+          "mutation_strength": 0.0,
+          "position": [0.3, 0.0, 0.2],
+          "canopy_radius": null
+        }
+      ]
+    },
+    "water-garden": {
+      "image_target": "23_Element_Water",
+      "plants": [
+        {
+          "plant_slot": "succulent-1",
+          "species": "succulent",
+          "seed": 13,
+          "planted_date": "2026-07-01",
+          "mutation_strength": 0.0,
+          "position": [0.0, 0.0, 0.0],
+          "canopy_radius": null
+        }
+      ]
+    }
+  }
+}

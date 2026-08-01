@@ -1,0 +1,25 @@
+{
+  "imagePath": "image-targets/22_Element_Air_luminance.png",
+  "resources": {
+    "originalImage": "22_Element_Air_original.png",
+    "croppedImage": "22_Element_Air_cropped.png",
+    "thumbnailImage": "22_Element_Air_thumbnail.png",
+    "geometryImage": "22_Element_Air_geometry.png",
+    "luminanceImage": "22_Element_Air_luminance.png"
+  },
+  "name": "22_Element_Air",
+  "type": "PLANAR",
+  "properties": {
+    "top": 108,
+    "left": 62,
+    "width": 626,
+    "height": 835,
+    "isRotated": false,
+    "originalWidth": 750,
+    "originalHeight": 1050
+  },
+  "userMetadataIsJson": true,
+  "loadAutomatically": true,
+  "created": 1744148015923,
+  "updated": 1744322353430
+}
