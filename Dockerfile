@@ -26,7 +26,7 @@ RUN conda create -n ${CONDA_ENV} --override-channels \
     && conda run -n ${CONDA_ENV} pip install --no-cache-dir trimesh numpy pytest \
     && conda clean -afy
 
-RUN curl -fsSL https://deb.nodesource.com/setup_20.x | bash - \
+RUN curl -fsSL https://deb.nodesource.com/setup_lts.x | bash - \
     && apt-get install -y nodejs \
     && npm install -g --no-fund --no-audit @gltf-transform/cli \
     && npm cache clean --force \
