@@ -1,0 +1,28 @@
+name: PlantStudio Addon Core Tests
+
+on:
+  push:
+    paths:
+      - "blender_addon/**"
+  workflow_dispatch:
+
+jobs:
+  test-core:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          lfs: true
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install pytest
+        run: pip install pytest
+
+      - name: Run core tests
+        run: python -m pytest blender_addon/tests/ -v

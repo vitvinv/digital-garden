@@ -1,0 +1,132 @@
+"""3D turtle — port of PlantStudio's KfTurtle drawing into a MeshBuffer.
+
+Matches the original API: matrix stack, push/pop, rotateX/Y/Z (256-degree
+units), moveInMillimeters, and drawing primitives (line -> pipe,
+polygon -> triangles). The drawingSurface is replaced by a MeshBuffer.
+"""
+
+from .matrix3d import KfMatrix, KfPoint3D
+from .mesh_buffer import MeshBuffer
+
+
+class MeshTurtle:
+    def __init__(self, mesh_buffer=None):
+        self.mesh_buffer = mesh_buffer if mesh_buffer is not None else MeshBuffer()
+        self.matrixStack = []
+        self.currentMatrix = KfMatrix()
+        self.currentMatrix.initializeAsUnitMatrix()
+        self.matrixStack.append(self.currentMatrix)
+        self.numMatrixesUsed = 1
+        self.scale_pixelsPerMm = 1.0
+        self.currentColor = (100, 200, 100)
+        self.currentLineWidth = 1.0
+        self.lineDivisions = 3
+
+    def reset(self):
+        self.matrixStack = []
+        self.currentMatrix = KfMatrix()
+        self.currentMatrix.initializeAsUnitMatrix()
+        self.matrixStack.append(self.currentMatrix)
+        self.numMatrixesUsed = 1
+        self.scale_pixelsPerMm = 1.0
+
+    # ── matrix stack ──
+
+    def push(self):
+        self.currentMatrix = self.currentMatrix.deepCopy()
+        self.matrixStack.append(self.currentMatrix)
+        self.numMatrixesUsed += 1
+
+    def pop(self):
+        if self.numMatrixesUsed > 1:
+            self.matrixStack.pop()
+            self.numMatrixesUsed -= 1
+        self.currentMatrix = self.matrixStack[-1]
+
+    def stackSize(self):
+        return self.numMatrixesUsed
+
+    # ── positioning ──
+
+    def xyz(self, x, y, z):
+        self.currentMatrix.position.x = x
+        self.currentMatrix.position.y = y
+        self.currentMatrix.position.z = z
+
+    def moveInMillimeters(self, mm):
+        self.currentMatrix.move(mm * self.scale_pixelsPerMm)
+
+    def moveInMillimetersAndRecord(self, mm):
+        self.currentMatrix.move(mm * self.scale_pixelsPerMm)
+
+    def moveInPixels(self, pixels):
+        self.currentMatrix.move(pixels)
+
+    def position(self):
+        p = self.currentMatrix.position
+        return KfPoint3D(p.x, p.y, p.z)
+
+    def setScale_pixelsPerMm(self, s):
+        self.scale_pixelsPerMm = s
+
+    def setLineColor(self, color):
+        self.currentColor = tuple(color)
+
+    def setLineWidth(self, width):
+        self.currentLineWidth = width
+
+    # ── rotation (256-degree units) ──
+
+    def rotateX(self, angle):
+        self.currentMatrix.rotateX(angle)
+
+    def rotateY(self, angle):
+        self.currentMatrix.rotateY(angle)
+
+    def rotateZ(self, angle):
+        self.currentMatrix.rotateZ(angle)
+
+    # ── drawing ──
+
+    def drawInMillimeters(self, mm, partID=0):
+        """Draw a line segment of the current width as a pipe."""
+        start = self.position()
+        self.currentMatrix.move(mm * self.scale_pixelsPerMm)
+        end = self.position()
+        radius = self.currentLineWidth * self.scale_pixelsPerMm * 0.5
+        faces = 6
+        self.mesh_buffer.add_pipe(
+            (start.x, start.y, start.z),
+            (end.x, end.y, end.z),
+            radius, radius, faces, self.currentColor)
+        return None
+
+    def drawPipe(self, start, end, radiusStart, radiusEnd, faces, color):
+        self.mesh_buffer.add_pipe(
+            (start.x, start.y, start.z),
+            (end.x, end.y, end.z),
+            radiusStart, radiusEnd, faces, color)
+
+    def drawPolygon(self, points, color):
+        """Triangulate a polygon (list of KfPoint3D) into the buffer."""
+        pts = []
+        for p in points:
+            tp = p.copy()
+            self.currentMatrix.transform(tp)
+            pts.append((tp.x, tp.y, tp.z))
+        if len(pts) < 3:
+            return
+        # fan triangulation
+        for i in range(1, len(pts) - 1):
+            self.mesh_buffer.add_triangle(pts[0], pts[i], pts[i + 1], color)
+
+    def drawTriangleSet(self, tdo_points, triangles, scale, color):
+        """Draw a TDO mesh (points + 1-based triangle indices) transformed."""
+        transformed = []
+        for p in tdo_points:
+            tp = KfPoint3D(p[0] * scale, p[1] * scale, p[2] * scale)
+            self.currentMatrix.transform(tp)
+            transformed.append((tp.x, tp.y, tp.z))
+        for (i, j, k) in triangles:
+            self.mesh_buffer.add_triangle(transformed[i - 1], transformed[j - 1],
+                                          transformed[k - 1], color)
