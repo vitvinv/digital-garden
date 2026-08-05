@@ -1,0 +1,31 @@
+# Succulent — L-Py L-system
+# Round rosette of thick fleshy leaves: roll then pitch per leaf.
+# Parameters injected by generate.py via setCode:
+#   SEED, HEIGHT, LEAF_COUNT, LEAF_LENGTH, LEAF_WIDTH, LEAF_THICKNESS,
+#   ROSETTE_TIERS, LEAF_ANGLE, LEAF_COLOR
+
+from math import pi
+
+module Leaf(len, tier)
+
+Axiom:
+  leaf_index = 0
+  for tier in range(ROSETTE_TIERS):
+    leaves_per_tier = max(3, LEAF_COUNT // ROSETTE_TIERS)
+    for i in range(leaves_per_tier):
+      pitch = LEAF_ANGLE * (tier + 1) / ROSETTE_TIERS
+      roll = (leaf_index * 360.0 / LEAF_COUNT) + (SEED % 11) * 3.0
+      nproduce [ /(roll) ^(pitch) Leaf(LEAF_LENGTH * (1.0 - tier * 0.08), tier) ]
+      leaf_index += 1
+  produce @O(LEAF_WIDTH * 0.8)
+
+derivation length: 1
+production:
+
+Leaf(len, tier):
+  nproduce ;(LEAF_COLOR) _(LEAF_THICKNESS * (1.0 + tier * 0.15)) F(len) @O(LEAF_WIDTH * 0.4)
+  produce
+
+interpretation:
+
+endlsystem

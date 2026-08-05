@@ -1,0 +1,30 @@
+# Shrub — L-Py L-system
+# Parameters injected by generate.py via setCode:
+#   SEED, HEIGHT, STEM_RADIUS, STEM_COUNT, BRANCH_DEPTH, BRANCH_ANGLE,
+#   BRANCH_LENGTH, LEAF_SIZE, LEAF_DENSITY, STEM_COLOR, LEAF_COLOR
+
+from math import pi
+
+module Branch(depth)
+
+Axiom:
+  for i in range(STEM_COUNT):
+    roll = (i * 360.0 / STEM_COUNT) + (SEED % 37) * 0.7
+    nproduce [ /(roll) Branch(BRANCH_DEPTH) ]
+  produce @O(STEM_RADIUS * 2.0)
+
+derivation length: 1
+production:
+
+Branch(depth):
+  if depth > 0:
+    nproduce ;(STEM_COLOR) F(HEIGHT * 0.4, STEM_RADIUS) [ &(BRANCH_ANGLE) /(25) Branch(depth - 1) ] [ &(-BRANCH_ANGLE) /(-25) Branch(depth - 1) ] ;(STEM_COLOR) F(HEIGHT * 0.4, STEM_RADIUS * 0.7)
+  else:
+    nproduce ;(STEM_COLOR) F(HEIGHT * 0.3, STEM_RADIUS * 0.5)
+    for j in range(LEAF_DENSITY):
+      nproduce [ ;(LEAF_COLOR) &(60) f(LEAF_SIZE * 0.5) ~l(LEAF_SIZE * (0.7 + (j % 3) * 0.2)) ]
+  produce @O(STEM_RADIUS * 0.5)
+
+interpretation:
+
+endlsystem

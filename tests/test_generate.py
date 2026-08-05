@@ -98,7 +98,12 @@ class TestGenerateDeterminism:
         r1 = generate.generate(species_name, 10, 60)
         r2 = generate.generate(species_name, 99, 60)
 
-        diff = not np.allclose(r1["mesh"].vertices, r2["mesh"].vertices)
+        v1 = r1["mesh"].vertices
+        v2 = r2["mesh"].vertices
+        if len(v1) != len(v2):
+            diff = True  # different vertex counts -> different meshes
+        else:
+            diff = not np.allclose(v1, v2)
         assert diff, f"{species_name}: different seeds should produce different meshes"
 
 

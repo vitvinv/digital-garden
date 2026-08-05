@@ -168,6 +168,14 @@ class PlantDesigner(QtWidgets.QMainWindow):
         self.day_spin.valueChanged.connect(self._on_control_changed)
         props_layout.addRow("Day", self.day_spin)
 
+        self.color_combo = QtWidgets.QComboBox()
+        self.color_combo.addItems([
+            "Leaf: green", "Leaf: brown", "Leaf: red",
+            "Leaf: olive", "Leaf: blue", "Leaf: magenta",
+        ])
+        self.color_combo.currentIndexChanged.connect(self._on_control_changed)
+        props_layout.addRow("Leaf color", self.color_combo)
+
         self.pos_x = QtWidgets.QDoubleSpinBox()
         self.pos_x.setRange(-5, 5)
         self.pos_x.setSingleStep(0.05)
@@ -259,6 +267,8 @@ class PlantDesigner(QtWidgets.QMainWindow):
         self.day_spin.setValue(plant["day_n"])
         self.pos_x.setValue(plant["position"][0])
         self.pos_z.setValue(plant["position"][2])
+        leaf_color = int(plant["overrides"].get("leaf_color", 2))
+        self.color_combo.setCurrentIndex(max(0, min(5, leaf_color - 1)))
         self._rebuild_param_sliders()
         for attr, (slider, spin, lo, hi) in self._slider_widgets.items():
             val = plant["overrides"].get(attr)
@@ -364,6 +374,7 @@ class PlantDesigner(QtWidgets.QMainWindow):
         plant["seed"] = self.seed_spin.value()
         plant["day_n"] = self.day_spin.value()
         plant["position"] = [self.pos_x.value(), 0.0, self.pos_z.value()]
+        plant["overrides"]["leaf_color"] = self.color_combo.currentIndex() + 1
         for attr, (slider, spin, lo, hi) in getattr(self, "_slider_widgets", {}).items():
             val = spin.value()
             plant["overrides"][attr] = val

@@ -22,7 +22,7 @@ RUN wget -q https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.s
 
 RUN conda create -n ${CONDA_ENV} --override-channels \
       -c openalea3 -c conda-forge \
-      python=3.10 openalea.plantgl -y \
+      python=3.10 openalea.plantgl openalea.lpy -y \
     && conda run -n ${CONDA_ENV} pip install --no-cache-dir trimesh numpy pytest \
     && conda clean -afy
 

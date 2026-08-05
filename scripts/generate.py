@@ -1,8 +1,11 @@
 """
-Deterministic procedural plant mesh generation using PlantGL.
+Deterministic procedural plant mesh generation.
+
+Primary backend: L-Py (openalea.lpy) L-systems — produces realistic,
+colored plant architectures. Falls back to PlantGL extrusions, then
+trimesh, when L-Py is unavailable.
 
 generate(species, seed, day_n, neighbor_state) -> dict
-  Uses PlantGL for semi-realistic plant geometry (extrusions, revolutions).
   Same (species, seed, day_n) always produces byte-identical mesh data.
 """
 
@@ -16,7 +19,19 @@ import trimesh
 
 from species import SPECIES, growth_scale, apply_neighbor_discount, apply_overrides
 
-# ── PlantGL imports (available inside Docker container) ──
+LSYSTEMS_DIR = os.path.join(os.path.dirname(os.path.abspath(__file__)), "lsystems")
+
+# ── L-Py imports (primary backend) ──
+
+HAS_LPY = False
+try:
+    from openalea.lpy import Lsystem as LPY_Lsystem
+    from openalea.lpy import generateScene as lpy_generateScene
+    HAS_LPY = True
+except ImportError:
+    HAS_LPY = False
+
+# ── PlantGL imports (secondary backend) ──
 
 try:
     from openalea.plantgl.all import (
@@ -361,16 +376,87 @@ BUILDERS = {
 }
 
 
+# ── L-Py backend ──
+
+def lpy_context(species, params, seed, scale, overrides=None):
+    """
+    Map species params → L-Py context variables for the species .lpy file.
+    Deterministic: derived purely from params, seed and scale.
+    overrides may include 'leaf_color' (1-6, L-Py palette index) and
+    'stem_color' (1-6).
+    """
+    overrides = overrides or {}
+    leaf_color = int(overrides.get("leaf_color", 2))
+    stem_color = int(overrides.get("stem_color", 1))
+    ctx = {"SEED": int(seed)}
+    if species == "fern":
+        ctx.update({
+            "HEIGHT": float(params.max_height * scale),
+            "STEM_RADIUS": float(params.stem_radius * scale),
+            "FROND_COUNT": max(2, int(params.frond_count * scale)),
+            "FROND_LENGTH": float(params.frond_length * scale),
+            "FROND_ANGLE": float(params.frond_angle_spread),
+            "LEAFLET_PAIRS": max(2, int(params.leaflet_pairs * scale)),
+            "LEAFLET_SIZE": float(params.leaflet_size * scale),
+            "STEM_COLOR": stem_color,
+            "LEAF_COLOR": leaf_color,
+        })
+    elif species == "shrub":
+        ctx.update({
+            "HEIGHT": float(params.max_height * scale),
+            "STEM_RADIUS": float(params.stem_radius * scale),
+            "STEM_COUNT": max(1, int(params.stem_count * scale)),
+            "BRANCH_DEPTH": max(1, int(params.branch_depth * scale)),
+            "BRANCH_ANGLE": float(math.degrees(params.branch_angle_spread)),
+            "BRANCH_LENGTH": float(params.branch_length_factor * scale),
+            "LEAF_SIZE": float(params.leaf_size * scale),
+            "LEAF_DENSITY": max(1, int(params.leaf_density * scale)),
+            "STEM_COLOR": stem_color,
+            "LEAF_COLOR": leaf_color,
+        })
+    elif species == "succulent":
+        ctx.update({
+            "HEIGHT": float(params.max_height * scale),
+            "LEAF_COUNT": max(4, int(params.leaf_count * scale)),
+            "LEAF_LENGTH": float(params.leaf_length * scale),
+            "LEAF_WIDTH": float(params.leaf_width * scale),
+            "LEAF_THICKNESS": float(params.leaf_thickness * scale),
+            "ROSETTE_TIERS": max(1, int(params.rosette_tiers * scale)),
+            "LEAF_ANGLE": float(math.degrees(params.leaf_angle_spread) * 2.5),
+            "LEAF_COLOR": leaf_color,
+        })
+    return ctx
+
+
+def build_lpy_scene(species, params, seed, scale, overrides=None):
+    """
+    Build a PlantGL Scene by running the species L-Py L-system.
+    Returns None if the species has no .lpy file.
+    """
+    lpy_path = os.path.join(LSYSTEMS_DIR, f"{species}.lpy")
+    if not HAS_LPY or not os.path.exists(lpy_path):
+        return None
+
+    with open(lpy_path, "r") as f:
+        code = f.read()
+
+    ctx = lpy_context(species, params, seed, scale, overrides)
+    lsystem = LPY_Lsystem()
+    lsystem.setCode(code, ctx)
+    lstring = lsystem.derive()
+    return lpy_generateScene(lstring)
+
+
 def build_plant_scene(species, seed, day_n, neighbor_state=None, overrides=None):
     """
     Build a PlantGL Scene for one plant (deterministic, no tessellation).
 
+    Uses the L-Py backend when available, falls back to PlantGL
+    primitives, then raises if neither is present.
+
     Used by generate() and by the Plant Designer for real-time preview.
     overrides: dict of species attribute overrides, or None.
     """
-    if not HAS_PLANTGL:
-        raise ImportError("PlantGL not available. Run inside the Docker container.")
-
     if species not in SPECIES:
         raise ValueError(f"Unknown species '{species}'. Known: {list(SPECIES.keys())}")
 
@@ -380,9 +466,17 @@ def build_plant_scene(species, seed, day_n, neighbor_state=None, overrides=None)
     scale = growth_scale(params, day_n)
     scale = apply_neighbor_discount(scale, neighbor_state)
 
-    builder = BUILDERS[species]
-    scene = builder(params, rng, scale)
-    return scene, params, scale
+    if HAS_PLANTGL:
+        scene = build_lpy_scene(species, params, seed, scale, overrides)
+        if scene is not None:
+            return scene, params, scale
+
+        # Fallback: manual PlantGL primitives
+        builder = BUILDERS[species]
+        scene = builder(params, rng, scale)
+        return scene, params, scale
+
+    raise ImportError("PlantGL not available. Run inside the pgl env or Docker container.")
 
 
 def generate(species, seed, day_n, neighbor_state=None, overrides=None):
