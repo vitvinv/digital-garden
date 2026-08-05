@@ -86,7 +86,15 @@ def new_plant(species="fern", seed=42, day_n=60, position=None, overrides=None):
 
 # ── Qt application ──
 
-class PlantDesigner(QtWidgets.QMainWindow):
+class PlantDesigner(QtWidgets.QWidget):
+    """
+    Plant Designer main window.
+
+    Note: uses QWidget (not QMainWindow) as root — the PlantGL
+    QGLViewer crashes on show() when embedded in QMainWindow on
+    the Qt5/PyQGLViewer Windows stack.
+    """
+
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Plant Designer")
@@ -105,6 +113,10 @@ class PlantDesigner(QtWidgets.QMainWindow):
     # ── UI construction ──
 
     def _build_ui(self):
+        root = QtWidgets.QVBoxLayout(self)
+        root.setContentsMargins(0, 0, 0, 0)
+        root.setSpacing(0)
+
         splitter = QtWidgets.QSplitter(Qt.Horizontal)
 
         # Left: 3D viewer
@@ -123,7 +135,7 @@ class PlantDesigner(QtWidgets.QMainWindow):
         splitter.addWidget(scroll)
         splitter.setStretchFactor(0, 1)
         splitter.setStretchFactor(1, 0)
-        self.setCentralWidget(splitter)
+        root.addWidget(splitter, 1)
 
         # Plant list
         list_label = QtWidgets.QLabel("Plants in garden")
@@ -208,8 +220,9 @@ class PlantDesigner(QtWidgets.QMainWindow):
         action_row.addWidget(fit_btn)
         panel_layout.addLayout(action_row)
 
-        self.status = self.statusBar()
-        self.status.showMessage("Ready")
+        self.status = QtWidgets.QLabel("Ready")
+        self.status.setContentsMargins(4, 4, 4, 4)
+        panel_layout.addWidget(self.status)
 
     # ── Sliders (rebuilt when species changes) ──
 
@@ -289,7 +302,7 @@ class PlantDesigner(QtWidgets.QMainWindow):
                     None, plant["overrides"] or None,
                 )
             except Exception as e:
-                self.status.showMessage(f"Error: {e}")
+                self.status.setText(f"Error: {e}")
                 return
             px, py, pz = plant["position"]
             for shape in pscene:
@@ -346,7 +359,7 @@ class PlantDesigner(QtWidgets.QMainWindow):
 
     def _on_remove(self):
         if len(self.plants) <= 1:
-            self.status.showMessage("Cannot remove the last plant")
+            self.status.setText("Cannot remove the last plant")
             return
         del self.plants[self.selected_index]
         self.selected_index = min(self.selected_index, len(self.plants) - 1)
@@ -410,9 +423,9 @@ class PlantDesigner(QtWidgets.QMainWindow):
         try:
             scene = self._build_garden_trimesh_scene()
             scene.export(path, file_type="glb")
-            self.status.showMessage(f"Exported {len(self.plants)} plant(s) to {path}")
+            self.status.setText(f"Exported {len(self.plants)} plant(s) to {path}")
         except Exception as e:
-            self.status.showMessage(f"Export failed: {e}")
+            self.status.setText(f"Export failed: {e}")
 
     def _on_save_config(self):
         slug, ok = QtWidgets.QInputDialog.getText(self, "Garden slug",
@@ -454,7 +467,7 @@ class PlantDesigner(QtWidgets.QMainWindow):
             "plants": plants_out,
         }
         config_path.write_text(json.dumps(cfg, indent=2) + "\n")
-        self.status.showMessage(f"Saved {len(plants_out)} plant(s) to {config_path}")
+        self.status.setText(f"Saved {len(plants_out)} plant(s) to {config_path}")
 
 
 def main():
