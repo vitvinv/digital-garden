@@ -116,8 +116,9 @@ def composite_garden_garden(garden_slug, garden_cfg):
         day_n_values.append(day_n)
 
         neighbor_state = compute_neighbor_state(plant, plants)
+        overrides = plant.get("overrides")
 
-        result = generate(species_name, seed, day_n, neighbor_state)
+        result = generate(species_name, seed, day_n, neighbor_state, overrides)
         mesh = result["mesh"]
         verts = result["vertices"]
         faces = result["faces"]

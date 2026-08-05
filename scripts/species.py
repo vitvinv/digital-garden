@@ -9,6 +9,8 @@ Each species defines:
 """
 
 import math
+import copy
+
 
 class SpeciesParams:
     def __init__(self, name, max_height, max_canopy_radius, growth_midpoint,
@@ -26,6 +28,22 @@ class SpeciesParams:
         if override is not None and override > 0:
             return float(override)
         return self.max_canopy_radius
+
+
+def apply_overrides(params, overrides):
+    """
+    Return a copy of params with attribute overrides applied.
+
+    overrides: dict of {attribute_name: value} or None.
+    The original params object is never mutated — determinism is preserved.
+    """
+    if not overrides:
+        return params
+    modified = copy.copy(params)
+    for key, value in overrides.items():
+        if hasattr(modified, key):
+            setattr(modified, key, value)
+    return modified
 
 
 SPECIES = {
@@ -95,3 +113,48 @@ def apply_neighbor_discount(scale, neighbor_state):
     overlap = neighbor_state.get("total_overlap", 0.0)
     discount = max(0.1, 1.0 - overlap)
     return scale * discount
+
+
+# ── Designer parameter schema ──
+# Per species: list of (attribute_name, label, min, max, step)
+# The Plant Designer exposes these as sliders/number inputs in real-time.
+
+DESIGN_PARAMS = {
+    "fern": [
+        ("max_height", "Height", 0.1, 1.5, 0.01),
+        ("max_canopy_radius", "Canopy radius", 0.05, 1.0, 0.01),
+        ("frond_count", "Frond count", 2, 24, 1),
+        ("frond_length", "Frond length", 0.1, 1.0, 0.01),
+        ("frond_angle_spread", "Frond spread", 0.1, 1.3, 0.01),
+        ("leaflet_pairs", "Leaflet pairs", 2, 30, 1),
+        ("leaflet_size", "Leaflet size", 0.01, 0.15, 0.005),
+        ("stem_radius", "Stem radius", 0.005, 0.06, 0.002),
+        ("growth_midpoint", "Growth midpoint (days)", 10, 300, 5),
+        ("growth_steepness", "Growth speed", 0.01, 0.2, 0.005),
+    ],
+    "succulent": [
+        ("max_height", "Height", 0.05, 0.6, 0.01),
+        ("max_canopy_radius", "Canopy radius", 0.05, 0.8, 0.01),
+        ("leaf_count", "Leaf count", 4, 40, 1),
+        ("leaf_length", "Leaf length", 0.05, 0.5, 0.01),
+        ("leaf_width", "Leaf width", 0.02, 0.2, 0.01),
+        ("leaf_thickness", "Leaf thickness", 0.01, 0.12, 0.005),
+        ("rosette_tiers", "Rosette tiers", 1, 8, 1),
+        ("leaf_angle_spread", "Leaf angle", 0.1, 1.0, 0.01),
+        ("growth_midpoint", "Growth midpoint (days)", 10, 300, 5),
+        ("growth_steepness", "Growth speed", 0.01, 0.2, 0.005),
+    ],
+    "shrub": [
+        ("max_height", "Height", 0.1, 1.5, 0.01),
+        ("max_canopy_radius", "Canopy radius", 0.05, 1.2, 0.01),
+        ("stem_count", "Stem count", 1, 12, 1),
+        ("branch_depth", "Branch depth", 1, 5, 1),
+        ("branch_angle_spread", "Branch angle", 0.1, 1.0, 0.01),
+        ("branch_length_factor", "Branch length", 0.2, 1.0, 0.01),
+        ("leaf_size", "Leaf size", 0.01, 0.15, 0.005),
+        ("leaf_density", "Leaf density", 1, 20, 1),
+        ("stem_radius", "Stem radius", 0.005, 0.08, 0.002),
+        ("growth_midpoint", "Growth midpoint (days)", 10, 300, 5),
+        ("growth_steepness", "Growth speed", 0.01, 0.2, 0.005),
+    ],
+}

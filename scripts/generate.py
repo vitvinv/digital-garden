@@ -8,12 +8,13 @@ generate(species, seed, day_n, neighbor_state) -> dict
 
 import math
 import hashlib
+import json
 import os
 import random
 import numpy as np
 import trimesh
 
-from species import SPECIES, growth_scale, apply_neighbor_discount
+from species import SPECIES, growth_scale, apply_neighbor_discount, apply_overrides
 
 # ── PlantGL imports (available inside Docker container) ──
 
@@ -32,10 +33,10 @@ except ImportError:
 
 
 class DeterministicRNG:
-    """PRNG deterministically seeded from (species, seed, day_n)."""
+    """PRNG deterministically seeded from (species, seed, day_n, overrides)."""
 
-    def __init__(self, species, seed, day_n):
-        key = f"{species}:{seed}:{day_n}"
+    def __init__(self, species, seed, day_n, overrides=None):
+        key = f"{species}:{seed}:{day_n}:{_overrides_key(overrides)}"
         seed_int = int(hashlib.sha256(key.encode()).hexdigest(), 16) % (2**31)
         self.rng = random.Random(seed_int)
 
@@ -47,6 +48,13 @@ class DeterministicRNG:
 
     def choice(self, seq):
         return self.rng.choice(seq)
+
+
+def _overrides_key(overrides):
+    """Canonical string for an overrides dict (deterministic ordering)."""
+    if not overrides:
+        return ""
+    return json.dumps(overrides, sort_keys=True, separators=(",", ":"))
 
 
 def _vec3(x, y, z):
@@ -319,22 +327,34 @@ BUILDERS = {
 }
 
 
-def generate(species, seed, day_n, neighbor_state=None):
-    """Deterministic plant mesh generator using PlantGL geometry."""
+def build_plant_scene(species, seed, day_n, neighbor_state=None, overrides=None):
+    """
+    Build a PlantGL Scene for one plant (deterministic, no tessellation).
+
+    Used by generate() and by the Plant Designer for real-time preview.
+    overrides: dict of species attribute overrides, or None.
+    """
     if not HAS_PLANTGL:
         raise ImportError("PlantGL not available. Run inside the Docker container.")
 
     if species not in SPECIES:
         raise ValueError(f"Unknown species '{species}'. Known: {list(SPECIES.keys())}")
 
-    params = SPECIES[species]
-    rng = DeterministicRNG(species, seed, day_n)
+    params = apply_overrides(SPECIES[species], overrides)
+    rng = DeterministicRNG(species, seed, day_n, overrides)
 
     scale = growth_scale(params, day_n)
     scale = apply_neighbor_discount(scale, neighbor_state)
 
     builder = BUILDERS[species]
     scene = builder(params, rng, scale)
+    return scene, params, scale
+
+
+def generate(species, seed, day_n, neighbor_state=None, overrides=None):
+    """Deterministic plant mesh generator using PlantGL geometry."""
+    scene, params, scale = build_plant_scene(species, seed, day_n,
+                                             neighbor_state, overrides)
 
     mesh = _extract_mesh(scene)
 
@@ -478,12 +498,12 @@ TM_BUILDERS = {
 }
 
 
-def generate_fallback(species, seed, day_n, neighbor_state=None):
+def generate_fallback(species, seed, day_n, neighbor_state=None, overrides=None):
     """Trimesh-based fallback generator."""
     if species not in SPECIES:
         raise ValueError(f"Unknown species '{species}'.")
-    params = SPECIES[species]
-    rng = DeterministicRNG(species, seed, day_n)
+    params = apply_overrides(SPECIES[species], overrides)
+    rng = DeterministicRNG(species, seed, day_n, overrides)
     scale = growth_scale(params, day_n)
     scale = apply_neighbor_discount(scale, neighbor_state)
     mesh = TM_BUILDERS[species](params, rng, scale)
