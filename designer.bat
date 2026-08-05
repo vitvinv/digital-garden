@@ -13,20 +13,14 @@ if errorlevel 1 (
     exit /b 1
 )
 
-call conda activate pgl 2>nul
-if errorlevel 1 (
-    echo [ERROR] conda environment "pgl" not found.
-    echo   Create it with:
-    echo     conda create -n pgl python=3.10 openalea.plantgl -c openalea3 -c conda-forge -y
-    echo     conda activate pgl
-    echo     pip install trimesh numpy
-    pause
-    exit /b 1
-)
-
-python scripts\designer.py
+conda run -n pgl python scripts\designer.py
 if errorlevel 1 (
     echo.
-    echo [ERROR] Plant Designer exited with an error. See the traceback above.
+    echo [ERROR] The Plant Designer failed. This may be because the "pgl" conda environment does not exist.
+    echo   Create it with:
+    echo     conda create -n pgl python=3.10 openalea.plantgl -c openalea3 -c conda-forge -y
+    echo     conda run -n pgl pip install trimesh numpy
+    echo.
+    echo   If the env exists and the error persists, see the traceback above.
     pause
 )
