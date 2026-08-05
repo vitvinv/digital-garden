@@ -21,15 +21,21 @@ from species import SPECIES, growth_scale, apply_neighbor_discount, apply_overri
 try:
     from openalea.plantgl.all import (
         Scene, Shape, Material, Discretizer,
-        TriangleSet, Extrusion, Revolution, Frustum,
+        TriangleSet, QuadSet, FaceSet, Extrusion, Revolution, Frustum,
         Cylinder, Sphere, Translated, AxisRotated,
         Polyline, Polyline2D, BezierCurve, BezierCurve2D,
         Vector3, Vector2, Group,
     )
     from openalea.plantgl.math import norm as pgl_norm
+    try:
+        from openalea.plantgl.all import discretize
+        HAS_DISCRETIZE = True
+    except ImportError:
+        HAS_DISCRETIZE = False
     HAS_PLANTGL = True
 except ImportError:
     HAS_PLANTGL = False
+    HAS_DISCRETIZE = False
 
 
 class DeterministicRNG:
@@ -75,24 +81,52 @@ def _line_path(start, end):
     return Polyline([_vec3(*start), _vec3(*end)])
 
 
-def _extract_mesh(scene):
-    """Discretize a PlantGL scene and return a trimesh.Trimesh."""
-    disc = Discretizer()
-    scene.apply(disc)
+def _split_index(idx):
+    """Return list of ints from an Index3/Index4/Index polygon (via str repr)."""
+    s = str(idx)
+    start = s.find("[")
+    if start < 0:
+        start = s.find("(")
+    end = s.rfind("]")
+    if end < 0:
+        end = s.rfind(")")
+    return [int(x) for x in s[start + 1:end].replace(" ", "").split(",")]
 
+
+def _append_faces(all_faces, offset, vals):
+    """Append triangulated faces for a polygon (fan triangulation)."""
+    if len(vals) == 3:
+        all_faces.append([offset + vals[0], offset + vals[1], offset + vals[2]])
+    elif len(vals) >= 4:
+        for i in range(1, len(vals) - 1):
+            all_faces.append([offset + vals[0], offset + vals[i], offset + vals[i + 1]])
+
+
+def _extract_mesh(scene):
+    """
+    Discretize a PlantGL scene and return a trimesh.Trimesh.
+
+    Uses pgl.discretize(geometry) per shape — works on PlantGL versions
+    where scene.apply(Discretizer()) does not convert in place (e.g. 3.21.x).
+    Handles TriangleSet, QuadSet and FaceSet output (fan-triangulated).
+    """
     all_verts = []
     all_faces = []
     offset = 0
 
     for shape in scene:
-        geom = shape.geometry
-        if not isinstance(geom, TriangleSet):
+        if HAS_DISCRETIZE:
+            tri = discretize(shape.geometry)
+        else:
+            tri = shape.geometry
+        if not isinstance(tri, (TriangleSet, QuadSet, FaceSet)):
             continue
-        pts = [(p.x, p.y, p.z) for p in geom.pointList]
+        pts = [(p.x, p.y, p.z) for p in tri.pointList]
         all_verts.extend(pts)
 
-        for idx in geom.indexList:
-            all_faces.append([offset + idx.x, offset + idx.y, offset + idx.z])
+        for idx in tri.indexList:
+            vals = _split_index(idx)
+            _append_faces(all_faces, offset, vals)
         offset += len(pts)
 
     if not all_verts:

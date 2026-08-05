@@ -61,6 +61,16 @@ except ImportError as e:
 Qt = QtCore.Qt
 
 
+class CompatPglViewer(pglviewer.PglViewer):
+    """
+    PlantGL 3.21.x's PglViewer calls self.updateGL() (removed in
+    PyQGLViewer 1.3.x for Qt5). Add a compatibility shim.
+    """
+
+    def updateGL(self):
+        self.update()
+
+
 # ── Data model helpers ──
 
 def new_plant(species="fern", seed=42, day_n=60, position=None, overrides=None):
@@ -98,7 +108,7 @@ class PlantDesigner(QtWidgets.QMainWindow):
         splitter = QtWidgets.QSplitter(Qt.Horizontal)
 
         # Left: 3D viewer
-        self.viewer = pglviewer.PglViewer()
+        self.viewer = CompatPglViewer()
         splitter.addWidget(self.viewer)
 
         # Right: control panel
@@ -373,7 +383,9 @@ class PlantDesigner(QtWidgets.QMainWindow):
                 None, plant["overrides"] or None,
             )
             mesh = result["mesh"]
-            mesh.apply_transform(trimesh.transformations.translation_matrix(plant["position"]))
+            # Direct vertex offset — apply_transform crashes with
+            # trimesh 5.0.0 + numpy 2.2.6 (pgl conda env)
+            mesh.vertices = mesh.vertices + np.asarray(plant["position"], dtype=np.float64)
             scene.add_geometry(mesh, node_name=plant["name"], geom_name=plant["name"])
         return scene
 

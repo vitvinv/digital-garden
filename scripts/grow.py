@@ -128,14 +128,12 @@ def composite_garden_garden(garden_slug, garden_cfg):
             print(f"  [{garden_slug}] {slot} ({species_name}): day {day_n} — EMPTY, skipping")
             continue
 
-        # Apply position offset
-        transform = trimesh.transformations.translation_matrix(position)
-        mesh.apply_transform(transform)
+        # Apply position offset (direct vertex offset — mesh.apply_transform
+        # crashes on some trimesh/numpy combos, e.g. trimesh 5.0.0 + numpy 2.2.6)
+        mesh.vertices = mesh.vertices + np.asarray(position, dtype=np.float64)
 
         node_name = f"{garden_slug}-{slot}"
-        scene.add_geometry(mesh, node_name=node_name,
-                          geom_name=node_name,
-                          transform=transform)
+        scene.add_geometry(mesh, node_name=node_name, geom_name=node_name)
 
         print(f"  [{garden_slug}] {slot} ({species_name}): day {day_n}, "
               f"height {height:.2f}m, {verts}v/{faces}f")
