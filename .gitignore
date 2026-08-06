@@ -5,3 +5,4 @@ __pycache__/
 
 # PlantStudio Blender addon — kept local for now (not published)
 blender_addon/
+blender_addon.zip
