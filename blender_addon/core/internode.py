@@ -127,7 +127,20 @@ class PdInternode(PdPlantPart):
         self.internodeAngle = (ci / 100.0) * 90.0
 
     def distanceFromApicalMeristem(self):
-        return self.distanceFromApicalMeristem_val
+        """Count phytomers along the apex until reaching an apical meristem
+        or inflorescence (port of the original on-demand computation)."""
+        result = 0
+        if self.nextPlantPart is not None and self.nextPlantPart.isPhytomer():
+            aPhytomer = self.nextPlantPart
+        else:
+            aPhytomer = None
+        while aPhytomer is not None:
+            result += 1
+            if aPhytomer.nextPlantPart is not None and aPhytomer.nextPlantPart.isPhytomer():
+                aPhytomer = aPhytomer.nextPlantPart
+            else:
+                aPhytomer = None
+        return result
 
     def calculateDistanceFromFirstPhytomer(self):
         if self.phytomerAttachedTo is not None:

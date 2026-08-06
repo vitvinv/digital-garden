@@ -29,9 +29,12 @@ def register():
                             PS_OT_delete_plant, PS_OT_random_seed)
     from .export_glb import PS_OT_export_garden
     from .animator import PS_OT_animate_growth
+    from .wizard import (PSWizardKnobs, PS_OT_wizard, PS_OT_wizard_stop,
+                         PS_OT_wizard_select, PS_OT_wizard_add)
 
     classes = [
         PSProperties,
+        PSWizardKnobs,
         PS_PT_panel,
         PS_OT_add_plant,
         PS_OT_regrow,
@@ -40,10 +43,15 @@ def register():
         PS_OT_random_seed,
         PS_OT_export_garden,
         PS_OT_animate_growth,
+        PS_OT_wizard,
+        PS_OT_wizard_stop,
+        PS_OT_wizard_select,
+        PS_OT_wizard_add,
     ]
     for cls in classes:
         bpy.utils.register_class(cls)
     bpy.types.Scene.ps_props = bpy.props.PointerProperty(type=PSProperties)
+    bpy.types.Scene.ps_wizard_knobs = bpy.props.PointerProperty(type=PSWizardKnobs)
 
 
 def unregister():
@@ -53,9 +61,12 @@ def unregister():
                             PS_OT_delete_plant, PS_OT_random_seed)
     from .export_glb import PS_OT_export_garden
     from .animator import PS_OT_animate_growth
+    from .wizard import (PSWizardKnobs, PS_OT_wizard, PS_OT_wizard_stop,
+                         PS_OT_wizard_select, PS_OT_wizard_add)
 
     classes = [
         PSProperties,
+        PSWizardKnobs,
         PS_PT_panel,
         PS_OT_add_plant,
         PS_OT_regrow,
@@ -64,10 +75,15 @@ def unregister():
         PS_OT_random_seed,
         PS_OT_export_garden,
         PS_OT_animate_growth,
+        PS_OT_wizard,
+        PS_OT_wizard_stop,
+        PS_OT_wizard_select,
+        PS_OT_wizard_add,
     ]
     for cls in reversed(classes):
         bpy.utils.unregister_class(cls)
     del bpy.types.Scene.ps_props
+    del bpy.types.Scene.ps_wizard_knobs
 
 
 if __name__ == "__main__":

@@ -87,3 +87,40 @@ def build_plant_object(species, seed, day, collection, tdo_library):
     obj["ps_day"] = day
     collection.objects.link(obj)
     return obj
+
+
+def rebuild_plant_mesh(obj, plant, fast=False):
+    """
+    Rebuild the mesh of an existing plant object in place (no new object).
+
+    fast=True: lower-detail draw (fewer stem divisions) for realtime preview.
+    """
+    buffer = MeshBuffer()
+    turtle = MeshTurtle(buffer)
+    turtle.setScale_pixelsPerMm(0.1)
+    if fast:
+        # realtime preview: 1 division per stem, low pipe faces
+        try:
+            plant.pGeneral.lineDivisions = 1
+        except AttributeError:
+            pass
+    draw_plant(plant, turtle)
+    data = buffer.to_mesh_data()
+
+    mesh = obj.data
+    name = obj.name
+    mesh.clear_geometry()
+    mesh.from_pydata(data["vertices"], [], data["faces"])
+    mesh.update()
+
+    # rebuild material slots to match current colors
+    color_to_slot = {}
+    mesh.materials.clear()
+    for i, color in enumerate(data["face_colors"]):
+        mat_name = f"{name}_mat_{color[0]}_{color[1]}_{color[2]}"
+        if mat_name not in color_to_slot:
+            mat = make_material(mat_name, color)
+            mesh.materials.append(mat)
+            color_to_slot[mat_name] = len(mesh.materials) - 1
+        mesh.polygons[i].material_index = color_to_slot[mat_name]
+    return obj

@@ -90,3 +90,6 @@ class PS_PT_panel(Panel):
         box2.prop(props, "garden_slug")
         box2.prop(props, "export_dir")
         box2.operator("plantstudio.export_garden", icon='EXPORT')
+
+        from .wizard import draw_wizard_panel
+        draw_wizard_panel(layout, context)
