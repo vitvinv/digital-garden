@@ -2,3 +2,6 @@ tmp/
 __pycache__/
 *.pyc
 .conda/
+
+# PlantStudio Blender addon — kept local for now (not published)
+blender_addon/
