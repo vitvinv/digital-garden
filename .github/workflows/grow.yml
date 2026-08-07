@@ -39,8 +39,8 @@ jobs:
       - name: Install gltf-transform (Draco)
         run: npm install -g @gltf-transform/cli
 
-      - name: Run grow script
-        run: python scripts/grow.py
+      - name: Run plant regeneration
+        run: python scripts/plant_glb.py
 
       - name: Publish and trigger deploy
         run: |
@@ -49,8 +49,8 @@ jobs:
           bash scripts/publish.sh
           AFTER=$(git rev-parse HEAD)
           if [ "$BEFORE" != "$AFTER" ]; then
-            echo "Garden GLBs changed - dispatching deploy."
+            echo "Plant GLBs changed - dispatching deploy."
             gh workflow run "Deploy to GitHub Pages"
           else
-            echo "No garden changes - skipping deploy."
+            echo "No plant changes - skipping deploy."
           fi

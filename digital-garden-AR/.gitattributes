@@ -2,4 +2,5 @@
 *.jpg filter=lfs diff=lfs merge=lfs -text
 *.jpeg filter=lfs diff=lfs merge=lfs -text
 src/assets/** filter=lfs diff=lfs merge=lfs -text
+src/assets/plants/*.json -filter -diff -merge
 external/** filter=lfs diff=lfs merge=lfs -text

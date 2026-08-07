@@ -27,10 +27,28 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 20
+          cache: npm
+          cache-dependency-path: digital-garden-AR/package-lock.json
 
       - name: Install dependencies
         working-directory: digital-garden-AR
         run: npm ci
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: scripts/requirements.txt
+
+      - name: Install Python deps
+        run: pip install -r scripts/requirements.txt
+
+      - name: Install gltf-transform (Draco)
+        run: npm install -g @gltf-transform/cli
+
+      - name: Regenerate plant GLBs
+        run: python scripts/plant_glb.py
 
       - name: Build
         working-directory: digital-garden-AR
