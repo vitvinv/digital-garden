@@ -3,6 +3,17 @@ __pycache__/
 *.pyc
 .conda/
 
-# PlantStudio Blender addon — kept local for now (not published)
-blender_addon/
+# PlantStudio Blender addon — commit only the pure-Python core + data
+# (needed by the CI growth script); keep the Blender-only UI files local.
+blender_addon/*
+!blender_addon/__init__.py
+!blender_addon/core/
+!blender_addon/core/**
+!blender_addon/data/
+!blender_addon/data/**
+!blender_addon/tests/
+!blender_addon/tests/**
+blender_addon/**/__pycache__/
+blender_addon/**/*.pyc
+blender_addon/**/.pytest_cache/
 blender_addon.zip
