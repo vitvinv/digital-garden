@@ -88,10 +88,21 @@ Keeps the repo (and a git-pulled Studio copy) in sync with the latest growth.
 
 ## Next steps / open items
 
-- Phone test of `garden.v-e-v.org` with the garden-sticker (Phase A verification).
+- Phone test of `garden.v-e-v.org` with the garden-sticker (Phase A verification):
+  open the URL → landing page → allow camera → scan the sticker image.
 - Wire new per-plant GLBs into the Studio scene as desired (arrange + scale).
-- The scene still references stale assets from old example spaces
-  (`bmo-bites/*`, `toggle-slam/palm-tree.glb`, `magic-photos/waves.mp4`);
-  strip those spaces in the editor if they cause startup errors.
 - Optional: add the Blender "Export Plant Config" operator to the local addon
   (writes `{plant_id, species, seed, planted_date}` from `ps_day`).
+  (Already added in `blender_addon/operators.py`.)
+
+## Scene history / notes
+
+- The scene was stripped down to the **Playing Cards** space only (the 3 other
+  example experiences — Magic Photos/waves, BMO Bites, Toggle SLAM — were
+  deleted). `scripts/strip_scene.py` does this programmatically.
+- **Startup crash fixed:** the old scene still referenced the deleted custom
+  components (`Pause Video on Image Target Lost`, `Coconut Spawner`,
+  `Toggle SLAM on Found`), which made the runtime reject at init
+  ("No attribute registered with name: ...") → blank screen, camera never
+  opened. The stripped scene loads cleanly (verified in a headless browser:
+  engine loads, landing page constructs, no console errors).
