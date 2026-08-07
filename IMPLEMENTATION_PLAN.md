@@ -59,13 +59,15 @@ digital-garden/                             # Git repo root
 
 ```
 Daily at 06:00 UTC (or manual dispatch)
-  → checkout (LFS)
-  → pip install numpy trimesh
+  → checkout (LFS) on hosted ubuntu runner (git-lfs available, no container)
+  → pip install numpy trimesh (scripts/requirements.txt)
   → npm install -g @gltf-transform/cli (Draco)
   → python scripts/grow.py
   → bash scripts/publish.sh      # commit + push
   → deploy.yml triggers           # webpack build + Pages deploy
 ```
+
+> Note: `grow.py` only needs numpy + trimesh (no PlantGL). The `ghcr.io/vitvinv/digital-garden-plantgl` container approach was abandoned — it lacked git-lfs and every scheduled run failed at checkout.
 
 ## Verified
 
@@ -76,10 +78,10 @@ Daily at 06:00 UTC (or manual dispatch)
 - Growth: day_90 plant has more vertices than day_7 plant (all species)
 - Neighbor overcrowding reduces growth (max 90% discount, 10% floor)
 
-## Remaining manual steps
+## Deployment status (verified 2026-08-07)
 
-1. **Enable GitHub Pages** — Repo Settings → Pages → Source: GitHub Actions
-2. **Add custom domain** `garden.v-e-v.org` in Pages settings
-3. **DNS at Porkbun:** CNAME `garden` → `vitvinv.github.io`
-4. **Phase 4 E2E test** — add `gltfModel` entity in `.expanse.json` pointing to `assets/gardens/{garden-slug}.glb`, run grow, verify AR render
-5. **Trigger `Daily Garden Growth`** from Actions tab to test the full pipeline
+- **GitHub Pages: DONE** — Source: GitHub Actions (`build_type: workflow`)
+- **Custom domain: DONE** — `garden.v-e-v.org`, HTTPS enforced, TLS cert approved
+- **DNS: DONE** — `garden.v-e-v.org` resolves to GitHub Pages (no Porkbun action needed)
+- **Phase 4 E2E: DONE** — `gltfModel` entities present in `.expanse.json` (`assets/daylily.glb`, `assets/gardens/*.glb`), deploy green, live assets return 200 on `garden.v-e-v.org`
+- **Daily Garden Growth: fixed** — `grow.yml` rewritten to run on the hosted runner with pip-installed deps (was failing on missing git-lfs inside the PlantGL container)

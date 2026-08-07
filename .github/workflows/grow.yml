@@ -12,26 +12,36 @@ concurrency:
   group: daily-grow
   cancel-in-progress: false
 
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 jobs:
   grow:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
-    container:
-      image: ghcr.io/vitvinv/digital-garden-plantgl:latest
-      credentials:
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
-    env:
-      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
+    timeout-minutes: 15
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
         with:
           lfs: true
 
-      - name: Run grow script (PlantGL)
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: scripts/requirements.txt
+
+      - name: Install Python deps
+        run: pip install -r scripts/requirements.txt
+
+      - name: Install gltf-transform (Draco)
+        run: npm install -g @gltf-transform/cli
+
+      - name: Run grow script
         run: python scripts/grow.py
 
       - name: Publish (commit + push)
-        run: bash scripts/publish.sh
+        run: |
+          git lfs install
+          bash scripts/publish.sh
