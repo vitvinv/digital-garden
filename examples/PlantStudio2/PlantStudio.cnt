@@ -1,0 +1,97 @@
+:Base PlantStudio.HLP>Main
+:Title PlantStudio
+1 Getting Started
+2 What is PlantStudio?=Welcome>Main
+2 PlantStudio Super-Speed Tour=Super-Speed_Tour
+2 Things PlantStudio 1.x users should know about PlantStudio 2=Things_PlantStudio_1.x_users_should_know_about_PlantStudio_2
+2 Reading button and parameter hints=Reading_button_and_parameter_hints
+2 Tutorial=Tutorial
+1 Finding Your Way Around
+2 Navigating in the main window=Navigating_in_the_main_window
+2 Selecting plants=Selecting_plants
+2 Zooming, scrolling and rotating=Zooming/scrolling/rotating
+2 Undoing and redoing=Undoing_and_redoing
+2 Dragging plants=Dragging_plants
+2 General program FAQ=FAQ_General_program
+2 Main window FAQ=FAQ_Main_window
+1 Making and Deleting Plants
+2 Making a new plant with the wizard=Making_a_new_plant_with_the_wizard
+2 Cutting, copying, pasting, and deleting plants=Cutting/copying/pasting/deleting_plants
+2 Copying and pasting plants as text=Copying_and_pasting_plants_as_text
+1 Changing Plants
+2 Moving and arranging plants=Moving_and_arranging_plants
+2 Resizing plants=Resizing_plants
+2 Randomizing plants=Randomizing_plants
+2 Renaming plants=Renaming_plants
+2 Posing plants=Posing_plants
+2 Changing plant ages=Changing_plant_ages
+2 Looking at and editing plant notes=Editing_plant_notes
+2 Creating and editing plants FAQ=FAQ:_Creating_and_editing_plants
+1 Changing Plant Parameters
+2 Changing key life cycle parameters=Changing_key_life_cycle_parameters
+2 Understanding the Parameters=Understanding_the_Parameters
+2 All the parameter hints to print=All_the_parameter_hints_to_print
+2 Using parameter panels=Using_parameter_panels
+2 Editing 3D objects=Editing_3D_objects
+2 Understanding how the simulation works=Understanding_how_the_simulation_works
+2 Changing plant parameters FAQ=FAQ:_Changing_plant_parameters
+2 3D Object FAQ=FAQ_3D_Objects
+1 Breeding Plants and Making Time Series
+2 Breeding plants using the breeder=Breeding_plants_using_the_breeder
+2 Changing breeding variation=Changing_breeding_options
+2 Making time series=Making_time_series
+2 Breeding FAQ=FAQ_Breeder
+1 Exporting
+2 Exporting 3D models=Exporting_3D_models_in_general
+2 Copying 2D pictures to the clipboard=Copying_pictures
+2 Saving pictures=Saving_pictures
+2 Printing pictures=Printing_pictures
+2 Making a nozzle or tube to spray plants=Making_a_nozzle_or_tube
+2 Making numbered animation files=Making_numbered_animation_files
+2 Export FAQ=FAQ_Export
+1 Managing Plant Files
+2 Opening, closing and saving plant files=Opening/closing/saving_plant_files
+2 Using the plant mover=Using_the_plant_mover
+2 Using the 3D object mover=Using_the_3D_object_mover
+2 Changing the current 3D object library=Changing_the_current_3D_object_library
+1 Choosing options
+2 Choosing viewing options in the main window=Choosing_viewing_options_in_the_main_window
+2 Changing preferences=Changing_preferences
+2 Changing the settings file=Changing_the_settings_file
+2 Using an alternate settings file=Using_an_alternate_settings_file
+2 Editing plant files outside the program=Editing_plant_files_outside_the_program
+2 Changing global parameter bounds and defaults=Changing_global_parameter_bounds_and_defaults
+2 Keyboard shortcuts=Keyboard_and_mouse_shortcuts
+1 Troubleshooting
+2 Frequently asked questions=Frequently_asked_questions
+2 Botanical strengths and limitations=Botanical_limitations_and_strengths_of_PlantStudio
+2 Getting diagnostic information=Getting_diagnostic_information
+2 Numerical exceptions=Numerical_exceptions
+2 Limitations=Limitations
+2 Technical support=Technical_support
+1 Glossary
+2 3D object=What_is_a_3D_object?
+2 biomass=What_is_biomass?
+2 drawing order=What_is_the_drawing_order
+2 first/seedling leaf=What_is_a_first_leaf?
+2 generation=What_is_a_generation?
+2 herbaceous plant=What_is_a_herbaceous_plant?
+2 ghosting=What_is_ghosting?
+2 inflorescence=What_is_an_inflorescence
+2 internode=What_is_an_internode?
+2 meristem=What_is_a_meristem?
+2 parameter panel=What_is_a_parameter_panel?
+2 parameter section=What_is_a_parameter_section?
+2 plant bitmap=What_is_a_plant_bitmap?
+2 randomizing=What_is_randomizing?
+2 resizing square=What_is_a_resizing_square?
+2 root top=What_is_a_root_top?
+2 secondary inflorescences/flowers=What_are_secondary_inflorescences_and_flowers?
+2 settings file=What_is_a_settings_file?
+2 stipule=What_is_a_stipule?
+2 XYZ rotations=What_are_XYZ_rotations?
+1 Registering
+2 Why register?=Why_register?
+2 How do I register?=How_do_I_register?
+2 Registration FAQ=FAQ_Registration
+2 License=License

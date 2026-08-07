@@ -1,0 +1,424 @@
+<HTML>
+<HEAD>
+<META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=windows-1252">
+<META NAME="Generator" CONTENT="Microsoft Word 97">
+<TITLE>PlantStudio parameter hints</TITLE>
+</HEAD>
+<BODY>
+
+<B><P>PlantStudio 2.0 parameter hints</P>
+</B><P>The little hints that pop up when you pause your mouse over the parameters in PlantStudio can be helpful -- but they keep running away! Here is a list of all of them you can print out and refer to. (These hints are current as of PlantStudio 2.0 final release.)</P>
+<B><P>General parameters</P>
+
+<UL>
+<LI>Drawing</B>: These parameters affect how the whole plant draws.</LI>
+<LI>Number of segments to draw to create curved line: The number of segments to divide each line on the plant (internodes, inflorescence segments, leaf petioles) in order to make the line look curved. Three segments makes a fairly smooth-looking curve.</LI>
+<LI>Random sway in drawing angles: An index of the amount of random 3D variation to use in all drawing angles for the plant.</LI>
+<B><LI>Growth</B>: These parameters affect how the whole plant grows.</LI>
+<LI>Age at maturity: Age when the plant is fully mature.</LI>
+<LI>Growth curve: Fraction of maximum plant biomass (Y) for a given plant age (X). Plants tend to grow in an s-curve fashion, so simulated plant growth follows this curve.</LI>
+<LI>Age at which flowering starts: Age when flowering starts.</LI>
+<LI>Fraction of total plant biomass at maturity in reproductive structures: Fraction of total plant biomass at maturity in reproductive structures.</LI>
+<LI>Plant has both primary and secondary flowers: If 'yes', this plant has both primary flowers (bearing fruit, either female or hermaphroditic) and secondary flowers (not bearing fruit, male). If 'no', the primary flowers are 'perfect' (hermaphroditic), and there are no secondary flowers. In cucumber and corn, for example, the fruits form out of the female flowers, and the male flowers are very small. </LI>
+<LI>Plant is dicotyledonous (has two seedling leaves): If 'yes', this plant belongs to a subclass of angiosperms called dicots which have two seedling leaves (cotyledons). If 'no, this plant is a monocot. Monocots (mostly grasses and grains) have one seedling leaf. In this model the impact of this choice is only the number of seedling leaves drawn, but in reality there are many differences between monocots and dicots.</LI>
+<LI>Number of apical (terminal) inflorescences: The number of inflorescences on this plant at the end (apex) of branches. This number of inflorescences develops from the plant's apical meristems no matter the reproductive allocation.</LI>
+<LI>Number of axillary inflorescences: The number of inflorescences on this plant found in the leaf axils of the plant's stems. This number of inflorescences develops from the plant's axillary meristems no matter the reproductive allocation.</LI>
+<LI>Phyllotactic rotation angle: The rotation angle between successive leaves on the plant stem. In most plants this angle is either 137 degrees or 180 degrees.</LI>
+<LI>Starting seed for random number generator: The starting seed for this plant's random number generator. This affects random choices of angles, lengths, and branching choices. When you randomize the plant, you change this number (randomly).</LI></UL>
+
+<B><P>Meristems (buds)</P>
+
+<UL>
+<LI>Branching</B>: A meristem is an actively developing group of cells, a bud, out of which grows a leaf or stem. How a plant branches depends on whether each meristem develops into a leaf structure or a new branch. Meristems 'decide' this based on many factors, which we simulate with just a few.</LI>
+<LI>Axillary meristem and leaf arrangement: If 'alternate', creation of leaves and axillary (side) meristems on any stem is alternate (one to the left, one to the right, etc). If 'opposite', leaves and axillary meristems are opposite (in pairs). Whorled leaves/meristems (more than two) are not simulated here.</LI>
+<LI>Branching index: The probability (as a percent) that any axillary (side) meristem (bud) will create a new vegetative branch on any day *if* it is far enough away from the apical (terminal) meristem to be outside the range of apical dominance.</LI>
+<LI>Apical dominance strength (as node distance): The distance (number of stem internodes) an axillary (side) meristem (bud) must be from the apical (terminal) meristem before it can consider creating a side branch. In real plants a more subtle hormone gradient prevents the development of axillary buds.</LI>
+<LI>Secondary branching (branches off branches): If 'yes', secondary (and tertiary, etc) branching is allowed, which means that branches can have branches in turn. If 'no', only the primary stem (main stalk) can have branches.</LI>
+<LI>Sympodial branching: If 'yes', each apical meristem creates only one internode, and an axillary meristem on that internode develops to create the next 'main' stem. Tomato plants grow this way. If 'no', growth is monopodial: each apical meristem creates a series of internodes.</LI>
+<LI>Branching angle: The angle between the stem the meristem comes from and the new branch it creates. The higher this angle, the more broad the plant will be (if there is branching).</LI>
+<LI>Probability each meristem will become reproductive when it gets flowering signal: When a determinate plant enters the reproductive phase all meristems are dedicated to reproduction, so this probability is 1.0. In an indeterminate plant some meristems continue to produce vegetative parts, and this probability is between zero and one.</LI>
+<B><LI>Drawing</B>: Often meristems are very small (and so you wouldn't draw them here), but sometimes you will want to draw leaf/stem buds on your plant, as in the case of Brussels sprouts.</LI>
+<LI>Meristem 3D object: The 3D object used to draw sections of meristems. Meristems are always drawn with five 'section' 3D objects spun around to create an enclosed three-dimensional structure.</LI>
+<LI>Meristem scale at full size: The drawing scale of the meristem section 3D object when the meristem is fully grown. On most plants you will not want to see meristems, so you will set this parameter to zero.</LI>
+<LI>Meristem X rotation: Just before this 3D object is drawn, it will be rotated in the X dimension by this amount. Normally you will leave this at zero, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Meristem Y rotation: Just before this 3D object is drawn, it will be rotated in the Y dimension by this amount. Normally you will leave this at zero, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Meristem Z rotation: Just before this 3D object is drawn, it will be rotated in the Z dimension by this amount. Normally you will leave this at zero, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Meristem front face color: The front face (facing in) color for meristem sections.</LI>
+<LI>Meristem back face color: The back face (facing out) color for meristems sections.</LI></UL>
+
+<B><P>Internodes (stems)</P>
+
+<UL>
+<LI>Drawing</B>: An internode is the section of stem between two successive leaves or branches.</LI>
+<LI>Internode color: The color of internodes.</LI>
+<LI>Curving index for first internode: An index of how much the first internode curves. This determines how upright or bent over the plant is.</LI>
+<LI>Curving index for all internodes but first: An index of how much stems curve around as they grow. A corn plant would have a curving index close to zero; a cucumber plant would have a larger curving index.</LI>
+<LI>Size: These parameters control how large the internode is, and thus how 'leggy' the plant is. Plants that stay close to the ground (with rosettes) have very short internodes; vines have long internodes.</LI>
+<LI>Length at optimal biomass: The length of an internode when the internode has the optimal internode biomass and when it has expanded to its full size from water uptake.</LI>
+<LI>Width at optimal biomass: The width of an internode of this plant when the internode has the optimal internode biomass and when it has expanded to its full size from water uptake.</LI>
+<B><LI>Creation and growth</B>: The size of any plant part is determined by an 'optimal' size and the actual conditions of growth. Plant parts compete for the available nutrients, as established by the general growth parameters. To simplify things, we express the weight (biomass) of plant parts simply as a percentage of the total final weight of the plant.</LI>
+<LI>Optimal final biomass (as percent of maximum plant biomass): The biomass (dry weight) of a complete or best internode, expressed as a percentage of final plant dry weight.</LI>
+<LI>Minimum days for meristem to create: The shortest number of days in which a vegetative meristem can create an internode, no matter how much biomass is available. This simulates physical limitations on the rate of growth.</LI>
+<LI>Maximum days for meristem to create: Days a vegetative meristem will accumulate biomass towards creation of an internode before it gives up and creates the internode. This simulates the plant's concentration of resources on newer meristems.</LI>
+<LI>Minimum fraction of optimal biomass needed to create: The smallest fraction of the optimal (best) amount of internode biomass that must be accumulated before a vegetative meristem can create an internode.</LI>
+<LI>Can recover from stunting at creation: If 'yes', the internode attempts to grow after it has been created to achieve the optimal biomass for an internode. If 'no', internodes can never grow in biomass after they are created (though they can expand through water uptake).</LI>
+<B><LI>Timing</B>: Timing parameters set bounds on how slowly or quickly plant parts can grow to create a realistic growth pattern. These limits effect how many of the plant parts the plant can create during its lifetime (though the general biomass growth curve limits that too).</LI>
+<LI>Minimum days to grow: The shortest number of days in which an internode can grow to the optimal internode biomass, no matter how much biomass is available. This simulates physical limitations on the rate of growth.</LI>
+<LI>Maximum days to grow: Days an internode will accumulate biomass towards the optimal internode biomass before it gives up and stops growing. This simulates the plant's concentration of resources on newer plant parts.</LI>
+<LI>Bolting: Some plants form a basal rosette (ring of leaves) one year, and in the next year expand and form a large inflorescence. Cabbages do this. These parameters create a simulated bolting plant.</LI>
+<LI>Length increase due to bolting, multiplier: How much longer internodes become because of bolting. This occurs mainly in plants that flower in the second year such as carrots and cabbages.</LI>
+<LI>Days to bolt: Days it takes an internode to reach its full bolted length once bolting has begun.</LI></UL>
+
+<B><P>Leaves</P>
+
+<UL>
+<LI>Drawing leaf</B>: Leaves are drawn very simply, with 3D mesh objects either created in our own format or imported from DXF.</LI>
+<LI>Leaf 3D object: The 3D object used to draw leaves.</LI>
+<LI>Leaf 3D object scale at optimal leaf biomass: The drawing scale of the leaf 3D object when the leaf is fully grown.</LI>
+<LI>Leaf X rotation: Just before this 3D object is drawn, it will be rotated in the X dimension by this amount. For leaves, this will normally be either 90 degrees or -90 degrees. Normally you will leave this at 90 or -90, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Leaf Y rotation: Just before this 3D object is drawn, it will be rotated in the Y dimension by this amount. Normally you will leave this at zero, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Leaf Z rotation: Just before this 3D object is drawn, it will be rotated in the Z dimension by this amount. Normally you will leave this at zero, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Leaf front face color: The front face (facing up) color for leaves.</LI>
+<LI>Leaf back face color: The back face (facing down) color for leaves.</LI>
+<B><LI>Compound leaves</B>: Compound leaves are made up of smaller leaflets arrayed on a petiole or leaf stem. For example, walnut trees have compound leaves.</LI>
+<LI>Number of leaflets (1 if simple): The number of leaflets per leaf. If this parameter is set to one, the plant will have simple leaves. If this parameter is set to greater than one, the plant will have compound leaves.</LI>
+<LI>Compound leaf shape: How the leaflets are arranged within each compound leaf. If 'pinnate', compound leaves are arranged like the barbs on a feather. If 'palmate', compound leaves are arranged like the fingers on a hand.</LI>
+<LI>If pinnate, alternate or opposite: If 'alternate', leaflets in a pinnate compound leaf are alternate (one to the left, one to the right, etc). If 'opposite', leaflets in a pinnate compound leaf are opposite (in pairs). If compound leaves are palmate, this parameter is not used.</LI>
+<LI>Compound leaf spread index: An index of how spread out the compound leaves are within the leaf stalk. The higher the number the greater the spread.</LI>
+<LI>Compound leaf bend angle at start: The angle to bend the compound leaf between each leaflet when the leaf is first formed. A greater angle here can form an emerging leaf like a fiddlehead.</LI>
+<LI>Compound leaf bend angle at full size: The angle to bend the compound leaf between each leaflet when the leaf is at full size.</LI>
+<B><LI>Drawing petiole</B>: The leaf petiole is the stalk that connects the leaf to the main plant stem.</LI>
+<LI>Angle between stem and petiole: The pull-down angle between the main stem and the leaf petiole (stalk).</LI>
+<LI>Petiole color: The color of leaf petioles (stalks).</LI>
+<LI>Petiole length when leaf has optimal biomass: The length of the leaf petiole when the leaf has accumulated the optimal (best) amount of biomass for a leaf.</LI>
+<LI>Petiole width when leaf has optimal biomass: The width of the leaf petiole when the leaf has accumulated the optimal (best) amount of biomass for a leaf.</LI>
+<LI>Petiole taper index (taper to % of width): How much to taper the leaf petiole's width as it reaches the leaf 3D object. For no tapering, choose 100% of initial width (the default). To taper the petiole, choose a lower percentage.</LI>
+<B><LI>Drawing stipule</B>: A stipule is an extra modified leaf that can appear at the base of the leaf petiole. These can sometimes be modified into thorns or tendrils.</LI>
+<LI>Number of sections in stipule: You can make a leaf stipule with one planar 3D object, in which case it looks sort of like a leaf, or you can make it with one 3D object drawn multiple times and spun around to produce an enclosed three-dimensional structure (like sections of an orange make up an orange). This is useful if you want to draw stipules that look like thorns or spikes. This parameter is the number of times to draw the specified 'section' 3D object to form the leaf stipule structure.</LI>
+<LI>Stipule section 3D object: The 3D object used to draw leaf stipules (or stipule sections).</LI>
+<LI>Stipule section 3D object scale at optimal leaf biomass: The drawing scale of the leaf stipule (or stipule section) 3D object when the leaf is fully grown.</LI>
+<LI>Stipule section X rotation: Just before this 3D object is drawn, it will be rotated in the X dimension by this amount. For leaf stipules, this will normally be either 90 degrees or -90 degrees. Normally you will leave this at 90 or -90, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Stipule section Y rotation: Just before this 3D object is drawn, it will be rotated in the Y dimension by this amount. Normally you will leave this at zero, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Stipule section Z rotation: Just before this 3D object is drawn, it will be rotated in the Z dimension by this amount. Normally you will leave this at zero, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Stipule section front face color: The front face (facing up) color for leaf stipules (or stipule sections).</LI>
+<LI>Stipule section back face color: The back face (facing down) color for leaf stipules (or stipule sections).</LI>
+<LI>Angle between stipule and main stem: The angle between the main stem of the plant and the leaf stipule. You will usually want to set this lower than the angle between the main stem and the leaf.</LI>
+<B><LI>Creation and growth</B>: The size of any plant part is determined by an 'optimal' size and the actual conditions of growth. Plant parts compete for the available nutrients, as established by the general growth parameters. To simplify things, we express the weight (biomass) of plant parts simply as a percentage of the total final weight of the plant.</LI>
+<LI>Optimal biomass (as percent of maximum plant biomass): The biomass (dry weight) of a complete or best leaf, expressed as a percentage of final plant dry weight.</LI>
+<LI>Growth curve: Fraction of final optimal (best) leaf biomass (Y) for a given leaf age (X). Leaves tend to grow in an s-curve fashion, so simulated leaf demands for biomass from the plant attempt to follow this curve.</LI>
+<LI>Fraction of optimal final biomass at creation: A leaf is created by a meristem with some amount of biomass, and then grows to its final biomass. This is the fraction of final biomass the leaf has when it is created. If zero, the leaf starts with nothing; if one, the leaf starts at full size.</LI>
+<LI>Timing: Timing parameters set bounds on how slowly or quickly plant parts can grow to create a realistic growth pattern. These limits effect how many of the plant parts the plant can create during its lifetime (though the general biomass growth curve limits that too).</LI>
+<LI>Minimum days to grow: The shortest number of days in which a leaf can grow to maturity, no matter how much biomass is available. This simulates physical limitations on the rate of growth.</LI>
+<LI>Maximum days to grow: Days a leaf will accumulate biomass towards the optimal leaf biomass before it gives up and stops growing. This simulates the plant's concentration of resources on newer plant parts.</LI></UL>
+
+<B><P>Seedling leaves</P>
+
+<UL>
+<LI>Drawing</B>: Seedling leaves, or cotyledons, are the first leaves that form on the plant. They often look quite different from the leaves that come afterward.</LI>
+<LI>Seedling leaf 3D object: The 3D object used to draw the seedling leaf or leaves (cotyledons) of this plant when it has just emerged from germination.</LI>
+<LI>Seedling Seedling leaf scale at full size: The drawing scale of the seedling leaf 3D object when the seedling leaf is fully grown.</LI>
+<LI>Seedling leaf X rotation: Just before this 3D object is drawn, it will be rotated in the X dimension by this amount. For leaves, this will normally be either 90 degrees or -90 degrees. Normally you will leave this at 90 or -90, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Seedling leaf Y rotation: Just before this 3D object is drawn, it will be rotated in the Y dimension by this amount. Normally you will leave this at zero, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Seedling leaf Z rotation: Just before this 3D object is drawn, it will be rotated in the Z dimension by this amount. Normally you will leave this at zero, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Seedling leaf front face color: The front face (facing up) color for seedling leaves.</LI>
+<LI>Seedling leaf back face color: The back face (facing down) color for seedling leaves.</LI>
+<B><LI>Timing</B>: The seedling leaves usually fall off the plant at some point. To place that point developmentally, we measure it by the number of internodes the plant has when the seedling leaves fall off. </LI>
+<LI>Number of nodes on main stem when seedling leaf falls off: This is when the seedling leaf or leaves for this plant should fall off, based on the number of nodes (leaf positions) on the main stem. For example, if this number is 4, the seedling leaves will disappear when four leaves have appeared above the seedling leaves.</LI></UL>
+
+<B><P>Primary flowers</P>
+
+<UL>
+<LI>Petals</B>: Primary flowers are perfect (hermaphroditic) or female, and secondary flowers are only male. Ninety percent of flowering plants have only perfect flowers. The primary flower parameters are divided into 'simple' and 'advanced' categories, the 'advanced' category including all the flower parts except one row of petals.</LI>
+<LI>Number of petals on flower: The number of petals in this row on the flower.</LI>
+<LI>Flower petal 3D object: The 3D object used to draw first-row petals.</LI>
+<LI>Flower petal scale at full size: The drawing scale of the first-row petal 3D object when the flower is fully grown.</LI>
+<LI>Flower petal X rotation: Just before this 3D object is drawn, it will be rotated in the X dimension by this amount. Normally you will leave this at zero, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Flower petal Y rotation: Just before this 3D object is drawn, it will be rotated in the Y dimension by this amount. Normally you will leave this at zero, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Flower petal Z rotation: Just before this 3D object is drawn, it will be rotated in the Z dimension by this amount. Normally you will leave this at zero, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Flower petal front face color: The front face (facing in) color for flower petals.</LI>
+<LI>Flower petal back face color: The back face (facing out) color for flower petals.</LI>
+<LI>Flower petals are radially arranged: If 'yes', the petals in this row are drawn rotated at different angles to make them form a circle around the stem. If 'no', they are all drawn at the same angle (and usually there is only one oddly-shaped 3D object).</LI>
+<LI>Angle between petals and main stem: The angle at which the first-row petals are drawn back from the center of the flower. Usually you will want to specify an increasing angle for each layer of floral parts. How this appears on the plant depends on how the 3D object you are using for petals was defined.</LI>
+<B><LI>Creation and growth</B>: The size of any plant part is determined by an 'optimal' size and the actual conditions of growth. Plant parts compete for the available nutrients, as established by the general growth parameters. To simplify things, we express the weight (biomass) of plant parts simply as a percentage of the total final weight of the plant.</LI>
+<LI>Optimal biomass (as percent of maximum plant biomass): The biomass (dry weight) of a complete or best flower, expressed as a percentage of final plant dry weight.</LI>
+<LI>Minimum fraction of optimal biomass needed to open: The smallest fraction of the optimal (best) amount of flower biomass that must be accumulated before the flower can open.</LI>
+<LI>Minimum fraction of optimal biomass needed to set fruit: The smallest fraction of the optimal (best) amount of flower biomass that must be accumulated before the flower can create a fruit.</LI>
+<B><LI>Timing</B>: Timing parameters set bounds on how slowly or quickly plant parts can grow to create a realistic growth pattern. For female or perfect flowers, additional timing limits support showing (or not showing) different stages of flower and fruit development.</LI>
+<LI>Minimum days to grow: The shortest number of days in which the flower can grow to maturity, no matter how much biomass is available. This simulates physical limitations on the rate of growth.</LI>
+<LI>Maximum days to grow: Days the flower will accumulate biomass towards maturity before it gives up and stops growing. This simulates the plant's concentration of resources on newer meristems.</LI>
+<LI>Minimum days before opening: The shortest number of days after flower creation that the flower can open from the flower bud.</LI>
+<LI>Minimum days before fruit can be set: The shortest number of days the flower can appear and grow before it can set a fruit. Set this to a high number if you don't want fruits on your plant.</LI>
+<LI>Days until drop if fruit not set: Days between the appearance of flowers and their abscission (falling off).</LI></UL>
+
+<B><P>Primary flowers, advanced</P>
+
+<UL>
+<LI>Pistils</B>: Pistils are the female organs of the plant. The stigma receives the pollen, and it is connected to the floral base by a stalk called the style, and together these make up the pistil. Though male flowers can have non-functional pistils, we only draw them on female or hermaphroditic (perfect) flowers here.</LI>
+<LI>Number of pistils in flower: The number of pistils on the flower.</LI>
+<LI>Style length at full size: How long to draw the style at its full size. A style is the stalk that (with the stigma) makes up the pistil, the pollen-receiving part of the flower.</LI>
+<LI>Style width at full size: The width of the style when the flower is fully grown.</LI>
+<LI>Style taper index (taper to % of width): How much to taper the style's width as it reaches the anther 3D object. For no tapering, choose 100% of initial width (the default). To taper the style, choose a lower percentage.</LI>
+<LI>Angle between style and main flower axis: The angle at which the styles are drawn back from the center of the flower. Usually you will want to specify an increasing angle for each layer of floral parts.</LI>
+<LI>Style color: The color of styles (pistil stalks).</LI>
+<LI>Number of sections in stigma: You can make a stigma with one planar 3D object, in which case it looks sort of like a leaf, or you can make it with one 3D object drawn multiple times and spun around to produce an enclosed three-dimensional structure (like sections of an orange make up an orange). This parameter is the number of times to draw the specified 'section' 3D object to form the stigma structure.</LI>
+<LI>Stigma section 3D object: The 3D object used to draw the stigma (pollen receiver).</LI>
+<LI>Stigma section scale at full size: The drawing scale of the stigma section 3D object when the flower is fully grown.</LI>
+<LI>Stigma section X rotation: Just before this 3D object is drawn, it will be rotated in the X dimension by this amount. Normally you will leave this at zero, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Stigma section Y rotation: Just before this 3D object is drawn, it will be rotated in the Y dimension by this amount. Normally you will leave this at zero, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Stigma section Z rotation: Just before this 3D object is drawn, it will be rotated in the Z dimension by this amount. Normally you will leave this at zero, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Stigma section front face color: The front face (facing in) color for stigmas.</LI>
+<LI>Stigma section back face color: The back face (facing out) color for stigmas.</LI>
+<LI>Stigma sections are radially arranged: If 'yes', the 3D objects used to draw the stigma are drawn rotated at different angles to make them form a circle around the stem. If 'no', they are all drawn at the same angle (and usually there is only one oddly-shaped 3D object).</LI>
+<B><LI>Stamens</B>: Stamens are the male organs of the flower. The anther, which holds the pollen, is connected to the flower base by a stalk called the filament, and together these make up a stamen. Perfect flowers have stamens and female flowers don't (though rarely they have non-functional stamens).</LI>
+<LI>Number of stamens in flower: The number of stamens on the flower.</LI>
+<LI>Filament length at full size: How long to draw the filament at its full size. A filament is the stalk that (with the anther) makes up the stamen, the pollen-holding part of the flower.</LI>
+<LI>Filament width at full size: The width of the filament when the flower is fully grown.</LI>
+<LI>Filament taper index (taper to % of width): How much to taper the filament's width as it reaches the anther 3D object. For no tapering, choose 100% of initial width (the default). To taper the filament, choose a lower percentage.</LI>
+<LI>Filament color: The color of filaments (anther stalks).</LI>
+<LI>Angle between filament and main flower axis: The angle at which the filaments are drawn back from the center of the flower. Usually you will want to specify an increasing angle for each layer of floral parts.</LI>
+<LI>Number of sections in anther: You can make an anther with one planar 3D object, in which case it looks sort of like a leaf, or you can make it with one 3D object drawn multiple times and spun around to produce an enclosed three-dimensional structure (like sections of an orange make up an orange). This parameter is the number of times to draw the specified 'section' 3D object to form the anther structure.</LI>
+<LI>Anther section 3D object: The 3D object used to draw the anthers on the flower.</LI>
+<LI>Anther section scale at full size: The drawing scale of the anther section 3D object when the flower is fully grown.</LI>
+<LI>Anther section X rotation: Just before this 3D object is drawn, it will be rotated in the X dimension by this amount. Normally you will leave this at zero, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Anther section Y rotation: Just before this 3D object is drawn, it will be rotated in the Y dimension by this amount. Normally you will leave this at zero, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Anther section Z rotation: Just before this 3D object is drawn, it will be rotated in the Z dimension by this amount. Normally you will leave this at zero, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Anther section front face color: The front face (facing in) color for anthers.</LI>
+<LI>Anther section back face color: The back face (facing out) color for anthers.</LI>
+<LI>Anther sections are radially arranged: If 'yes', the 3D objects used to draw the anther are drawn rotated at different angles to make them form a circle around the stem. If 'no', they are all drawn at the same angle (and usually there is only one oddly-shaped 3D object).</LI>
+<B><LI>Second row of petals</B>: You can optionally include five rows of petals in a flower (the first row is in the simple flower parameters). To make the petals look better together, it's a good idea to slightly vary them in color, size, and starting X rotations.</LI>
+<LI>Number of petals in second petal row: The number of second-row petals.</LI>
+<LI>Second petal row 3D object: The 3D object used to draw second-row petals.</LI>
+<LI>Second petal row scale at full size: The drawing scale of the second-row petal 3D object when the flower is fully grown.</LI>
+<LI>Second petal row X rotation: Just before this 3D object is drawn, it will be rotated in the X dimension by this amount. Normally you will leave this at zero, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Second petal row Y rotation: Just before this 3D object is drawn, it will be rotated in the Y dimension by this amount. Normally you will leave this at zero, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Second petal row Z rotation: Just before this 3D object is drawn, it will be rotated in the Z dimension by this amount. Normally you will leave this at zero, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Second petal row front face color: The front face (facing in) color for second-row petals.</LI>
+<LI>Second petal row back face color: The back face (facing out) color for second-row petals.</LI>
+<LI>Second row petals are radially arranged: If 'yes', the 3D objects used to draw second-row petals are drawn rotated at different angles to make them form a circle around the stem. If 'no', they are all drawn at the same angle (and usually there is only one oddly-shaped 3D object).</LI>
+<LI>Angle between second-row petals and main stem: The angle at which the second-row petals are drawn back from the center of the flower. Usually you will want to specify an increasing angle for each layer of floral parts. How this appears on the plant depends on how the 3D object you are using for these petals was defined.</LI>
+<B><LI>Third row of petals, fourth row of petals, fifth row of petals (same as second row of petals).</LI>
+<LI>Sepals</B>: Sepals are the outermost layer of the flower's covering parts, and are often green.</LI>
+<LI>Number of sepals on flower: The number of sepals on the flower.</LI>
+<LI>Sepal 3D object: The 3D object used to draw sepals.</LI>
+<LI>Sepal scale at full size: The drawing scale of the sepal 3D object when the flower is fully grown.</LI>
+<LI>Sepal X rotation: Just before this 3D object is drawn, it will be rotated in the X dimension by this amount. Normally you will leave this at zero, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Sepal Y rotation: Just before this 3D object is drawn, it will be rotated in the Y dimension by this amount. Normally you will leave this at zero, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Sepal Z rotation: Just before this 3D object is drawn, it will be rotated in the Z dimension by this amount. Normally you will leave this at zero, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Sepal front face color: The front face (facing in) color for sepals.</LI>
+<LI>Sepal back face color: The back face (facing out) color for sepals.</LI>
+<LI>Sepals are radially arranged: If 'yes', the 3D objects used to draw sepals are drawn rotated at different angles to make them form a circle around the stem. If 'no', they are all drawn at the same angle (and usually there is only one oddly-shaped 3D object).</LI>
+<LI>Angle between sepals and main stem: The angle at which the sepals are drawn back from the center of the flower. Usually you will want to specify an increasing angle for each layer of floral parts. How this appears on the plant depends on how the 3D object you are using for sepals was defined.</LI>
+<B><LI>Flower bud</B>: You can draw the flower bud either as a separate 3D object, or simply by opening up the angles that draw the floral parts.</LI>
+<LI>How to draw bud: If 'no bud', don't draw a bud on the flower at all. If 'single 3D object bud', draw a single 3D object (usually spun around in a circle) during the bud stage (this is the pre-PS2 style). If 'unfolding flower', don't draw a separate bud, but 'open up' the flower by drawing all of its parts small and folded in together.</LI>
+<LI>Number of petals on flower bud: The number of flower bud petals.</LI>
+<LI>Bud petal 3D object: The 3D object used to draw flower bud petals.</LI>
+<LI>Bud petal scale at full size: The drawing scale of the flower bud petal 3D object when the flower bud is fully grown (before the flower appears).</LI>
+<LI>Bud petal X rotation: Just before this 3D object is drawn, it will be rotated in the X dimension by this amount. Normally you will leave this at zero, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Bud petal Y rotation: Just before this 3D object is drawn, it will be rotated in the Y dimension by this amount. Normally you will leave this at zero, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Bud petal Z rotation: Just before this 3D object is drawn, it will be rotated in the Z dimension by this amount. Normally you will leave this at zero, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Bud petal front face color: The front face (facing in) color for flower bud petals.</LI>
+<LI>Bud petal back face color: The back face (facing out) color for flower bud petals.</LI>
+<LI>Bud petals are radially arranged: If 'yes', the 3D objects used to draw the flower bud are drawn rotated at different angles to make them form a circle around the stem. If 'no', they are all drawn at the same angle (and usually there is only one oddly-shaped 3D object).</LI>
+<LI>Angle between bud petals and main stem: The angle at which the flower bud petals are drawn back from the center of the flower. Usually you will want this angle to be small, to create a closed bud.</LI></UL>
+
+<B><P>Primary inflorescences</P>
+
+<UL>
+<LI>Architecture</B>: An inflorescence is a structure that holds the flowers on the plant. It can have many shapes, many of which can be created by combining these parameters (note that sunflower-like inflorescences have a special parameter). As with flowers, inflorescences can be primary (hermaphroditic or female) or secondary (male only).</LI>
+<LI>Number of flowers on main branch: The number of flowers on the main branch of the inflorescence. This is produced without variation.</LI>
+<LI>Number of flowers per secondary branch: The number of flowers on each secondary branch (not the main branch) of the inflorescence. This number of flowers will be produced on each branch whenever an inflorescence is produced, with no variation.</LI>
+<LI>Number of secondary branches: The number of secondary inflorescence stems on the inflorescence. For spikes, racemes and umbels, this number should be zero. For panicles, this number depends on the number of flowers. Tertiary branches cannot be drawn.</LI>
+<LI>Stalk color: The color of the inflorescence stem.</LI>
+<LI>Pedicel color: The color of pedicels (flower stems).</LI>
+<LI>Inflorescence branches are alternate: If 'yes', the branches on the inflorescence are alternate (one to the left, then one to the right, etc). If 'no', the branches on the inflorescence (if any) will be drawn opposite (in pairs).</LI>
+<LI>Angle of inflor. branch with inflor. stem: The angle between the main inflorescence stem and each 'branch' of the inflorescence -- that is, each secondary inflorescence stem. Panicle inflorescences have branches; racemes do not.</LI>
+<LI>Angle between flowers (to bend infllorescence): The angle between sections of the inflorescence. To make the inflorescence bend over its length, make this angle greater than zero.</LI>
+<LI>Angle of pedicel with inflor. stem: The angle between the main inflorescence stem and each single flower stalk or pedicel.</LI>
+<LI>Angle of peduncle with plant stem if axillary: The angle at the start of the inflorescence if it comes out of an axillary bud from a plant stem (not used if the inflorescence is apical).</LI>
+<LI>Angle of peduncle with plant stem if apical: The angle at the start of the inflorescence if it comes out of an apical bud from a plant stem (not used if the inflorescence is axillary).</LI>
+<LI>Flowers spiral around main stem: If 'yes', the flowers on the inflorescence are drawn using the same phyllotaxis (spiraling) around the inflorescence stem (and branches) as is used for the main stem. If 'no', the flowers are drawn without spiraling.</LI>
+<LI>Head type (like sunflower): If 'yes', the inflorescence is of the composite type. The small disc flowers are drawn in a circle, each with one petal that looks something like a ray flower. This is not botanically accurate but looks right.</LI>
+<B><LI>Size</B>: These parameters control how large all the parts of the inflorescence will appear on the plant. Apical inflorescences are found at the tips of branches; axillary inflorescences are found in the angle between leaf and stem.</LI>
+<LI>Primary stalk length if apical (terminal): The length of the main inflorescence stem before the first flower if the inflorescence is apical (at the apex or end of a plant stem).</LI>
+<LI>Primary stalk length if axillary: The length of the inflorescence stem before the first flower stalk (pedicel) if the  inflorescence is axillary (coming out of the leaf axils on plant stems).</LI>
+<LI>Internode length (between flowers): The length of the segments of the main inflorescence stem between pedicels (flower stalks). Similar to the internode length for the entire plant. For an umbelliferous flower, make this number very small; for a raceme or spike make this number larger.</LI>
+<LI>Pedicel (flower stalk) length: The length of each pedicel (flower stalk) in the inflorescence.</LI>
+<LI>Stem width: The width of the inflorescence stem when the inflorescence is fully grown.</LI>
+<LI>Pedicel taper index: How much to taper the pedicel's width as it reaches the flower. For no tapering, choose 100% of initial width (the default). To taper the pedicel, choose a lower percentage.</LI>
+<B><LI>Creation and growth</B>: The size of any plant part is determined by an 'optimal' size and the actual conditions of growth. Plant parts compete for the available nutrients, as established by the general growth parameters. To simplify things, we express the weight (biomass) of plant parts simply as a percentage of the total final weight of the plant.</LI>
+<LI>Apical (terminal): The primary inflorescences for this plant are apical (at the apex or end of a plant stem). This parameter is only used if separate primary and secondary inflorescences are present on the plant.</LI>
+<LI>Optimal biomass (as percent of maximum plant biomass): The biomass (dry weight) of a complete or best inflorescence, expressed as a percentage of final plant dry weight.</LI>
+<LI>Minimum fraction of optimal biomass needed to create: The smallest fraction of the optimal (best) amount of inflorescence biomass that must be accumulated before the inflorescence can be created.</LI>
+<LI>Minimum fraction of optimal biomass needed to make flowers: The smallest fraction of the optimal (best) amount of inflorescence biomass that must be accumulated before the inflorescence can begin to create flowers.</LI>
+<B><LI>Timing</B>: Timing parameters set bounds on how slowly or quickly plant parts can grow to create a realistic growth pattern. For inflorescences, timing parameters control not only limits on growth, but also how the inflorescence produces its flowers.</LI>
+<LI>Days for all flowers to develop: Days it takes to create the flowers on the inflorescence. Flowers are created without accumulating biomass beforehand. They begin to demand biomass as soon as they are created, to open from buds to flowers and then to grow to full size.</LI>
+<LI>Flowers develop from top to bottom: If 'yes', the flowers on the inflorescence develop in order from the top to the bottom (basipetal). If 'no', flowers develop from the bottom to the top (acropetal).</LI>
+<LI>Minimum days for meristem to create: The shortest number of days in which a reproductive meristem can produce an inflorescence, no matter how much biomass is available. This simulates physical limitations on the rate of growth.</LI>
+<LI>Maximum days for meristem to create: Days a reproductive meristem will accumulate biomass towards creation of an inflorescence before it gives up and creates a smaller inflorescence. This simulates the plant's concentration of resources on newer meristems.</LI>
+<LI>Minimum days to grow: The shortest number of days in which the inflorescence can possibly reach its optimal biomass after its creation. This simulates physical limitations on the rate of growth.</LI>
+<LI>Maximum days to grow: Days the inflorescence will attempt to accumulate biomass to reach its optimal biomass (after its creation) before it stops growing. This simulates the plant's concentration of resources on the demands of newer plant parts.</LI>
+<B><LI>Bracts</B>: Some inflorescences begin with a set of modified leaves called bracts. The red 'petals' of poinsetta plants are actually large bracts below the tiny yellow flowers in the inflorescence.</LI>
+<LI>Number of bracts: The number of inflorescence bracts.</LI>
+<LI>Bract 3D object: The 3D object used to draw inflorescence bracts.</LI>
+<LI>Bract scale at full size: The drawing scale of the inflorescence bract 3D object when the inflorescence is fully grown.</LI>
+<LI>Bract X rotation: Just before this 3D object is drawn, it will be rotated in the X dimension by this amount. Normally you will leave this at zero, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Bract Y rotation: Just before this 3D object is drawn, it will be rotated in the Y dimension by this amount. Normally you will leave this at zero, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Bract Z rotation: Just before this 3D object is drawn, it will be rotated in the Z dimension by this amount. Normally you will leave this at zero, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Bract front face color: The front face (facing up) color for inflorescence bracts.</LI>
+<LI>Bract back face color: The back face (facing down) color for inflorescence bracts.</LI>
+<LI>Bracts are radially arranged: If 'yes', the 3D objects used to draw inflorescence bracts are drawn rotated at different angles to make them form a circle around the stem. If 'no', they are all drawn at the same angle (and usually there is only one oddly-shaped 3D object).</LI>
+<LI>Angle between bracts and stem: The angle at which the inflorescence bracts are drawn back from the center of the stem.</LI></UL>
+
+<B><P>Secondary flowers</P>
+
+<UL>
+<LI>Flower petals</B>: Primary flowers are perfect (hermaphroditic) or female, and secondary flowers are only male. Ninety percent of flowering plants have only perfect flowers. Secondary flowers can only have stamens, one row of petals, and sepals (because it's not worth including so many parameters for parts rarely used).</LI>
+<LI>Number of petals on flower: The number of petals on the flower.</LI>
+<LI>Flower petal 3D object: The 3D object used to draw the flower petals.</LI>
+<LI>Flower petal scale at full size: The drawing scale of the flower petal 3D object when the flower is fully grown.</LI>
+<LI>Flower petal X rotation: Just before this 3D object is drawn, it will be rotated in the X dimension by this amount. Normally you will leave this at zero, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Flower petal Y rotation: Just before this 3D object is drawn, it will be rotated in the Y dimension by this amount. Normally you will leave this at zero, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Flower petal Z rotation: Just before this 3D object is drawn, it will be rotated in the Z dimension by this amount. Normally you will leave this at zero, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Flower petal front face color: The front face (facing in) color for flower petals.</LI>
+<LI>Flower petal back face color: The back face (facing out) color for flower petals.</LI>
+<LI>Flower petals are radially arranged: If 'yes', the petals are drawn rotated at different angles to make them form a circle around the stem. If 'no', they are all drawn at the same angle (and usually there is only one oddly-shaped 3D object).</LI>
+<LI>Angle between petals and main stem: The angle at which the petals are drawn back from the center of the flower. Usually you will want to specify an increasing angle for each layer of floral parts. How this appears on the plant depends on how the 3D object you are using for petals was defined.</LI>
+<B><LI>Creation and growth</B>: The size of any plant part is determined by an 'optimal' size and the actual conditions of growth. Plant parts compete for the available nutrients, as established by the general growth parameters. To simplify things, we express the weight (biomass) of plant parts simply as a percentage of the total final weight of the plant.</LI>
+<LI>Optimal biomass (as percent of maximum plant biomass): The biomass (dry weight) of a complete or best flower, expressed as a percentage of final plant dry weight.</LI>
+<LI>Minimum fraction of optimal biomass needed to open: The smallest fraction of the optimal (best) amount of flower biomass that must be accumulated before the flower can open.</LI>
+<B><LI>Timing</B>: Timing parameters set bounds on how slowly or quickly plant parts can grow to create a realistic growth pattern. For secondary (male) flowers, additional timing limits support showing (or not showing) different stages of flower development, including dropping off the plant after pollination is finished.</LI>
+<LI>Minimum days to grow: The shortest number of days in which the flower can grow to maturity, no matter how much biomass is available. This simulates physical limitations on the rate of growth.</LI>
+<LI>Maximum days to grow: Days the flower will accumulate biomass towards maturity before it gives up and stops growing. This simulates the plant's concentration of resources on newer meristems.</LI>
+<LI>Minimum days before opening: The shortest number of days after flower creation that the flower can open from the flower bud.</LI>
+<LI>Days until drop: Days between the appearance of flowers and their abscission (falling off).</LI>
+<B><LI>Stamens</B>: Stamens are the male organs of the flower. The anther, which holds the pollen, is connected to the flower base by a stalk called the filament, and together these make up a stamen.</LI>
+<LI>Number of stamens in flower: The number of stamens on the flower.</LI>
+<LI>Filament length at full size: How long to draw the filament when the flower is fully grown. A filament is the stalk that (with the anther) makes up the stamen, the pollen-holding part of the flower.</LI>
+<LI>Filament width at full size: The width of the filament when the flower is fully grown.</LI>
+<LI>Filament taper index (taper to % of width): How much to taper the filament's width as it reaches the anther 3D object. For no tapering, choose 100% of initial width (the default). To taper the filament, choose a lower percentage.</LI>
+<LI>Filament color: The color of filaments (anther stalks).</LI>
+<LI>Angle between filament and main flower axis: The angle at which the filaments are drawn back from the center of the flower. Usually you will want to specify an increasing angle for each layer of floral parts.</LI>
+<LI>Number of sections in anther: You can make an anther with one planar 3D object, in which case it looks sort of like a leaf, or you can make it with one 3D object drawn multiple times and spun around to produce an enclosed three-dimensional structure (like sections of an orange make up an orange). This parameter is the number of times to draw the specified 'section' 3D object to form the anther structure.</LI>
+<LI>Anther section 3D object: The 3D object used to draw the anthers on the flower.</LI>
+<LI>Anther section scale at full size: The drawing scale of the anther 3D object when the flower is fully grown.</LI>
+<LI>Anther section X rotation: Just before this 3D object is drawn, it will be rotated in the X dimension by this amount. Normally you will leave this at zero, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Anther section Y rotation: Just before this 3D object is drawn, it will be rotated in the Y dimension by this amount. Normally you will leave this at zero, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Anther section Z rotation: Just before this 3D object is drawn, it will be rotated in the Z dimension by this amount. Normally you will leave this at zero, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Anther section front face color: The front face (facing in) color for anthers.</LI>
+<LI>Anther section back face color: The back face (facing out) color for anthers.</LI>
+<LI>Anther sections are radially arranged: If 'yes', the 3D objects used to draw one anther are drawn rotated at different angles to make them form a circle around the stem. If 'no', they are all drawn at the same angle (and usually there is only one oddly-shaped 3D object).</LI>
+<B><LI>Sepals</B>: Sepals are the outermost layer of the flower's covering parts, and are often green.</LI>
+<LI>Number of sepals on flower: The number of sepals on the flower.</LI>
+<LI>Sepal 3D object: The 3D object used to draw the sepals.</LI>
+<LI>Sepal scale at full size: The drawing scale of the sepal 3D object when the flower is fully grown.</LI>
+<LI>Sepal X rotation: Just before this 3D object is drawn, it will be rotated in the X dimension by this amount. Normally you will leave this at zero, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Sepal Y rotation: Just before this 3D object is drawn, it will be rotated in the Y dimension by this amount. Normally you will leave this at zero, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Sepal Z rotation: Just before this 3D object is drawn, it will be rotated in the Z dimension by this amount. Normally you will leave this at zero, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Sepal front face color: The front face (facing in) color for sepals.</LI>
+<LI>Sepal back face color: The back face (facing out) color for sepals.</LI>
+<LI>Sepals are radially arranged: If 'yes', the 3D objects used to draw the sepals are drawn rotated at different angles to make them form a circle around the stem. If 'no', they are all drawn at the same angle (and usually there is only one oddly-shaped 3D object).</LI>
+<LI>Angle between sepals and main stem: The angle at which the sepals are drawn back from the center of the flower. Usually you will want to specify an increasing angle for each layer of floral parts. How this appears on the plant depends on how the 3D object you are using for sepals was defined.</LI>
+<B><LI>Flower bud</B>: You can draw the flower bud either as a separate 3D object, or simply by opening up the angles that draw the floral parts.</LI>
+<LI>How to draw bud: If 'no bud', don't draw a bud on the flower at all. If 'single 3D object bud', draw a single 3D object (usually spun around in a circle) during the bud stage (this is the pre-PS2 style). If 'unfolding flower', don't draw a separate bud, but 'open up' the flower by drawing all of its parts small and folded in together.</LI>
+<LI>Number of petals on flower bud: The number of flower bud petals.</LI>
+<LI>Bud petal 3D object: The 3D object used to draw the flower petals.</LI>
+<LI>Bud petal scale at full size: The drawing scale of the flower bud petal 3D object when the flower bud is fully grown (before the flower appears).</LI>
+<LI>Bud petal X rotation: Just before this 3D object is drawn, it will be rotated in the X dimension by this amount. Normally you will leave this at zero, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Bud petal Y rotation: Just before this 3D object is drawn, it will be rotated in the Y dimension by this amount. Normally you will leave this at zero, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Bud petal Z rotation: Just before this 3D object is drawn, it will be rotated in the Z dimension by this amount. Normally you will leave this at zero, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Bud petal front face color: The front face (facing in) color for flower bud petals.</LI>
+<LI>Bud petal back face color: The back face (facing out) color for flower bud petals.</LI>
+<LI>Bud petals are radially arranged: If 'yes', the 3D objects used to draw the flower bud are drawn rotated at different angles to make them form a circle around the stem. If 'no', they are all drawn at the same angle (and usually there is only one oddly-shaped 3D object).</LI>
+<LI>Angle between bud petals and main stem: The angle at which the bud petals are drawn back from the center of the flower.</LI></UL>
+
+<B><P>Secondary inflorescences</P>
+
+<UL>
+<LI>Architecture</B>: An inflorescence is a structure that holds the flowers on the plant. It can have many shapes, many of which can be created by combining these parameters (note that sunflower-like inflorescences have a special parameter). As with flowers, inflorescences can be primary (hermaphroditic or female) or secondary (male only).</LI>
+<LI>Number of flowers on main branch: The number of flowers on the main branch of the inflorescence. This is produced without variation.</LI>
+<LI>Number of flowers per secondary branch: The number of flowers on each secondary branch (not the main branch) of the inflorescence. This number of flowers will be produced on each branch whenever an inflorescence is produced, with no variation.</LI>
+<LI>Number of secondary branches: The number of secondary inflorescence stems on the inflorescence. For spikes, racemes and umbels, this number should be zero. For panicles, this number depends on the number of flowers. Tertiary branches cannot be drawn.</LI>
+<LI>Stalk color: The color of the inflorescence stem.</LI>
+<LI>Pedicel color: The color of pedicels (flower stems).</LI>
+<LI>Inflorescence branches are alternate: If 'yes', the branches on the inflorescence are alternate (one to the left, then one to the right, etc). If  'no', the branches on the inflorescence (if any) will be drawn opposite (in pairs).</LI>
+<LI>Angle of inflor. branch with inflor. stem: The angle between the main inflorescence stem and each 'branch' of the inflorescence -- that is, each secondary inflorescence stem. Panicle inflorescences have branches; racemes do not.</LI>
+<LI>Angle between flowers (to bend infllorescence): The angle between sections of the inflorescence. To make the inflorescence bend over its length, make this angle greater than zero.</LI>
+<LI>Angle of pedicel with inflor. stem: The angle between the main inflorescence stem and each single flower stalk or pedicel.</LI>
+<LI>Angle of peduncle with plant stem if axillary: The angle at the start of the inflorescence if it comes out of an axillary bud from a plant stem (not used if the inflorescence is apical).</LI>
+<LI>Angle of peduncle with plant stem if apical: The angle at the start of the inflorescence if it comes out of an apical bud from a plant stem (not used if the inflorescence is axillary).</LI>
+<LI>Flowers spiral around main stem: If 'yes', the flowers on the inflorescence are drawn using the same phyllotaxis (spiraling) around the inflorescence stem (and branches) as is used for the main stem. If 'no', the flowers are drawn without spiraling.</LI>
+<LI>Head type (like sunflower): The inflorescence is of the composite type. The small disc flowers are drawn in a circle, each with one petal that looks something like a ray flower. This is not botanically accurate but looks right.</LI>
+<B><LI>Size</B>: These parameters control how large all the parts of the inflorescence will appear on the plant. Apical inflorescences are found at the tips of branches; axillary inflorescences are found in the angle between leaf and stem.</LI>
+<LI>Primary stalk length if apical (terminal): The length of the main inflorescence stem before the first flower if the inflorescence is apical (at the apex or end of a plant stem).</LI>
+<LI>Primary stalk length if axillary: The length of the primary inflorescence stem before the first flower stalk (pedicel) if the inflorescence is axillary (coming out of the leaf axils on plant stems).</LI>
+<LI>Internode length (between flowers): The length of the segments of the main inflorescence stem between pedicels (flower stalks). Similar to the internode length for the entire plant. For an umbelliferous flower, make this number very small; for a raceme or spike make this number larger.</LI>
+<LI>Pedicel (flower stalk) length: The length of each pedicel (flower stalk) in the inflorescence.</LI>
+<LI>Stem width: The width of the inflorescence stem when the inflorescence is fully grown.</LI>
+<LI>Pedicel taper index: How much to taper the pedicel's width as it reaches the flower. For no tapering, choose 100% of initial width (the default). To taper the pedicel, choose a lower percentage.</LI>
+<B><LI>Creation and growth</B>: The size of any plant part is determined by an 'optimal' size and the actual conditions of growth. Plant parts compete for the available nutrients, as established by the general growth parameters. To simplify things, we express the weight (biomass) of plant parts simply as a percentage of the total final weight of the plant.</LI>
+<LI>Apical (terminal): The secondary inflorescences for this plant are apical (at the apex or end of a plant stem). This parameter is only used if separate primary and secondary inflorescences are present on the plant.</LI>
+<LI>Optimal biomass (as percent of maximum plant biomass): The biomass (dry weight) of a complete or best inflorescence, expressed as a percentage of final plant dry weight.</LI>
+<LI>Minimum fraction of optimal biomass needed to create: The smallest fraction of the optimal (best) amount of inflorescence biomass that must be accumulated before the inflorescence can be created.</LI>
+<LI>Minimum fraction of optimal biomass needed to make flowers: The smallest fraction of the optimal (best) amount of inflorescence biomass that must be accumulated before the inflorescence can begin to create flowers.</LI>
+<B><LI>Timing</B>: Timing parameters set bounds on how slowly or quickly plant parts can grow to create a realistic growth pattern. For inflorescences, timing parameters control not only limits on growth, but also how the inflorescence produces its flowers.</LI>
+<LI>Days for all flowers to develop: Days it takes to create the flowers on the inflorescence. Flowers are created without accumulating biomass beforehand. They begin to demand biomass as soon as they are created, to open from buds to flowers and then to grow to full size.</LI>
+<LI>Flowers develop from top to bottom: If 'yes', the flowers on the inflorescence develop in order from the top to the bottom (basipetal). If 'no', flowers develop from the bottom to the top (acropetal).</LI>
+<LI>Minimum days for meristem to create: The shortest number of days in which a reproductive meristem can produce an inflorescence, no matter how much biomass is available. This simulates physical limitations on the rate of growth.</LI>
+<LI>Maximum days for meristem to create: Days a reproductive meristem will accumulate biomass towards creation of an inflorescence before it gives up and creates a smaller inflorescence. This simulates the plant's concentration of resources on newer meristems.</LI>
+<LI>Minimum days to grow: The shortest number of days in which the inflorescence can possibly reach its optimal biomass after its creation. This simulates physical limitations on the rate of growth.</LI>
+<LI>Maximum days to grow: Days the inflorescence will attempt to accumulate biomass to reach its optimal biomass (after its creation) before it stops growing. This simulates the plant's concentration of resources on the demands of newer plant parts.</LI>
+<B><LI>Bracts</B>: Some inflorescences begin with a set of modified leaves called bracts. The red 'petals' of poinsetta plants are actually large bracts below the tiny yellow flowers in the inflorescence.</LI>
+<LI>Number of bracts at start of inflorescence: The number of inflorescence bracts.</LI>
+<LI>Bract 3D object: The 3D object used to draw inflorescence bracts.</LI>
+<LI>Bract scale at full size: The drawing scale of the inflorescence bract 3D object when the inflorescence is fully grown.</LI>
+<LI>Bract X rotation: Just before this 3D object is drawn, it will be rotated in the X dimension by this amount. Normally you will leave this at zero, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Bract Y rotation: Just before this 3D object is drawn, it will be rotated in the Y dimension by this amount. Normally you will leave this at zero, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Bract Z rotation: Just before this 3D object is drawn, it will be rotated in the Z dimension by this amount. Normally you will leave this at zero, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Bract front face color: The front face (facing in) color for inflorescence bracts.</LI>
+<LI>Bract back face color: The back face (facing out) color for inflorescence bracts.</LI>
+<LI>Bracts are radially arranged: If 'yes', the 3D objects used to draw inflorescence bracts are drawn rotated at different angles to make them form a circle around the stem. If 'no', they are all drawn at the same angle (and usually there is only one oddly-shaped 3D object).</LI>
+<LI>Angle between bracts and inflorescence stem: The angle at which the inflorescence bracts are drawn back from the center of the stem.</LI></UL>
+
+<B><P>Fruit</P>
+
+<UL>
+<LI>Drawing</B>: Fruits are drawn very simply with a 3D object, usually rotated around in 'sections' to form a solid-looking object. You can specify colors for the fruit in its ripe and unripe stages.</LI>
+<LI>Number of sections in fruit: You can make a fruit with one planar 3D object, in which case it looks sort of like a leaf, or you can make it with one 3D object drawn multiple times and spun around to produce an enclosed three-dimensional structure (like sections of an orange make up an orange). This parameter is the number of times to draw the specified 'section' 3D object to form the fruit structure.</LI>
+<LI>Fruit section 3D object: The 3D object used to draw fruit sections. Fruit sections do not simulate real objects; they just make it easier to draw roughly spherical fruits.</LI>
+<LI>Fruit section scale at full size: The drawing scale of the fruit section 3D object when the fruit is fully grown.</LI>
+<LI>Fruit section X rotation: Just before this 3D object is drawn, it will be rotated in the X dimension by this amount. Normally you will leave this at zero, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Fruit section Y rotation: Just before this 3D object is drawn, it will be rotated in the Y dimension by this amount. Normally you will leave this at zero, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Fruit section Z rotation: Just before this 3D object is drawn, it will be rotated in the Z dimension by this amount. Normally you will leave this at zero, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Fruit sections are radially arranged: If 'yes', the 3D objects used to draw sections of a fruit are drawn rotated at different angles to make them form a circle around the stem. If 'no', they are all drawn at the same angle (and usually there is only one oddly-shaped 3D object).</LI>
+<LI>Unripe fruit section front face color: The front face (facing in) color for sections of an unripe fruit.</LI>
+<LI>Unripe fruit section back face color: The back face (facing out) color for sections of an unripe fruit.</LI>
+<LI>Ripe fruit section front face color: The front face (facing in) color for sections of a ripe fruit.</LI>
+<LI>Ripe fruit section back face color: The back face (facing out) color for sections of a ripe fruit. </LI>
+<B><LI>Creation and growth</B>: The size of any plant part is determined by an 'optimal' size and the actual conditions of growth. Plant parts compete for the available nutrients, as established by the general growth parameters. To simplify things, we express the weight (biomass) of plant parts simply as a percentage of the total final weight of the plant.</LI>
+<LI>Optimum biomass (as percent of maximum plant biomass): The biomass (dry weight) of a complete or best fruit, expressed as a percentage of final plant dry weight.</LI>
+<LI>Growth curve: Fraction of final optimal (best) fruit biomass (Y) for a given fruit age (X). Fruits tend to grow in an s-curve fashion, so simulated fruit demands for biomass from the plant attempt to follow this curve.</LI>
+<B><LI>Timing</B>: Timing parameters set bounds on how slowly or quickly plant parts can grow to create a realistic growth pattern. For fruit, they also determine when the fruit 'ripens' by changing color.</LI>
+<LI>Minimum days to grow: The shortest number of days in which a fruit can grow to maturity, no matter how much biomass is available. This simulates physical limitations on the rate of growth.</LI>
+<LI>Maximum days to grow: Days a fruit will accumulate biomass towards maturity before it gives up and stops growing. This simulates the plant's concentration of resources on newer meristems.</LI>
+<LI>Days to ripen once full-sized: Days it takes for a fruit on this plant to ripen once it has stopped expanding. This is only for drawing (it has a different color when it is ripe) and does not affect the model.</LI></UL>
+
+<B><P>Root top</P>
+
+<UL>
+<LI>Drawing</B>: The root top isn't modeled as part of the plant; it's just drawn on the bottom of the plant very simply, to accommodate plants like carrots and beets.</LI>
+<LI>Root top shows above ground: The top of the root for this plant shows above the ground (and is worth looking at, as in a carrot or beet). If 'yes', a 3D object and colors should be chosen for the root top.</LI>
+<LI>Root top 3D object: The 3D object used to draw the top of the root (the part you can see sticking out of the ground, as in a carrot).</LI>
+<LI>Root top scale at full size: The drawing scale of the root top 3D object when the plant is mature.</LI>
+<LI>Root top X rotation: Just before this 3D object is drawn, it will be rotated in the X dimension by this amount. Normally you will leave this at zero, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Root top Y rotation: Just before this 3D object is drawn, it will be rotated in the Y dimension by this amount. Normally you will leave this at zero, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Root top Z rotation: Just before this 3D object is drawn, it will be rotated in the Z dimension by this amount. Normally you will leave this at zero, but you might need to set it differently if you have imported 3D objects from DXF files.</LI>
+<LI>Root top front face color: The front face (facing in) color for the root top.</LI>
+<LI>Root top back face color: The back face (facing out) color for the root top.</LI></UL>
+
+<font size=-1>PlantStudio is a product of Kurtz-Fernhout Software. For more information on this product and our other software titles, visit our web site at 
+<a href="http://www.kurtz-fernhout.com">http://www.kurtz-fernhout.com</a>. The PlantStudio software program and all documentation is 
+Copyright 1998-2002 Cynthia F. Kurtz and Paul D. Fernhout All Rights Reserved. PlantStudio is a trademark of Cynthia F. Kurtz and Paul D. Fernhout. 
+<p>
+
+<P>&nbsp;</P></BODY>
+</HTML>
