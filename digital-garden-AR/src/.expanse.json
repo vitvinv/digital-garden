@@ -202,7 +202,7 @@
     "a8f21946-b2fe-4589-9302-6232ec649775": {
       "id": "a8f21946-b2fe-4589-9302-6232ec649775",
       "position": [
-        1,
+        0,
         0,
         0
       ],
@@ -221,11 +221,12 @@
       "material": null,
       "parentId": "88453035-dc0f-486d-868a-8ff7c2fda864",
       "components": {},
-      "name": "Air",
+      "name": "Garden",
       "imageTarget": {
-        "name": "22_Element_Air"
+        "name": "garden-sticker"
       },
-      "order": 2.150211680966083
+      "order": 2.150211680966083,
+      "hidden": false
     },
     "15816879-3500-4b51-9c88-2419bf1a7bff": {
       "id": "15816879-3500-4b51-9c88-2419bf1a7bff",
@@ -259,38 +260,8 @@
         "loop": true
       },
       "name": "0_Card_Container.gltf",
-      "order": 2.716933167964583
-    },
-    "26105c67-faa8-43cb-901e-6fcb80f31f87": {
-      "id": "26105c67-faa8-43cb-901e-6fcb80f31f87",
-      "position": [
-        0,
-        0,
-        0
-      ],
-      "rotation": [
-        0,
-        0,
-        0,
-        1
-      ],
-      "scale": [
-        1,
-        1,
-        1
-      ],
-      "parentId": "28878a86-3de0-4d09-a97d-e2aca00f534b",
-      "components": {},
-      "gltfModel": {
-        "src": {
-          "type": "asset",
-          "asset": "assets/playing-cards/0_Card_Front.gltf/0_Card_Front.gltf"
-        },
-        "animationClip": "",
-        "loop": true
-      },
-      "name": "0_Card_Front.gltf",
-      "order": 0.2059880580250355
+      "order": 2.716933167964583,
+      "hidden": false
     },
     "0cfa66a2-eff3-41a1-b0f0-0bcfc198966f": {
       "id": "0cfa66a2-eff3-41a1-b0f0-0bcfc198966f",
@@ -321,7 +292,8 @@
         "loop": true
       },
       "name": "22_Element_Air.gltf",
-      "order": 3.8259768816164055
+      "order": 3.8259768816164055,
+      "hidden": true
     },
     "28878a86-3de0-4d09-a97d-e2aca00f534b": {
       "id": "28878a86-3de0-4d09-a97d-e2aca00f534b",
@@ -345,452 +317,8 @@
       "material": null,
       "parentId": "a8f21946-b2fe-4589-9302-6232ec649775",
       "components": {},
-      "name": "Card"
-    },
-    "fa9f1e85-91a8-4d7c-88e9-f63f0a3f0e81": {
-      "id": "fa9f1e85-91a8-4d7c-88e9-f63f0a3f0e81",
-      "position": [
-        3,
-        0,
-        0
-      ],
-      "rotation": [
-        0,
-        0,
-        0,
-        1
-      ],
-      "scale": [
-        2,
-        2,
-        2
-      ],
-      "geometry": null,
-      "material": null,
-      "parentId": "88453035-dc0f-486d-868a-8ff7c2fda864",
-      "components": {},
-      "name": "Water",
-      "imageTarget": {
-        "name": "23_Element_Water"
-      },
-      "order": 3.681079881923593
-    },
-    "d344585b-22b4-49ab-96b8-6d07012a39dd": {
-      "id": "d344585b-22b4-49ab-96b8-6d07012a39dd",
-      "position": [
-        0,
-        0,
-        0
-      ],
-      "rotation": [
-        0,
-        0,
-        0,
-        1
-      ],
-      "scale": [
-        0.31,
-        0.31,
-        0.31
-      ],
-      "geometry": null,
-      "material": null,
-      "parentId": "fa9f1e85-91a8-4d7c-88e9-f63f0a3f0e81",
-      "components": {},
-      "name": "Card"
-    },
-    "0a66b32e-b653-43ef-ba69-b69fc236c5a6": {
-      "id": "0a66b32e-b653-43ef-ba69-b69fc236c5a6",
-      "position": [
-        0,
-        0,
-        0
-      ],
-      "rotation": [
-        0,
-        0,
-        0,
-        1
-      ],
-      "scale": [
-        1,
-        1,
-        1
-      ],
-      "material": {
-        "type": "hider"
-      },
-      "parentId": "d344585b-22b4-49ab-96b8-6d07012a39dd",
-      "components": {},
-      "gltfModel": {
-        "src": {
-          "type": "asset",
-          "asset": "assets/playing-cards/0_Card_Container.gltf/0_Card_Container.gltf"
-        },
-        "animationClip": "",
-        "loop": true
-      },
-      "name": "0_Card_Container.gltf",
-      "order": 0.48035683673324503
-    },
-    "096e63a7-1a4d-4e13-85a6-caa07f78e552": {
-      "id": "096e63a7-1a4d-4e13-85a6-caa07f78e552",
-      "position": [
-        0,
-        0,
-        0
-      ],
-      "rotation": [
-        0,
-        0,
-        0,
-        1
-      ],
-      "scale": [
-        1,
-        1,
-        1
-      ],
-      "parentId": "d344585b-22b4-49ab-96b8-6d07012a39dd",
-      "components": {},
-      "gltfModel": {
-        "src": {
-          "type": "asset",
-          "asset": "assets/playing-cards/0_Card_Front.gltf/0_Card_Front.gltf"
-        },
-        "animationClip": "",
-        "loop": true
-      },
-      "name": "0_Card_Front.gltf",
-      "order": 0.2059880580250355
-    },
-    "543b0031-e027-4d0c-9129-ed558a1776c1": {
-      "id": "543b0031-e027-4d0c-9129-ed558a1776c1",
-      "position": [
-        0,
-        0,
-        0
-      ],
-      "rotation": [
-        0,
-        0,
-        0,
-        0.9999999999999998
-      ],
-      "scale": [
-        1,
-        0.9999999999999999,
-        0.9999999999999999
-      ],
-      "parentId": "d344585b-22b4-49ab-96b8-6d07012a39dd",
-      "components": {},
-      "gltfModel": {
-        "src": {
-          "type": "asset",
-          "asset": "assets/playing-cards/23_Element_Water.gltf/23_Element_Water.gltf"
-        },
-        "animationClip": "",
-        "loop": true
-      },
-      "name": "23_Element_Water.gltf",
-      "order": 0.7960714756297046
-    },
-    "9e8d85dc-ed76-4e95-933b-896094458bde": {
-      "id": "9e8d85dc-ed76-4e95-933b-896094458bde",
-      "position": [
-        -1,
-        0,
-        0
-      ],
-      "rotation": [
-        0,
-        0,
-        0,
-        1
-      ],
-      "scale": [
-        2,
-        2,
-        2
-      ],
-      "geometry": null,
-      "material": null,
-      "parentId": "88453035-dc0f-486d-868a-8ff7c2fda864",
-      "components": {},
-      "name": "Earth",
-      "imageTarget": {
-        "name": "25_Element_Earth"
-      },
-      "order": 5.546400582424154
-    },
-    "ee9c57e2-266c-4ada-b2c2-d75518b49425": {
-      "id": "ee9c57e2-266c-4ada-b2c2-d75518b49425",
-      "position": [
-        0,
-        0,
-        0
-      ],
-      "rotation": [
-        0,
-        0,
-        0,
-        1
-      ],
-      "scale": [
-        0.31,
-        0.31,
-        0.31
-      ],
-      "geometry": null,
-      "material": null,
-      "parentId": "9e8d85dc-ed76-4e95-933b-896094458bde",
-      "components": {},
-      "name": "Card"
-    },
-    "a75f7292-09c1-4446-8129-2ec59e0094c8": {
-      "id": "a75f7292-09c1-4446-8129-2ec59e0094c8",
-      "position": [
-        0,
-        0,
-        0
-      ],
-      "rotation": [
-        0,
-        0,
-        0,
-        1
-      ],
-      "scale": [
-        0.9999999999999999,
-        0.9999999999999998,
-        0.9999999999999998
-      ],
-      "parentId": "ee9c57e2-266c-4ada-b2c2-d75518b49425",
-      "components": {},
-      "gltfModel": {
-        "src": {
-          "type": "asset",
-          "asset": "assets/playing-cards/25_Element_Earth.gltf/25_Element_Earth.gltf"
-        },
-        "animationClip": "",
-        "loop": true
-      },
-      "name": "25_Element_Earth.gltf",
-      "order": 3.244088868463868
-    },
-    "3cfec7f2-6686-4ec4-b09e-3156dad6b74e": {
-      "id": "3cfec7f2-6686-4ec4-b09e-3156dad6b74e",
-      "position": [
-        0,
-        0,
-        0
-      ],
-      "rotation": [
-        0,
-        0,
-        0,
-        0.9999999999999998
-      ],
-      "scale": [
-        1,
-        0.9999999999999999,
-        0.9999999999999999
-      ],
-      "parentId": "ee9c57e2-266c-4ada-b2c2-d75518b49425",
-      "components": {},
-      "gltfModel": {
-        "src": {
-          "type": "asset",
-          "asset": "assets/playing-cards/0_Card_Front.gltf/0_Card_Front.gltf"
-        },
-        "animationClip": "",
-        "loop": true
-      },
-      "name": "0_Card_Front.gltf",
-      "order": -3.707290811090295
-    },
-    "78a96e21-9e95-469b-afd2-c42b68efde7e": {
-      "id": "78a96e21-9e95-469b-afd2-c42b68efde7e",
-      "position": [
-        0,
-        0,
-        0
-      ],
-      "rotation": [
-        0,
-        0,
-        0,
-        0.9999999999999998
-      ],
-      "scale": [
-        1,
-        0.9999999999999999,
-        0.9999999999999999
-      ],
-      "material": {
-        "type": "hider"
-      },
-      "parentId": "ee9c57e2-266c-4ada-b2c2-d75518b49425",
-      "components": {},
-      "gltfModel": {
-        "src": {
-          "type": "asset",
-          "asset": "assets/playing-cards/0_Card_Container.gltf/0_Card_Container.gltf"
-        },
-        "animationClip": "",
-        "loop": true
-      },
-      "name": "0_Card_Container.gltf",
-      "order": -2.0190705743302577
-    },
-    "cac6e34c-a449-4bd8-9fad-3bb9d083b92a": {
-      "id": "cac6e34c-a449-4bd8-9fad-3bb9d083b92a",
-      "position": [
-        -3,
-        0,
-        0
-      ],
-      "rotation": [
-        0,
-        0,
-        0,
-        1
-      ],
-      "scale": [
-        2,
-        2,
-        2
-      ],
-      "geometry": null,
-      "material": null,
-      "parentId": "88453035-dc0f-486d-868a-8ff7c2fda864",
-      "components": {},
-      "name": "Fire",
-      "imageTarget": {
-        "name": "20_Element_Fire"
-      },
-      "order": 6.768719824337127
-    },
-    "608c9340-f8f8-4b2b-94d6-d0e9d818411e": {
-      "id": "608c9340-f8f8-4b2b-94d6-d0e9d818411e",
-      "position": [
-        0,
-        0,
-        0
-      ],
-      "rotation": [
-        0,
-        0,
-        0,
-        1
-      ],
-      "scale": [
-        0.31,
-        0.31,
-        0.31
-      ],
-      "geometry": null,
-      "material": null,
-      "parentId": "cac6e34c-a449-4bd8-9fad-3bb9d083b92a",
-      "components": {},
-      "name": "Card"
-    },
-    "82dfdd68-5722-415a-9f6c-9f30c92240f0": {
-      "id": "82dfdd68-5722-415a-9f6c-9f30c92240f0",
-      "position": [
-        0,
-        0,
-        0
-      ],
-      "rotation": [
-        0,
-        0,
-        0,
-        0.9999999999999998
-      ],
-      "scale": [
-        1,
-        0.9999999999999999,
-        0.9999999999999999
-      ],
-      "parentId": "608c9340-f8f8-4b2b-94d6-d0e9d818411e",
-      "components": {},
-      "gltfModel": {
-        "src": {
-          "type": "asset",
-          "asset": "assets/playing-cards/0_Card_Front.gltf/0_Card_Front.gltf"
-        },
-        "animationClip": "",
-        "loop": true
-      },
-      "name": "0_Card_Front.gltf",
-      "order": -3.707290811090295
-    },
-    "08d59c7d-ef2a-4167-a8b2-4b860be9780b": {
-      "id": "08d59c7d-ef2a-4167-a8b2-4b860be9780b",
-      "position": [
-        0,
-        0,
-        0
-      ],
-      "rotation": [
-        0,
-        0,
-        0,
-        0.9999999999999998
-      ],
-      "scale": [
-        1,
-        0.9999999999999999,
-        0.9999999999999999
-      ],
-      "material": {
-        "type": "hider"
-      },
-      "parentId": "608c9340-f8f8-4b2b-94d6-d0e9d818411e",
-      "components": {},
-      "gltfModel": {
-        "src": {
-          "type": "asset",
-          "asset": "assets/playing-cards/0_Card_Container.gltf/0_Card_Container.gltf"
-        },
-        "animationClip": "",
-        "loop": true
-      },
-      "name": "0_Card_Container.gltf",
-      "order": -2.0190705743302577
-    },
-    "491bf145-06fa-476d-9498-fca791972776": {
-      "id": "491bf145-06fa-476d-9498-fca791972776",
-      "position": [
-        0,
-        0,
-        0
-      ],
-      "rotation": [
-        0,
-        0,
-        0,
-        1
-      ],
-      "scale": [
-        1,
-        1,
-        1
-      ],
-      "geometry": null,
-      "material": null,
-      "parentId": "608c9340-f8f8-4b2b-94d6-d0e9d818411e",
-      "components": {},
-      "gltfModel": {
-        "src": {
-          "type": "asset",
-          "asset": "assets/playing-cards/20_Element_Fire.gltf/20_Element_Fire.gltf"
-        },
-        "animationClip": "",
-        "loop": true
-      },
-      "name": "20_Element_Fire.gltf"
+      "name": "Card",
+      "hidden": false
     },
     "f251ec0b-764f-4b71-b107-e95fa8289f64": {
       "id": "f251ec0b-764f-4b71-b107-e95fa8289f64",
@@ -2241,6 +1769,39 @@
       "order": 17.028744183474238,
       "parentId": "377b65a9-0810-4e9a-8efd-261b32b1bd8b",
       "hidden": true
+    },
+    "daa72afa-34cc-405f-86bc-3b6570019359": {
+      "id": "daa72afa-34cc-405f-86bc-3b6570019359",
+      "position": [
+        0,
+        -1.0159389620595132,
+        -0.6403132313263393
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        3.712903225806455,
+        3.712903225806455,
+        3.712903225806455
+      ],
+      "geometry": null,
+      "material": null,
+      "parentId": "28878a86-3de0-4d09-a97d-e2aca00f534b",
+      "components": {},
+      "gltfModel": {
+        "src": {
+          "type": "asset",
+          "asset": "assets/daylily.glb"
+        },
+        "animationClip": "",
+        "loop": true
+      },
+      "name": "daylily.glb",
+      "order": 5.5451557112176495
     }
   },
   "spaces": {
