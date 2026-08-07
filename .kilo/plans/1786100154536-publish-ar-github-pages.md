@@ -1,136 +1,91 @@
-# Publish AR Experience to GitHub Pages + Fix Daily Growth Pipeline
+# AR Garden on garden.v-e-v.org + Restructure to Per-Plant Growth Pipeline
 
-## Goal
+## Context (verified)
 
-Get the 8th Wall Studio AR experience (with the new Blender `daylily.glb` plant) live on GitHub Pages, openable from a phone, with the daily plant-growth script automatically rebuilding and redeploying it.
+- Repo `vitvinv/digital-garden` → GitHub Pages at **https://garden.v-e-v.org/** (`build_type: workflow`, custom domain, HTTPS enforced, cert valid to 2026-10-30). All assets currently return 200, including `assets/daylily.glb`.
+- The scene (`digital-garden-AR/src/.expanse.json`) has a "Playing Cards" space (the **default** space per the space-selector) with a `Garden` entity anchored to the **`garden-sticker`** image target, whose child is `daylily.glb`. World camera confirmed (`xrCameraType: "world"`).
+- **Bug:** `digital-garden-AR/src/app.js` registers only the 4 element-card targets in `XR8.XrController.configure`. Per the Studio docs (https://8thwall.org/docs/studio/guides/xr/image-targets), every target must be listed there — `garden-sticker` is not, so scanning the sticker shows nothing.
+- **Risk:** the scene still references assets that don't exist in the repo: `assets/bmo-bites/cereal.glb`, `assets/bmo-bites/bmo.glb`, `assets/toggle-slam/palm-tree.glb`, `assets/magic-photos/waves.mp4` (removed in commit a031662). May cause startup errors on the phone; the Playing Cards space itself references only existing assets.
+- Blender addon (`blender_addon/`, gitignored): the growth engine + mesh drawing live in **`core/` (pure Python, zero bpy)** — `grow_species(species, day, seed, tdo_library)` → `draw_plant(plant, MeshTurtle(MeshBuffer))` → verts/faces/colors. Proven headless by 48 tests. `scene_bridge.py` shows the exact headless recipe: `MeshTurtle` scale `0.001` (mm→m), `orient_vertices()` (rotate −90° about Y), then mesh/GLB export. The addon's "slider" is the `Age (days)` property (`ps_day`).
+- The addon has **no GLB export code** (README's `export_glb.py` never existed) — Blender's native exporter is used today.
+- `blender_addon/__init__.py` imports bpy only inside `register()`/`unregister()` → `import blender_addon.core` is safe without Blender.
+- CI facts: GitHub Actions `Deploy to GitHub Pages` builds `digital-garden-AR` (webpack) on push. `Daily Garden Growth` runs on the hosted runner with pip deps and explicitly dispatches the deploy (`GITHUB_TOKEN` pushes don't trigger workflows — verified). `src/assets/**` and `image-targets/**` are Git LFS.
 
-## Verified current state (no speculation)
+## Decisions (user-confirmed)
 
-- **GitHub Pages is already live and configured.** Repo `vitvinv/digital-garden`, Pages `build_type: workflow`, custom domain **`garden.v-e-v.org`**, HTTPS enforced, TLS cert approved (expires 2026-10-30). No DNS/Porkbun action needed.
-- **Deploy workflow already succeeds** on every push to `main` (latest run `31171757433`, 2026-08-07, green). It builds `digital-garden-AR` with webpack and deploys `dist/` via `actions/deploy-pages`.
-- **The live site serves the new Blender plant**: `https://garden.v-e-v.org/` returns 200, and `bundle.js`, `external/runtime/runtime.js`, `assets/daylily.glb`, `assets/gardens/fire-garden.glb` all return 200 with full content.
-- **No subpath problem**: built `dist/index.html` uses relative script URLs, and `bundle.js` contains zero absolute-path asset references (asset-loader emits relative paths like `assets/daylily.glb`). `dist/` is gitignored and built only in CI.
-- **`daylily.glb` is anchored to the `garden-sticker` image target** in `src/.expanse.json` (Garden → Card → daylily.glb). Phone test requires displaying `digital-garden-AR/image-targets/garden-sticker_original.png`.
-- **The 8th Wall Publish dialog (HTML5 / Embed tabs) is not part of this workflow**:
-  - The hosted 8th Wall platform was **retired 2026-02-28** (docs: "Publishing", 8thwall.org).
-  - **HTML5 tab** → builds/downloads a self-contained `.zip` for manual hosting.
-  - **Embed tab** (iframe / full HTML) → embed code for placing a hosted build on another website or a gaming platform (itch.io, Newgrounds, etc.).
-  - Not needed here: pushing to GitHub `main` triggers the CI build + Pages deploy automatically. (If embedding is wanted later, the page to embed is `https://garden.v-e-v.org/`.)
+1. **Phase A first:** make the AR scene work on the phone with `daylily.glb`, then build the restructure.
+2. **Per-plant JSON model:** each plant = one JSON `{plant_id, species, seed, planted_date}` + one derived GLB. Plants are arranged freely in the Studio editor (`.expanse.json`); the cloud script never touches the scene.
+3. **Day model:** `day = today − planted_date`. Never regresses, catches up if a run is missed; the Blender slider maps to `planted_date = today − sliderAge` on export.
+4. **Headless generation:** reuse `blender_addon/core` as-is (no rewrite) + a small trimesh GLB writer. No Blender in CI. Fidelity note: GLBs carry vertex colors, not Blender PBR materials (slightly flatter look; acceptable).
+5. **Commit `blender_addon/core/` + `data/`** (+ optional `tests/`) to the repo; Blender-only UI files stay gitignored.
+6. **Deploy regenerates GLBs pre-build** so the deployed site always has fresh GLBs (stale local pushes can never leak); the **daily cron** regenerates + commits + dispatches deploy (keeps the repo/Studio copy in sync via git pull).
 
-## The one broken piece (root cause confirmed)
+---
 
-`Daily Garden Growth` (`grow.yml`) fails **every run**:
+## Phase A — Make the AR scene work on the phone with daylily
 
-```
-##[error]Unable to locate executable file: git-lfs.
-```
+1. Edit `digital-garden-AR/src/app.js`: add `require('../image-targets/garden-sticker.json')` to the `imageTargetData` array (keep the 4 element targets).
+2. Commit + push to `main` (auto-triggers `Deploy to GitHub Pages`). Confirm the run is green and `https://garden.v-e-v.org/bundle.js` returns 200 (grep the deployed bundle for `garden-sticker` as a sanity check).
+3. **Phone test (user):**
+   - Open `https://garden.v-e-v.org/` in the phone browser (Safari/Chrome); allow camera; the landing page then the "Playing Cards" space loads by default.
+   - Print or display `digital-garden-AR/image-targets/garden-sticker_original.png`; point the camera at it → `daylily.glb` should appear on the sticker.
+4. **If the app fails to start / black screen:**
+   - The stale references to `bmo-bites`, `toggle-slam/palm-tree`, `magic-photos/waves.mp4` are the prime suspect. Strip the scene to only the garden: in the Studio editor delete the "BMO Bites", "Magic Photos", "Toggle SLAM" spaces and the "Space Selector" UI (or remove the corresponding objects in `.expanse.json`), then re-commit.
+   - Use phone remote debugging (iOS Safari / Android Chrome) to read console errors and confirm which asset 404s before/after cleanup.
 
-Cause: the job runs inside the `ghcr.io/vitvinv/digital-garden-plantgl` container (a minimal conda/PlantGL image), which does **not** have `git-lfs` installed, so `actions/checkout@v4` with `lfs: true` fails before any step runs. Verified from failed run `31157230228` logs.
+---
 
-Note: `grow.py` imports only `numpy` + `trimesh` (plus stdlib) — PlantGL is not used by the current growth script. The container is unnecessary.
+## Phase B — Per-plant PlantStudio growth pipeline (cloud, no PC)
 
-## Decision (user-approved)
+### Tasks (ordered)
 
-Rewrite `grow.yml` to run on the hosted `ubuntu-latest` runner with pip-installed deps (no container). This matches the "pip-only, no conda" decision already documented in `IMPLEMENTATION_PLAN.md`.
+1. **Un-ignore + commit the PlantStudio core.** Update `.gitignore` to keep `blender_addon/` ignored except:
+   ```
+   blender_addon/
+   !blender_addon/__init__.py
+   !blender_addon/core/
+   !blender_addon/core/**
+   !blender_addon/data/
+   !blender_addon/data/**
+   !blender_addon/tests/        # optional, to run the 48 headless tests in CI
+   !blender_addon/tests/**
+   ```
+   `blender_addon/data/` holds the species `.pla` libraries (63 species) + `3D object library.tdo` (~2 MB). Commit; run `pytest blender_addon/tests/` in CI (optional but recommended).
 
-## Tasks (ordered)
+2. **Add `scripts/plant_glb.py`** (headless regenerator, mirrors `scene_bridge.py`):
+   - Load `SpeciesLibrary` + `TdoLibrary` from the committed `blender_addon/data/`.
+   - Read every `digital-garden-AR/src/assets/plants/*.json`.
+   - For each plant: `day = (today − planted_date).days`; `grow_species(species, day, seed, tdo_library)`; `MeshBuffer` + `MeshTurtle` (scale `0.001`) + `draw_plant`; `orient_vertices` (same transform as `scene_bridge`); build a `trimesh.Trimesh` with per-face vertex colors; export GLB to `digital-garden-AR/src/assets/plants/{plant_id}.glb` (run `gltf-transform draco` if available, else fall back).
+   - Deterministic per (species, seed, day, data); print per-plant summary (day, verts, faces, bytes); exit non-zero on any plant error.
+   - Per-plant JSON schema: `{"plant_id": "...", "species": "Daylily", "seed": 280, "planted_date": "2026-08-01"}` — `species` must match the core library names.
 
-### 1. Add `scripts/requirements.txt`
-Content:
-```
-numpy
-trimesh
-```
-Enables pip caching in the workflow and matches the path already referenced by `IMPLEMENTATION_PLAN.md`.
+3. **Seed the pipeline:** create one plant JSON (e.g. derive from daylily: species `Daylily`, seed `280`, planted_date chosen so the current day ≈ the model's age) and generate its GLB with `plant_glb.py`. Decide whether daylily moves to the per-plant model now or stays a hand-exported GLB (plants without a JSON are left untouched by the script).
 
-### 2. Rewrite `.github/workflows/grow.yml`
+4. **Wire GLB regeneration into `deploy.yml`** as a pre-build step before `npm run build`:
+   - `actions/setup-python` + `pip install -r scripts/requirements.txt` (numpy, trimesh already listed) + `npm install -g @gltf-transform/cli`; then `python scripts/plant_glb.py`.
+   - Effect: every deploy ships current-day GLBs; stale local GLB files never reach the live site.
 
-```yaml
-name: Daily Garden Growth
+5. **Point the daily cron (`grow.yml`) at the new script:** replace the `python scripts/grow.py` step with `python scripts/plant_glb.py`; keep checkout(LFS) → pip → gltf-transform → regenerate → publish (commit changed plant GLBs) → dispatch `Deploy to GitHub Pages` (`actions: write` already set). The commit keeps the repo (and a git-pull'd Studio copy) in sync with the latest growth.
 
-on:
-  schedule:
-    - cron: "0 6 * * *"
-  workflow_dispatch:
+6. **Blender-side (local, not committed):** add an "Export Plant Config" operator to the addon that reads the selected plant's `ps_species` / `ps_seed` / `ps_day` and writes `{plant_id, species, seed, planted_date: today − ps_day}` to `digital-garden-AR/src/assets/plants/`. The GUI keeps its WYSIWYG role; the JSON drives CI.
 
-permissions:
-  contents: write
+7. **Retire the trimesh pipeline (recommended; reversible/deferrable):** remove `scripts/grow.py`, `scripts/species.py`, `scripts/generate.py`, `scripts/designer.py`, root `growth-config.json`, `tests/test_generate.py`, `tests/test_grow.py`, and the old `src/assets/gardens/*.glb` (they are not referenced by the scene). Alternative: leave them dormant for now.
 
-concurrency:
-  group: daily-grow
-  cancel-in-progress: false
+8. **Docs:** update `IMPLEMENTATION_PLAN.md` to describe the per-plant JSON model, the headless regenerator, and the cron/dispatch flow.
 
-env:
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+### Validation
 
-jobs:
-  grow:
-    runs-on: ubuntu-latest
-    timeout-minutes: 15
-    steps:
-      - name: Checkout repo
-        uses: actions/checkout@v4
-        with:
-          lfs: true
+- `pytest blender_addon/tests/` (48 headless tests) green in CI; add a few tests for `plant_glb.py` (byte-determinism on same day; day+1 grows mesh size; a new plant JSON produces a new GLB).
+- Run `scripts/plant_glb.py` locally: valid GLBs (trimesh loads), byte-stable on repeat runs within the same day.
+- Push → deploy builds with fresh GLBs; curl the plant GLB → 200; live bytes match the committed GLB.
+- Dispatch `Daily Garden Growth` → GLBs regenerate, publish commits if changed, deploy dispatch succeeds (already proven mechanism).
+- Next day: plants are visibly older on the phone (day has advanced by 1).
 
-      - name: Setup Python
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.12"
-          cache: pip
-          cache-dependency-path: scripts/requirements.txt
+### Risks / notes
 
-      - name: Install Python deps
-        run: pip install -r scripts/requirements.txt
-
-      - name: Install gltf-transform (Draco)
-        run: npm install -g @gltf-transform/cli
-
-      - name: Run grow script
-        run: python scripts/grow.py
-
-      - name: Publish (commit + push)
-        run: |
-          git lfs install
-          bash scripts/publish.sh
-```
-
-Key points preserved from the old file: `contents: write` permission, `GITHUB_TOKEN` env (used by `scripts/publish.sh` to set the token remote), `lfs: true` checkout (hosted runners have `git-lfs`), and `git lfs install` before publishing so LFS objects for regenerated `gardens/*.glb` are pushed.
-
-### 3. Optional housekeeping (do if low-risk)
-- Delete the **dead nested workflow** `digital-garden-AR/.github/workflows/deploy.yml` — GitHub only reads `.github/workflows/` at the repo root, so it never runs and only causes confusion.
-- Remove/replace the now-unused PlantGL container path: `build-docker.yml` + the `container:` reference in the old `grow.yml` (the new `grow.yml` already drops it). Leaving `build-docker.yml` running is harmless but wasteful; preferred: delete it and the PlantGL verification step it runs.
-- Update stale claims in `IMPLEMENTATION_PLAN.md` (Phase 0 "PlantGL not available", grow pipeline "container", "scripts/requirements.txt" missing) to reflect the trimesh/pip-only reality.
-
-### 4. Push to `main`
-The push triggers `Deploy to GitHub Pages` (sanity check that nothing regressed). Workflow changes alone do not publish — the growth pipeline only runs on schedule/dispatch.
-
-### 5. Verify the growth pipeline end-to-end
-- Manually dispatch **Daily Garden Growth** (Actions tab → workflow_dispatch).
-- Expect: checkout OK → grow.py regenerates `digital-garden-AR/src/assets/gardens/*.glb` → `publish.sh` commits (`grow: <date> — N garden(s) updated`) and pushes to `main` → `Deploy to GitHub Pages` auto-triggers → Pages updates.
-- If GLBs are byte-identical to the committed ones, `publish.sh` exits 0 with no commit and no deploy — expected and correct.
-
-### 6. Validate deployment
-- `gh run list` shows both runs green.
-- `curl -s -o NUL -w "%{http_code}" https://garden.v-e-v.org/assets/gardens/fire-garden.glb` → 200 (repeat for `water-garden.glb`, `daylily.glb`).
-
-### 7. Phone test
-1. Display `digital-garden-AR/image-targets/garden-sticker_original.png` (print or a second device/screen).
-2. On the phone browser open **`https://garden.v-e-v.org/`** (HTTPS required for camera).
-3. Allow camera access; accept the landing page; point camera at the garden-sticker image.
-4. Confirm the `daylily.glb` model and the procedural garden GLBs render.
-- Note: this scene is **image-target based** (SLAM), so a target image must be in view. The target list is configured in `src/app.js` + `.expanse.json`.
-
-## Validation summary
-- `pytest tests/` (78 tests) still green before/after workflow edits (no Python changes expected).
-- `Daily Garden Growth` run green on dispatch.
-- Follow-on `Deploy to GitHub Pages` run green.
-- Live assets return 200 on `garden.v-e-v.org`.
-- Manual AR check on phone against the garden-sticker target.
-
-## Risks / notes
-- **Scheduled runs that produce no diff**: publish.sh exits cleanly (no commit → no deploy). Idempotent by design.
-- **LFS**: `daylily.glb`, image targets, and `gardens/*.glb` are LFS-tracked (`.gitattributes`). Both workflows must keep `lfs: true`; hosted runners have git-lfs. Explicit `git lfs install` is included before the push.
-- **`grow.py` needs only numpy + trimesh** (verified imports). Draco is optional (grow.py falls back gracefully when `gltf-transform` is absent).
-- **The Blender `daylily.glb` is static** — `grow.py` only regenerates `gardens/*.glb`. The new plant will not change daily; only the procedural gardens grow. Integrating the Blender plant into daily growth would require adding it as a procedural species in `growth-config.json` — out of scope unless requested.
-- **Phone/desktop**: use a recent mobile browser (Safari / Chrome); camera + HTTPS required; no extra 8th Wall app key or domain allow-listing is needed for this self-hosted Studio build.
+- **Fidelity:** headless GLBs are vertex-colored, not PBR-material Blender exports — flatter look. Fallback if unacceptable: run real Blender `--background` in a CI container reusing `scene_bridge` as-is.
+- **Species names** in JSON must match the core library (`Daylily`, `maiden grass`, …); wrong names fail loudly in `plant_glb.py`.
+- **Data source:** tests historically read `examples/PlantStudio-master/for-olpc-python`; `plant_glb.py` should consistently use the committed `blender_addon/data/`.
+- **LFS:** plant GLBs under `src/assets/**` are LFS-tracked; workflows keep `lfs: true`, and publish step runs `git lfs install`.
+- **Missed days** self-correct (planted_date model catches up).
+- Phase A may reveal scene cleanups (missing `bmo-bites`/`toggle-slam`/`magic-photos` assets) that should be completed before Phase B polish.
