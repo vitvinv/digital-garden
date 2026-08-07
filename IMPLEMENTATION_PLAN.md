@@ -64,7 +64,7 @@ Daily at 06:00 UTC (or manual dispatch)
   → npm install -g @gltf-transform/cli (Draco)
   → python scripts/grow.py
   → bash scripts/publish.sh      # commit + push
-  → deploy.yml triggers           # webpack build + Pages deploy
+  → gh workflow run "Deploy to GitHub Pages"   # explicit dispatch (GITHUB_TOKEN pushes don't trigger workflows)
 ```
 
 > Note: `grow.py` only needs numpy + trimesh (no PlantGL). The `ghcr.io/vitvinv/digital-garden-plantgl` container approach was abandoned — it lacked git-lfs and every scheduled run failed at checkout.

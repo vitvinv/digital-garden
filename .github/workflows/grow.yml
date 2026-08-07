@@ -7,6 +7,7 @@ on:
 
 permissions:
   contents: write
+  actions: write
 
 concurrency:
   group: daily-grow
@@ -41,7 +42,15 @@ jobs:
       - name: Run grow script
         run: python scripts/grow.py
 
-      - name: Publish (commit + push)
+      - name: Publish and trigger deploy
         run: |
           git lfs install
+          BEFORE=$(git rev-parse HEAD)
           bash scripts/publish.sh
+          AFTER=$(git rev-parse HEAD)
+          if [ "$BEFORE" != "$AFTER" ]; then
+            echo "Garden GLBs changed - dispatching deploy."
+            gh workflow run "Deploy to GitHub Pages"
+          else
+            echo "No garden changes - skipping deploy."
+          fi
