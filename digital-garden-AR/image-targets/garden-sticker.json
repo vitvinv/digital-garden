@@ -1,7 +1,7 @@
 {
   "type": "PLANAR",
   "properties": {
-    "top": 26,
+    "top": 28,
     "left": 0,
     "width": 480,
     "height": 640,
@@ -18,6 +18,6 @@
     "thumbnailImage": "garden-sticker_thumbnail.png",
     "luminanceImage": "garden-sticker_luminance.png"
   },
-  "created": 1786099198123,
-  "updated": 1786099272952
+  "created": 1786471357839,
+  "updated": 1786471413170
 }
