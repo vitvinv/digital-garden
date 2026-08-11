@@ -16,7 +16,7 @@
       "scale": [
         1,
         1,
-        1
+        1.2
       ],
       "material": {
         "type": "hider"
@@ -91,7 +91,8 @@
         1
       ],
       "parentId": "88453035-dc0f-486d-868a-8ff7c2fda864",
-      "order": 0.6644431107322474
+      "order": 0.6644431107322474,
+      "hidden": false
     },
     "28878a86-3de0-4d09-a97d-e2aca00f534b": {
       "id": "28878a86-3de0-4d09-a97d-e2aca00f534b",
@@ -155,43 +156,11 @@
       "parentId": "88453035-dc0f-486d-868a-8ff7c2fda864",
       "order": 1.0308214152219775
     },
-    "0cfa66a2-eff3-41a1-b0f0-0bcfc198966f": {
-      "id": "0cfa66a2-eff3-41a1-b0f0-0bcfc198966f",
-      "position": [
-        0,
-        0,
-        0
-      ],
-      "rotation": [
-        0,
-        0,
-        0,
-        1
-      ],
-      "scale": [
-        0.9999999999999998,
-        0.9999999999999998,
-        0.9999999999999998
-      ],
-      "parentId": "28878a86-3de0-4d09-a97d-e2aca00f534b",
-      "components": {},
-      "gltfModel": {
-        "src": {
-          "type": "asset",
-          "asset": "assets/playing-cards/22_Element_Air.gltf/22_Element_Air.gltf"
-        },
-        "animationClip": "",
-        "loop": true
-      },
-      "name": "22_Element_Air.gltf",
-      "order": 3.8259768816164055,
-      "hidden": true
-    },
     "daa72afa-34cc-405f-86bc-3b6570019359": {
       "id": "daa72afa-34cc-405f-86bc-3b6570019359",
       "position": [
         0,
-        -1.0159389620595132,
+        -1.5657872824697567,
         -0.6403132313263393
       ],
       "rotation": [
@@ -246,14 +215,15 @@
         1
       ],
       "parentId": "88453035-dc0f-486d-868a-8ff7c2fda864",
-      "order": 0.4038940050501252
+      "order": 0.4038940050501252,
+      "hidden": false
     },
     "952648a6-36ee-43cf-816f-b294fc546b3b": {
       "id": "952648a6-36ee-43cf-816f-b294fc546b3b",
       "position": [
         0,
         0,
-        -0.8156774171939367
+        0
       ],
       "rotation": [
         0,
@@ -262,25 +232,26 @@
         1
       ],
       "scale": [
-        2.258064516129033,
-        3.2258064516129044,
-        1.6129032258064517
+        3.25,
+        3.2500000000000013,
+        3.25
       ],
-      "geometry": {
-        "type": "box",
-        "depth": 1,
-        "height": 1,
-        "width": 1
-      },
       "material": {
-        "type": "unlit",
-        "color": "#000000",
-        "side": "back"
+        "type": "basic",
+        "color": "#FFFFFF"
       },
       "parentId": "28878a86-3de0-4d09-a97d-e2aca00f534b",
       "components": {},
-      "name": "Box",
-      "order": 6.561487971911548
+      "name": "hider",
+      "order": 6.561487971911548,
+      "gltfModel": {
+        "src": {
+          "type": "asset",
+          "asset": "assets/hider-1.glb"
+        },
+        "animationClip": "",
+        "loop": true
+      }
     }
   },
   "spaces": {
