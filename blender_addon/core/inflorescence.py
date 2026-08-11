@@ -18,6 +18,8 @@ class PdFlowerFruit(PdPlantPart):
         super().__init__(plant)
         self.isOpen = False
         self.hasSetFruit = False
+        self.isRipe = False
+        self.daysAccumulatingFruitBiomass = 0
 
     def partType(self):
         return kPartTypeFlowerFruit
@@ -27,16 +29,29 @@ class PdFlowerFruit(PdPlantPart):
 
     def nextDay(self):
         super().nextDay()
-        p = self.plant.pInflor[self.gender]
+        p = self.plant.pFlower[self.gender]
         if not self.isOpen:
             if self.age >= _gp(p, "minDaysToOpenFlower", 3):
                 self.isOpen = True
         if not self.hasSetFruit:
             minDays = _gp(p, "minDaysBeforeSettingFruit", 3)
             minFract = _gp(p, "minFractionOfOptimalBiomassToCreateFruit_frn", 0.8)
-            if self.age >= minDays and \
-                    self.liveBiomass_pctMPB >= _gp(p, "optimalBiomass_pctMPB") * minFract:
+            biomassReached = self.liveBiomass_pctMPB >= _gp(p, "optimalBiomass_pctMPB") * minFract
+            deadlineReached = self.age > _gp(p, "maxDaysToGrowIfOverMinFraction", 30)
+            if self.age >= minDays and (biomassReached or deadlineReached):
                 self.hasSetFruit = True
+                self.daysAccumulatingFruitBiomass = 0
+        elif not self.isRipe:
+            daysToRipen = self._days_to_ripen()
+            if self.daysAccumulatingFruitBiomass >= daysToRipen:
+                self.isRipe = True
+            self.daysAccumulatingFruitBiomass += 1
+
+    def _days_to_ripen(self):
+        """pFruit.DaysToRipen — days of fruit biomass before turning ripe."""
+        fruit = getattr(self.plant, "params", None)
+        fruit = getattr(fruit, "pFruit", None)
+        return int(_gp(fruit, "daysToRipen", 5) or 5)
 
     def traverseActivity(self, mode, traverser):
         """Flowers demand and grow reproductive biomass toward optimal,
@@ -46,11 +61,10 @@ class PdFlowerFruit(PdPlantPart):
         if mode == kActivityNextDay:
             self.nextDay()
         elif mode == kActivityDemandReproductive:
-            p = self.plant.pInflor[self.gender]
-            maxDays = _gp(p, "maxDaysToGrow", 10)
-            if self.age > maxDays:
-                self.biomassDemand_pctMPB = 0.0
-                return
+            # The original flower demand has NO age cap — it demands toward
+            # the flower's own optimal biomass every day until it is reached
+            # (linearGrowthResult returns 0 once current >= optimal).
+            p = self.plant.pFlower[self.gender]
             self.biomassDemand_pctMPB = umath.linearGrowthResult(
                 self.liveBiomass_pctMPB, _gp(p, "optimalBiomass_pctMPB"),
                 _gp(p, "minDaysToGrow", 3))
@@ -140,8 +154,11 @@ class PdInflorescence(PdPlantPart):
         flower = PdFlowerFruit(self.plant)
         flower.gender = self.gender
         flower.phytomerAttachedTo = self
-        flower.liveBiomass_pctMPB = _gp(self.plant.pInflor[self.gender], "optimalBiomass_pctMPB") * \
-            _gp(self.plant.pInflor[self.gender], "minFractionOfOptimalBiomassToCreateInflorescence_frn", 0.2)
+        # The original initializes flowers at zero biomass
+        # (ufruit.initializeGender sets liveBiomass_pctMPB = 0.0) and grows
+        # them via reproductive demand toward the FLOWER's own optimal
+        # biomass (pFlower.optimalBiomass_pctMPB) — not the inflorescence's.
+        flower.liveBiomass_pctMPB = 0.0
         self.flowers.append(flower)
         self.plant.partsCreated += 1
 

@@ -8,6 +8,8 @@ sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
 
 from blender_addon.core.factory import create_plant, grow_species
 from blender_addon.core.plant_library import SpeciesLibrary
+from blender_addon.core.normalize import registry_default
+from blender_addon.core.params import PlantParams
 
 DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "..",
                         "examples", "PlantStudio-master", "for-olpc-python")
@@ -35,6 +37,27 @@ def count_parts(plant):
         stack.append(part.rightBranchPlantPart)
         stack.append(part.nextPlantPart)
     return count
+
+
+def iter_flowers(plant):
+    """Yield every PdFlowerFruit in the part tree."""
+    if plant.firstPhytomer is None:
+        return
+    stack = [plant.firstPhytomer]
+    seen = set()
+    while stack:
+        part = stack.pop()
+        if part is None or id(part) in seen:
+            continue
+        seen.add(id(part))
+        if hasattr(part, "flowers"):
+            for flower in part.flowers:
+                yield flower
+        stack.append(part.leftBranchPlantPart)
+        stack.append(part.rightBranchPlantPart)
+        stack.append(part.nextPlantPart)
+        stack.append(part.leftLeaf)
+        stack.append(part.rightLeaf)
 
 
 class TestSimulation:
@@ -97,3 +120,63 @@ class TestSimulation:
             species = lib.get(name)
             plant = grow_species(species, 50)
             assert plant.age == 50, f"{name} failed"
+
+    @pytest.mark.parametrize("name", ["corn", "tomato", "gilia"])
+    def test_fruit_sets_by_deadline(self, lib, name):
+        """P1 regression: fruit must set even when biomass stays below the
+        min-fraction threshold — the original's maxDaysToGrowIfOverMinFraction
+        deadline fallback (IMPROVEMENT_PLAN §1)."""
+        species = lib.get(name)
+        assert species is not None, f"species {name!r} not found"
+        plant = grow_species(species, 200)
+        flowers = list(iter_flowers(plant))
+        assert flowers, f"{name} produced no flowers by day 200"
+        assert any(f.hasSetFruit for f in flowers), (
+            f"{name}: no flower set fruit by day 200 "
+            f"(threshold never reached nor deadline passed)")
+
+    @pytest.mark.parametrize("name", ["corn", "tomato", "gilia"])
+    def test_fruit_ripens(self, lib, name):
+        """P3a regression: a flower that has set fruit eventually ripens
+        (isRipe True) after pFruit.daysToRipen days (IMPROVEMENT_PLAN §3a)."""
+        species = lib.get(name)
+        assert species is not None, f"species {name!r} not found"
+        plant = grow_species(species, 200)
+        flowers = [f for f in iter_flowers(plant) if f.hasSetFruit]
+        assert flowers, f"{name}: expected fruit to set by day 200"
+        assert any(f.isRipe for f in flowers), (
+            f"{name}: fruit set but nothing ripened by day 200 "
+            f"(daysToRipen never elapsed)")
+
+
+class TestRegistryDefaults:
+    """P5a: normalize defaults derive from param_registry.json where sane."""
+
+    @pytest.mark.parametrize("section,attr,expected", [
+        ("pGeneral", "lineDivisions", 3),
+        ("pGeneral", "ageAtMaturity", 100),
+        ("pGeneral", "numAxillaryInflors", 4),
+        ("pGeneral", "isDicot", True),
+        ("pMeristem", "branchingIndex", 30.0),
+        ("pInternode", "optimalFinalBiomass_pctMPB", 4.0),
+        ("pInternode", "minDaysToCreateInternode", 3),
+        ("pLeaf", "maxDaysToGrow", 10),
+    ])
+    def test_registry_default_matches_normalize(self, section, attr, expected):
+        assert registry_default(section, attr, None) == expected
+
+    def test_from_scratch_params_get_registry_defaults(self):
+        params = PlantParams()
+        from blender_addon.core.normalize import normalize_params
+        normalize_params(params)
+        assert params.pGeneral.lineDivisions == 3
+        assert params.pGeneral.ageAtMaturity == 100
+        assert params.pInternode.optimalFinalBiomass_pctMPB == 4.0
+
+    def test_wrong_registry_defaults_overridden(self):
+        # registry says 30/0, but a from-scratch plant needs 1.0/1
+        params = PlantParams()
+        from blender_addon.core.normalize import normalize_params
+        normalize_params(params)
+        assert params.pMeristem.determinateProbability == 1.0
+        assert params.pLeaf.compoundNumLeaflets == 1

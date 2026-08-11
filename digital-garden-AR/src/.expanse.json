@@ -247,6 +247,40 @@
       ],
       "parentId": "88453035-dc0f-486d-868a-8ff7c2fda864",
       "order": 0.4038940050501252
+    },
+    "952648a6-36ee-43cf-816f-b294fc546b3b": {
+      "id": "952648a6-36ee-43cf-816f-b294fc546b3b",
+      "position": [
+        0,
+        0,
+        -0.8156774171939367
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        2.258064516129033,
+        3.2258064516129044,
+        1.6129032258064517
+      ],
+      "geometry": {
+        "type": "box",
+        "depth": 1,
+        "height": 1,
+        "width": 1
+      },
+      "material": {
+        "type": "unlit",
+        "color": "#000000",
+        "side": "back"
+      },
+      "parentId": "28878a86-3de0-4d09-a97d-e2aca00f534b",
+      "components": {},
+      "name": "Box",
+      "order": 6.561487971911548
     }
   },
   "spaces": {

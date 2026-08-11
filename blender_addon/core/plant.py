@@ -33,10 +33,16 @@ class PdPlant:
         self.pLeaf = params.pLeaf
         self.pSeedlingLeaf = params.pSeedlingLeaf
         self.pAxillaryBud = params.pAxillaryBud
-        # flowers normalized as dicts with snake_case keys
-        self.pInflor = {
+        # flowers normalized as dicts with snake_case keys; pFlower and
+        # pInflor are SEPARATE sections in the original (flower's own
+        # parameters vs the inflorescence's), so keep them separate.
+        self.pFlower = {
             0: params.flowers.get("kGenderFemale", {}),
             1: params.flowers.get("kGenderMale", {}),
+        }
+        self.pInflor = {
+            0: params.inflors.get("kGenderFemale", {}),
+            1: params.inflors.get("kGenderMale", {}),
         }
         name = getattr(params, "name", "plant")
         # If the plant will produce inflorescences but has no flower section
@@ -45,12 +51,16 @@ class PdPlant:
         num_ap = int(getattr(params.pGeneral, "numApicalInflors", 0) or 0)
         num_ax = int(getattr(params.pGeneral, "numAxillaryInflors", 0) or 0)
         if (num_ap > 0 or num_ax > 0):
-            if not self.pInflor[0]:
+            if not self.pFlower[0]:
                 from .tdo_parser import AssetError
                 raise AssetError(
                     f"species '{name}' is configured to produce inflorescences "
                     f"(numApicalInflors={num_ap}, numAxillaryInflors={num_ax}) "
                     f"but has no kGenderFemale flower section in its .pla data")
+        if not self.pFlower[0]:
+            self.pFlower[0] = _default_flower_params()
+        if not self.pFlower[1]:
+            self.pFlower[1] = _default_flower_params()
         if not self.pInflor[0]:
             self.pInflor[0] = _default_inflor_params()
         if not self.pInflor[1]:
@@ -255,11 +265,21 @@ def _default_inflor_params():
         maxDaysToCreateInflorescenceIfOverMinFraction = 10
         minDaysToGrow = 3
         maxDaysToGrow = 10
-        minDaysToOpenFlower = 3
-        minDaysBeforeSettingFruit = 3
-        minFractionOfOptimalBiomassToCreateFruit_frn = 0.8
         numFlowersOnMainBranch = 1
         numFlowersPerBranch = 1
         numBranches = 0
         daysToAllFlowersCreated = 10
+    return _P()
+
+
+def _default_flower_params():
+    """Fallback flower params (pFlower) when a species has no flower section."""
+    class _P:
+        optimalBiomass_pctMPB = 1.0
+        minFractionOfOptimalBiomassToOpenFlower_frn = 0.5
+        minFractionOfOptimalBiomassToCreateFruit_frn = 0.8
+        minDaysToGrow = 3
+        maxDaysToGrowIfOverMinFraction = 30
+        minDaysToOpenFlower = 3
+        minDaysBeforeSettingFruit = 3
     return _P()

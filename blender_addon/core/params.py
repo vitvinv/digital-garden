@@ -48,8 +48,15 @@ class PlantParams:
         self.pInflorescence = ParamObject()
         self.pFruit = ParamObject()
         self.pRoot = ParamObject()
-        # flower params keyed by gender and part index
+        # flower params keyed by gender (pFlower[kGenderFemale].*) — the
+        # flower's own parameters (petal rows, optimal biomass, etc.)
         self.flowers = {}
+        # inflorescence params keyed by gender (pInflor[kGenderFemale].*) —
+        # the inflorescence's parameters (stalks, bracts, flower counts).
+        # Kept SEPARATE from pFlower, matching the original model; merging
+        # them caused the flower's OptimalBiomass_pctMPB to be shadowed by
+        # the inflorescence's optimalBiomass_pctMPB.
+        self.inflors = {}
         # 3D object params (bud, leaf, stipule, seedling, inflorescence, fruit)
         self.pAxillaryBud = TdoParams()
         self.pAxillaryBudParams = ParamObject()

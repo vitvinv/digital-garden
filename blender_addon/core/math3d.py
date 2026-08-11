@@ -79,9 +79,26 @@ def linearGrowth(current, optimal, minDays):
 
 
 def linearGrowthResult(current, optimal, minDays):
+    """Daily biomass DEMAND increment toward optimal — exact port of the
+    original utravers.linearGrowthResult.
+
+    Original:
+        amountNeeded = optimal - current
+        maxPossible  = safedivExcept(optimal, minDays, optimal)
+        amountNeeded = max(0.0, min(amountNeeded, maxPossible))
+        result = amountNeeded
+
+    Returns the clamped per-day increment (0 when current >= optimal), NOT
+    the new total. Callers add this to liveBiomass, so returning the new
+    total would double-count the existing biomass and run away (e.g. an
+    inflorescence reaching liveBiomass 127 against optimal 0.83).
+    """
     if minDays <= 0:
-        return optimal
-    return current + (optimal - current) / minDays
+        maxPossible = optimal
+    else:
+        maxPossible = optimal / minDays
+    amountNeeded = optimal - current
+    return max(0.0, min(amountNeeded, maxPossible))
 
 
 class SCurve:

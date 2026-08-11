@@ -88,7 +88,15 @@ def set_param(params, access, ftype, value, tdo=None):
 
     if base.startswith("pFlower") or base.startswith("pInflor"):
         gender_key = base[base.find("[") + 1:base.find("]")]
-        obj = params.flowers.setdefault(gender_key, {})
+        # pFlower[kGenderFemale].* and pInflor[kGenderFemale].* are SEPARATE
+        # parameter sections in the original (flower vs inflorescence). Keep
+        # them in separate dicts so their shared key names (e.g. the flower's
+        # OptimalBiomass_pctMPB vs the inflorescence's optimalBiomass_pctMPB)
+        # cannot collide.
+        if base.startswith("pFlower"):
+            obj = params.flowers.setdefault(gender_key, {})
+        else:
+            obj = params.inflors.setdefault(gender_key, {})
         rest = parts[1:]
         if len(rest) >= 2 and rest[0].startswith("tdoParams"):
             part_key = rest[0][rest[0].find("[") + 1:rest[0].find("]")]

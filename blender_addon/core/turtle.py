@@ -6,7 +6,7 @@ polygon -> triangles). The drawingSurface is replaced by a MeshBuffer.
 """
 
 from .matrix3d import KfMatrix, KfPoint3D
-from .mesh_buffer import MeshBuffer
+from .mesh_buffer import MeshBuffer, PIPE_FACES
 
 
 class MeshTurtle:
@@ -88,24 +88,32 @@ class MeshTurtle:
 
     # ── drawing ──
 
+    def ring_basis(self):
+        """Cross-section basis (px,py,pz, qx,qy,qz) from the turtle's local
+        Y/Z frame, perpendicular to the current forward direction."""
+        m = self.currentMatrix
+        return (m.a1, m.b1, m.c1, m.a2, m.b2, m.c2)
+
     def drawInMillimeters(self, mm, partID=0):
         """Draw a line segment of the current width as a pipe."""
         start = self.position()
         self.currentMatrix.move(mm * self.scale_pixelsPerMm)
         end = self.position()
         radius = self.currentLineWidth * self.scale_pixelsPerMm * 0.5
-        faces = 6
         self.mesh_buffer.add_pipe(
             (start.x, start.y, start.z),
             (end.x, end.y, end.z),
-            radius, radius, faces, self.currentColor)
+            radius, radius, PIPE_FACES, self.currentColor)
         return None
 
-    def drawPipe(self, start, end, radiusStart, radiusEnd, faces, color):
+    def drawPipe(self, start, end, radiusStart, radiusEnd, faces, color,
+                 basis_start=None, basis_end=None, cap_start=True, cap_end=True):
         self.mesh_buffer.add_pipe(
             (start.x, start.y, start.z),
             (end.x, end.y, end.z),
-            radiusStart, radiusEnd, faces, color)
+            radiusStart, radiusEnd, faces, color,
+            basis_start=basis_start, basis_end=basis_end,
+            cap_start=cap_start, cap_end=cap_end)
 
     def drawPolygon(self, points, color):
         """Triangulate a polygon (list of KfPoint3D) into the buffer."""

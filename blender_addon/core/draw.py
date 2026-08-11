@@ -10,6 +10,7 @@ from . import math3d as umath
 from .meristem import (kDirectionLeft, kDirectionRight, kArrangementOpposite,
                        kActivityDraw)
 from .traverser import PdTraverser
+from .mesh_buffer import PIPE_FACES
 
 kDontTaper = 0
 kUseAmendment = 1
@@ -146,6 +147,10 @@ def _draw_stem_segment(part, length, width, angleZ, angleY, color, taperIndex, d
         endWidth = width
 
     turtle.setLineColor(color)
+    # Thread the cross-section frame so consecutive pipe segments share their
+    # joint ring (exit ring of segment i == entry ring of segment i+1). The
+    # existing vertex dedup then welds them, removing double-shell seams.
+    prev_basis = turtle.ring_basis()
     for i in range(lineDivisions):
         isLast = (i >= lineDivisions - 1)
         if not isLast:
@@ -167,6 +172,9 @@ def _draw_stem_segment(part, length, width, angleZ, angleY, color, taperIndex, d
             endPortionWidth = width
         turtle.rotateY(segmentTurnY)
         turtle.rotateZ(segmentTurnZ)
+        end_basis = turtle.ring_basis()
+        start_basis = prev_basis
+        prev_basis = end_basis
         # draw pipe for this segment
         start_pos = turtle.position()
         turtle.setLineWidth(startPortionWidth)
@@ -175,7 +183,9 @@ def _draw_stem_segment(part, length, width, angleZ, angleY, color, taperIndex, d
         turtle.drawPipe(start_pos, end_pos,
                         startPortionWidth * turtle.scale_pixelsPerMm * 0.5,
                         endPortionWidth * turtle.scale_pixelsPerMm * 0.5,
-                        6, color)
+                        PIPE_FACES, color,
+                        basis_start=start_basis, basis_end=end_basis,
+                        cap_start=(i == 0), cap_end=isLast)
 
 
 # ── leaf drawing ──
@@ -205,7 +215,7 @@ def draw_leaf(leaf, direction):
         seed_scale = getattr(st, "scaleAtFullSize", 0) or \
             getattr(leaf.plant.pSeedlingLeaf, "scaleAtFullSize", 20) or 20
         scale = propFullSize * (seed_scale / 100.0)
-        _draw_leaf_tdo(leaf, scale, seedling=True)
+        _draw_leaf_tdo(leaf, scale)
     else:
         if getattr(pLeaf, "stipuleTdoParams", None) is not None and \
                 getattr(leaf.plant.params.stipuleTdoParams, "scaleAtFullSize", 0) > 0:
@@ -219,40 +229,26 @@ def draw_leaf(leaf, direction):
     turtle.pop()
 
 
-def _draw_leaf_tdo(leaf, scale, seedling):
+def _draw_leaf_tdo(leaf, scale):
+    """Draw a seedling leaf: reuse the regular leaf TDO unless the species
+    defines a specific seedling leaf object (params.seedlingTdoParams)."""
     turtle = leaf.plant.turtle
     if turtle is None:
         return
-    pLeaf = leaf.plant.pLeaf
-    if seedling:
-        # seedling leaves reuse the regular leaf TDO unless the species
-        # defines a specific seedling leaf object (params.seedlingTdoParams)
-        tdo = getattr(leaf.plant.params, "seedlingTdoParams", None)
-        if tdo is None or tdo.object3D is None:
-            tdo = leaf.plant.params.leafTdoParams
-        if tdo is None or tdo.object3D is None:
-            from .tdo_parser import AssetError
-            raise AssetError(
-                f"seedling leaf 3D object reference missing for species "
-                f"'{leaf.plant.name}' (seedlingTdoParams.object3D "
-                f"and pLeaf.leafTdoParams.object3D are both unset)")
-        faceColor = require_color(tdo.faceColor,
-                                 f"species '{leaf.plant.name}' seedling leafTdoParams.faceColor")
-        turtle.rotateX(_angle_with_sway(leaf, tdo.xRotationBeforeDraw))
-        turtle.rotateY(_angle_with_sway(leaf, tdo.yRotationBeforeDraw))
-        turtle.rotateZ(_angle_with_sway(leaf, tdo.zRotationBeforeDraw))
-    else:
+    tdo = getattr(leaf.plant.params, "seedlingTdoParams", None)
+    if tdo is None or tdo.object3D is None:
         tdo = leaf.plant.params.leafTdoParams
-        if tdo is None or tdo.object3D is None:
-            from .tdo_parser import AssetError
-            raise AssetError(
-                f"leaf 3D object reference missing for species "
-                f"'{leaf.plant.name}' (pLeaf.leafTdoParams.object3D)")
-        faceColor = require_color(tdo.faceColor,
-                                 f"species '{leaf.plant.name}' leafTdoParams.faceColor")
-        turtle.rotateX(_angle_with_sway(leaf, tdo.xRotationBeforeDraw))
-        turtle.rotateY(_angle_with_sway(leaf, tdo.yRotationBeforeDraw))
-        turtle.rotateZ(_angle_with_sway(leaf, tdo.zRotationBeforeDraw))
+    if tdo is None or tdo.object3D is None:
+        from .tdo_parser import AssetError
+        raise AssetError(
+            f"seedling leaf 3D object reference missing for species "
+            f"'{leaf.plant.name}' (seedlingTdoParams.object3D "
+            f"and pLeaf.leafTdoParams.object3D are both unset)")
+    faceColor = require_color(tdo.faceColor,
+                             f"species '{leaf.plant.name}' seedling leafTdoParams.faceColor")
+    turtle.rotateX(_angle_with_sway(leaf, tdo.xRotationBeforeDraw))
+    turtle.rotateY(_angle_with_sway(leaf, tdo.yRotationBeforeDraw))
+    turtle.rotateZ(_angle_with_sway(leaf, tdo.zRotationBeforeDraw))
     turtle.rotateZ(-64)
     r_tdo = resolve_tdo(leaf.plant, tdo.object3D,
                         owner=f"species '{leaf.plant.name}' leafTdoParams.object3D")
@@ -758,12 +754,15 @@ def _draw_flower_fruit(flower):
     turtle = plant.turtle
     if turtle is None:
         return
-    p = plant.pInflor[flower.gender]
+    p = plant.pFlower[flower.gender]
     if not p:
         return
     flower.hasBeenDrawn = True
-    propFullSize = umath.safedivExcept(flower.liveBiomass_pctMPB,
-                                       _gp(p, "optimalBiomass_pctMPB", 1.0), 0)
+    # The flower's propFullSize is relative to the FLOWER's own optimal
+    # biomass (pFlower.optimalBiomass_pctMPB), clamped to [0,1] like the
+    # original — NOT the inflorescence's optimalBiomass.
+    propFullSize = umath.min(1.0, umath.safedivExcept(
+        flower.liveBiomass_pctMPB, _gp(p, "optimalBiomass_pctMPB", 1.0), 0))
     turtle.push()
     if not flower.isOpen:
         budOption = int(_gp(p, "budDrawingOption", kDrawSingleTdoBud) or kDrawSingleTdoBud)
@@ -897,7 +896,9 @@ def draw_fruit(flower, plant):
     """Draw the fruit TDO for a flower that has set fruit.
 
     Faithful port: scale = (scaleAtFullSize/100) * flower propFullSize,
-    circle-of-TDOs radial arrangement, ripe color (faceColor).
+    circle-of-TDOs radial arrangement. Color follows stage: unripe fruit
+    (isRipe False) uses alternateFaceColor, ripe fruit uses faceColor
+    (matching ufruit.py draw: unripe = alternate color, ripe = regular).
     """
     turtle = plant.turtle
     if turtle is None:
@@ -918,17 +919,25 @@ def draw_fruit(flower, plant):
             f"pFruit.tdoParams.object3D is None")
     r_tdo = resolve_tdo(plant, tdo_container.object3D,
                         owner=f"species '{plant.name}' pFruit.tdoParams.object3D")
-    pInflor = plant.pInflor[flower.gender]
-    optimal = pInflor.get("optimalBiomass_pctMPB", 1.0) if isinstance(pInflor, dict) else 1.0
-    prop_full_size = min(1.0, flower.liveBiomass_pctMPB / max(0.001, optimal))
+    # Fruit propFullSize is relative to the FRUIT's own optimal biomass
+    # (pFruit.optimalBiomass_pctMPB), clamped to [0,1] like the original
+    # (ufruit.py draw: min(1.0, totalBiomass / pFruit.optimalBiomass)).
+    fruit_optimal = _gp(fruit_params, "optimalBiomass_pctMPB", 1.0) or 1.0
+    prop_full_size = min(1.0, flower.liveBiomass_pctMPB / max(0.001, fruit_optimal))
     scale_at_full = getattr(tdo_container, "scaleAtFullSize", 0.0)
     if not scale_at_full:
         raise AssetError(
             f"cannot draw fruit for species '{plant.name}': "
             f"pFruit.tdoParams.scaleAtFullSize is {scale_at_full!r}")
     scale = (scale_at_full / 100.0) * prop_full_size
-    # ripe color is faceColor (the .pla "ripe section front face color")
-    color = tdo_container.faceColor
+    # stage color: ripe uses faceColor, unripe uses alternateFaceColor
+    # (fall back to faceColor if the alternate color is unset)
+    if getattr(flower, "isRipe", False):
+        color = tdo_container.faceColor
+    else:
+        color = getattr(tdo_container, "alternateFaceColor", None)
+        if color is None:
+            color = tdo_container.faceColor
     if color is None:
         raise AssetError(
             f"cannot draw fruit for species '{plant.name}': "

@@ -2,6 +2,10 @@
 
 import math
 
+# Radial quads per pipe. 3 gives a triangular cross-section (cheap); raise for
+# close-up/hero renders. add_pipe clamps to >= 3.
+PIPE_FACES = 3
+
 
 class MeshBuffer:
     def __init__(self):
@@ -39,19 +43,11 @@ class MeshBuffer:
         self.add_triangle(p0, p1, p2, color)
         self.add_triangle(p0, p2, p3, color)
 
-    def add_pipe(self, center_start, center_end, radius_start, radius_end, faces, color):
-        """Cylinder/cone between two centers. faces = number of side quads."""
-        if radius_start <= 0 and radius_end <= 0:
-            return
-        n = max(3, faces)
-        ring_start = []
-        ring_end = []
-        dx = center_end[0] - center_start[0]
-        dy = center_end[1] - center_start[1]
-        dz = center_end[2] - center_start[2]
-        length = math.sqrt(dx * dx + dy * dy + dz * dz)
-        if length < 1e-9:
-            return
+    @staticmethod
+    def _perpendicular_basis(dx, dy, dz):
+        """Unit perpendicular pair (px,py,pz, qx,qy,qz) spanning the ring plane
+        of a pipe whose axis runs along (dx,dy,dz)."""
+        length = math.sqrt(dx * dx + dy * dy + dz * dz) or 1.0
         ux, uy, uz = dx / length, dy / length, dz / length
         # build a perpendicular frame
         ref = (0.0, 1.0, 0.0) if abs(uy) < 0.9 else (1.0, 0.0, 0.0)
@@ -63,25 +59,58 @@ class MeshBuffer:
         qx = uy * pz - uz * py
         qy = uz * px - ux * pz
         qz = ux * py - uy * px
+        return (px, py, pz, qx, qy, qz)
+
+    def _ring(self, center, radius, n, basis):
+        """Ring of n vertices around center at radius, using the given basis."""
+        px, py, pz, qx, qy, qz = basis
+        pts = []
         for i in range(n):
             ang = i * 2.0 * math.pi / n
             ca, sa = math.cos(ang), math.sin(ang)
-            rx, ry, rz = (ca * px + sa * qx), (ca * py + sa * qy), (ca * pz + sa * qz)
-            ring_start.append((center_start[0] + rx * radius_start,
-                               center_start[1] + ry * radius_start,
-                               center_start[2] + rz * radius_start))
-            ring_end.append((center_end[0] + rx * radius_end,
-                             center_end[1] + ry * radius_end,
-                             center_end[2] + rz * radius_end))
+            rx = ca * px + sa * qx
+            ry = ca * py + sa * qy
+            rz = ca * pz + sa * qz
+            pts.append((center[0] + rx * radius,
+                        center[1] + ry * radius,
+                        center[2] + rz * radius))
+        return pts
+
+    def add_pipe(self, center_start, center_end, radius_start, radius_end, faces, color,
+                 basis_start=None, basis_end=None, cap_start=True, cap_end=True):
+        """Cylinder/cone between two centers. faces = number of side quads.
+
+        basis_start/basis_end: optional (px,py,pz, qx,qy,qz) ring orientations.
+        Passing a shared basis for the end ring of one pipe and the start ring of
+        the next lets consecutive pipes share (weld) their joint vertices.
+        """
+        if radius_start <= 0 and radius_end <= 0:
+            return
+        n = max(3, faces)
+        dx = center_end[0] - center_start[0]
+        dy = center_end[1] - center_start[1]
+        dz = center_end[2] - center_start[2]
+        length = math.sqrt(dx * dx + dy * dy + dz * dz)
+        if length < 1e-9:
+            return
+        if basis_start is None:
+            basis = self._perpendicular_basis(dx, dy, dz)
+            if basis_end is None:
+                basis_end = basis
+            basis_start = basis
+        elif basis_end is None:
+            basis_end = self._perpendicular_basis(dx, dy, dz)
+        ring_start = self._ring(center_start, radius_start, n, basis_start)
+        ring_end = self._ring(center_end, radius_end, n, basis_end)
         for i in range(n):
             j = (i + 1) % n
             self.add_quad(ring_start[i], ring_start[j], ring_end[j], ring_end[i], color)
-        # end caps
-        if radius_start > 0.001:
+        # end caps (only on open tips; interior joint rings are welded/shared)
+        if cap_start and radius_start > 0.001:
             cx, cy, cz = center_start
             for i in range(1, n - 1):
                 self.add_triangle((cx, cy, cz), ring_start[i], ring_start[i + 1], color)
-        if radius_end > 0.001:
+        if cap_end and radius_end > 0.001:
             cx, cy, cz = center_end
             for i in range(1, n - 1):
                 self.add_triangle((cx, cy, cz), ring_end[i + 1], ring_end[i], color)
