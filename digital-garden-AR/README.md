@@ -1,34 +1,14 @@
-# Studio: Image Targets
+# Digital Garden AR
 
-This project demonstrates how to use Image Targets to anchor virtual content to images in the real world.
-There are multiple spaces in this project that showcase different types of image targets.
+An 8th Wall Image Target project that anchors a virtual garden plant to the `garden-sticker` image target in the real world.
 
-![Preview of the image targets project open in the editor](./src/assets/preview.png)
+![Preview of the garden image target project open in the editor](./src/assets/preview.png)
 
 <details><summary>Try it out</summary>
 
-https://8thwall.org/studio-image-targets-example
+Scan the garden sticker image with your phone camera.
 
-<img alt="QR Code for the preview link" src="https://8th.io/qr?v=2&url=https://8thwall.org/studio-image-targets-example" width=250 height=250 />
-
-## Playing Cards
-
-<img alt="Fire Image Target" src="./image-targets/20_Element_Fire_original.png" width=400 />
-<img alt="Water Image Target" src="./image-targets/23_Element_Water_original.png" width=400 />
-<img alt="Air Image Target" src="./image-targets/22_Element_Air_original.png" width=400 />
-<img alt="Earth" src="./image-targets/25_Element_Earth_original.png" width=400 />
-
-## BMO Bites
-
-<img alt="Cereal Box Image Target" src="./image-targets/bmo-bites_original.png" width=400 />
-
-## Magic Photos
-
-<img alt="Waves Image Target" src="./image-targets/waves_original.jpg" width=400 />
-
-## Toggle SLAM
-
-<img alt="Scan to Toggle SLAM Image Target" src="./image-targets/toggle-slam_original.png" width=400 />
+<img alt="Garden Sticker Image Target" src="./image-targets/garden-sticker_original.png" width=400 />
 
 </details>
 
@@ -49,4 +29,3 @@ This project contains Github Actions configuration for deployment to Github Page
 ## Questions?
 
 Please raise any questions on [Github Discussions](https://github.com/orgs/8thwall/discussions) or join the [Discord](https://8th.io/discord) to connect with the community.
-

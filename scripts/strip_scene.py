@@ -1,4 +1,4 @@
-"""Strip the AR scene down to the entry (Playing Cards) space.
+"""Strip the AR scene down to the entry (Garden) space.
 
 Removes spaces: BMO Bites, Magic Photos, Toggle SLAM, Space Selector
 and every object outside the entry space tree. Those spaces referenced

@@ -85,18 +85,18 @@
       "hidden": false
     },
     "a608ddd9-9379-464d-966f-5d8d8674c83c": {
-      "camera": {
-        "type": "perspective",
-        "xr": {
-          "desktop": "disabled",
-          "xrCameraType": "world",
-          "headset": "AR",
-          "phone": "AR",
-          "world": {
-            "disableWorldTracking": false
+        "camera": {
+          "type": "perspective",
+          "xr": {
+            "desktop": "disabled",
+            "xrCameraType": "world",
+            "headset": "AR",
+            "phone": "AR",
+            "world": {
+              "disableWorldTracking": true
+            }
           }
-        }
-      },
+        },
       "components": {},
       "geometry": null,
       "id": "a608ddd9-9379-464d-966f-5d8d8674c83c",
@@ -257,7 +257,7 @@
   "spaces": {
     "88453035-dc0f-486d-868a-8ff7c2fda864": {
       "id": "88453035-dc0f-486d-868a-8ff7c2fda864",
-      "name": "Playing Cards",
+      "name": "Garden",
       "activeCamera": "a608ddd9-9379-464d-966f-5d8d8674c83c",
       "includedSpaces": [],
       "reflections": {
