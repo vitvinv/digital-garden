@@ -4,7 +4,7 @@
       "id": "a8f21946-b2fe-4589-9302-6232ec649775",
       "position": [
         0,
-        0.5,
+        0.25,
         0.25
       ],
       "rotation": [
@@ -14,9 +14,9 @@
         1
       ],
       "scale": [
-        1,
-        1,
-        1
+        0.5,
+        0.5,
+        0.5
       ],
       "geometry": null,
       "material": null,
@@ -82,7 +82,8 @@
       "parentId": "a8f21946-b2fe-4589-9302-6232ec649775",
       "components": {},
       "name": "Card",
-      "hidden": false
+      "hidden": false,
+      "order": 0.5066866515427442
     },
     "a608ddd9-9379-464d-966f-5d8d8674c83c": {
       "camera": {
@@ -124,9 +125,9 @@
     "daa72afa-34cc-405f-86bc-3b6570019359": {
       "id": "daa72afa-34cc-405f-86bc-3b6570019359",
       "position": [
-        0.03448378242426578,
+        0.06896756484853156,
         -0.5,
-        -0.30114289514167814
+        -0.6022857902833563
       ],
       "rotation": [
         0,
@@ -135,9 +136,9 @@
         1
       ],
       "scale": [
-        1,
-        1,
-        1
+        2,
+        2,
+        2
       ],
       "geometry": null,
       "material": null,
@@ -152,7 +153,9 @@
         "loop": true
       },
       "name": "daylily.glb",
-      "order": 11.47500697138334
+      "order": 10.72532899999749,
+      "disabled": true,
+      "hidden": true
     },
     "47699d9e-18a5-4f88-a4f9-b8be92e8f74a": {
       "components": {},
@@ -259,7 +262,7 @@
       "position": [
         0,
         -0.5,
-        -0.25
+        -0.5
       ],
       "rotation": [
         0,
@@ -268,9 +271,9 @@
         1
       ],
       "scale": [
-        1,
-        1,
-        1
+        2,
+        2,
+        2
       ],
       "geometry": null,
       "material": null,
@@ -285,7 +288,7 @@
         "loop": true
       },
       "name": "phlox_280.glb",
-      "order": 10.050957580462459
+      "order": 9.33674760250539
     }
   },
   "spaces": {
