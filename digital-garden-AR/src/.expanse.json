@@ -4,8 +4,8 @@
       "id": "a8f21946-b2fe-4589-9302-6232ec649775",
       "position": [
         0,
-        0,
-        0
+        0.5,
+        0.25
       ],
       "rotation": [
         0,
@@ -73,9 +73,9 @@
         1
       ],
       "scale": [
-        0.31,
-        0.31,
-        0.31
+        1,
+        1,
+        1
       ],
       "geometry": null,
       "material": null,
@@ -85,18 +85,18 @@
       "hidden": false
     },
     "a608ddd9-9379-464d-966f-5d8d8674c83c": {
-        "camera": {
-          "type": "perspective",
-          "xr": {
-            "desktop": "disabled",
-            "xrCameraType": "world",
-            "headset": "AR",
-            "phone": "AR",
-            "world": {
-              "disableWorldTracking": true
-            }
+      "camera": {
+        "type": "perspective",
+        "xr": {
+          "desktop": "disabled",
+          "xrCameraType": "world",
+          "headset": "AR",
+          "phone": "AR",
+          "world": {
+            "disableWorldTracking": true
           }
-        },
+        }
+      },
       "components": {},
       "geometry": null,
       "id": "a608ddd9-9379-464d-966f-5d8d8674c83c",
@@ -124,9 +124,9 @@
     "daa72afa-34cc-405f-86bc-3b6570019359": {
       "id": "daa72afa-34cc-405f-86bc-3b6570019359",
       "position": [
-        0,
-        -1.5657872824697567,
-        -0.6403132313263393
+        0.03448378242426578,
+        -0.5,
+        -0.30114289514167814
       ],
       "rotation": [
         0,
@@ -135,9 +135,9 @@
         1
       ],
       "scale": [
-        3.712903225806455,
-        3.712903225806455,
-        3.712903225806455
+        1,
+        1,
+        1
       ],
       "geometry": null,
       "material": null,
@@ -152,7 +152,7 @@
         "loop": true
       },
       "name": "daylily.glb",
-      "order": 5.5451557112176495
+      "order": 11.47500697138334
     },
     "47699d9e-18a5-4f88-a4f9-b8be92e8f74a": {
       "components": {},
@@ -197,9 +197,9 @@
         1
       ],
       "scale": [
-        3.25,
-        3.2500000000000013,
-        3.25
+        1,
+        1.0000000000000004,
+        1
       ],
       "material": {
         "type": "basic",
@@ -223,7 +223,7 @@
       "position": [
         0,
         0,
-        0
+        -2.7755575615628914e-17
       ],
       "rotation": [
         0,
@@ -232,9 +232,9 @@
         1
       ],
       "scale": [
-        3.25,
-        3.25,
-        3.25
+        1,
+        1,
+        1
       ],
       "geometry": null,
       "material": {
@@ -251,7 +251,41 @@
         "loop": true
       },
       "name": "hider.glb",
-      "order": 8.09098464309628
+      "order": 8.09098464309628,
+      "hidden": false
+    },
+    "20c8b5b1-ff71-4cf4-8aa5-80e21cf655c7": {
+      "id": "20c8b5b1-ff71-4cf4-8aa5-80e21cf655c7",
+      "position": [
+        0,
+        -0.5,
+        -0.25
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "geometry": null,
+      "material": null,
+      "parentId": "28878a86-3de0-4d09-a97d-e2aca00f534b",
+      "components": {},
+      "gltfModel": {
+        "src": {
+          "type": "asset",
+          "asset": "assets/plants/phlox_280.glb"
+        },
+        "animationClip": "",
+        "loop": true
+      },
+      "name": "phlox_280.glb",
+      "order": 10.050957580462459
     }
   },
   "spaces": {
