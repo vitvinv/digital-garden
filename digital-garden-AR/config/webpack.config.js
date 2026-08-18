@@ -4,6 +4,7 @@ const CopyWebpackPlugin = require('copy-webpack-plugin')
 
 const createVirtualEntryPlugin = require('./entry-plugin')
 const createDev8Plugin = require('./dev8-plugin')
+const createPlantCacheBustPlugin = require('./plant-cache-bust')
 
 const rootPath = process.cwd()
 const distPath = path.join(rootPath, 'dist')
@@ -24,9 +25,10 @@ const makeAssetLoader = () => ({
 const config = {
   entry: './entry.js',
   output: {
-    filename: 'bundle.js',
+    filename: 'bundle.[contenthash].js',
     path: distPath,
     publicPath: '/',
+    clean: true,
   },
   plugins: [
     new HtmlWebpackPlugin({
@@ -34,6 +36,9 @@ const config = {
       filename: 'index.html',
       scriptLoading: 'blocking',
       inject: false,
+    }),
+    createPlantCacheBustPlugin({
+      srcDir: srcPath,
     }),
     new CopyWebpackPlugin({
       patterns: [

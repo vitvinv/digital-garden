@@ -8,11 +8,15 @@ plant to `digital-garden-AR/src/assets/plants/{plant_id}.glb`.
 
 Per-plant JSON schema:
     {
-      "plant_id": "daylily-1",
+      "plant_id": "daylily_280",
       "species": "Daylily",            # must match the core species library
       "seed": 280,
-      "planted_date": "2026-06-08"     # YYYY-MM-DD; day = today - planted_date
+      "planted_date": "2026-06-08"     # strict ISO YYYY-MM-DD; day = today - planted_date
     }
+
+Configs are authored by the Blender addon's "export with metadata" button,
+which always writes strict ISO dates. Hand-typed DMY/ambiguous dates are
+rejected by design.
 
 Output matches the Blender addon's export conventions:
   - MeshTurtle scale 0.001 (mm -> meters)
@@ -125,7 +129,11 @@ def regenerate_plant(config, plants_dir, day_override=None, compress=True,
     if not plant_id or not species_name or not planted_date:
         raise ValueError(f"plant config missing plant_id/species/planted_date: {config}")
 
-    day_n = compute_day_n(planted_date, day_override)
+    try:
+        day_n = compute_day_n(planted_date, day_override)
+    except ValueError as e:
+        raise ValueError(f"[{plant_id}] planted_date '{planted_date}' must be "
+                         f"strict ISO YYYY-MM-DD: {e}") from e
     species = lib.get(species_name)
     if species is None:
         raise ValueError(f"unknown species '{species_name}' (library has "
