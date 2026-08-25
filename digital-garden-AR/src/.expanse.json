@@ -127,7 +127,7 @@
       "position": [
         0.06896756484853156,
         -0.5,
-        -0.6022857902833563
+        -0.17590400484991897
       ],
       "rotation": [
         0,
@@ -136,9 +136,9 @@
         1
       ],
       "scale": [
-        2,
-        2,
-        2
+        1,
+        1,
+        1
       ],
       "geometry": null,
       "material": null,
@@ -154,8 +154,7 @@
       },
       "name": "daylily.glb",
       "order": 10.72532899999749,
-      "disabled": true,
-      "hidden": true
+      "hidden": false
     },
     "47699d9e-18a5-4f88-a4f9-b8be92e8f74a": {
       "components": {},
@@ -297,10 +296,7 @@
       "name": "Garden",
       "activeCamera": "a608ddd9-9379-464d-966f-5d8d8674c83c",
       "includedSpaces": [],
-      "reflections": {
-        "type": "url",
-        "url": "https://cdn.8thwall.com/web/assets/envmap/basic_env_map-m9hqpneh.jpg"
-      }
+      "reflections": null
     }
   },
   "entrySpaceId": "88453035-dc0f-486d-868a-8ff7c2fda864",

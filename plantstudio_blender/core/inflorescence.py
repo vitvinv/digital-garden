@@ -16,6 +16,9 @@ def _gp(obj, name, default=0.0):
 class PdFlowerFruit(PdPlantPart):
     def __init__(self, plant=None):
         super().__init__(plant)
+        # Keep the original four-stage lifecycle explicit. The renderer uses
+        # this stage instead of inferring fruit from a boolean side effect.
+        self.stage = "bud"
         self.isOpen = False
         self.hasSetFruit = False
         self.isRipe = False
@@ -29,22 +32,43 @@ class PdFlowerFruit(PdPlantPart):
 
     def nextDay(self):
         super().nextDay()
-        p = self.plant.pFlower[self.gender]
-        if not self.isOpen:
-            if self.age >= _gp(p, "minDaysToOpenFlower", 3):
+        flower = self.plant.pFlower[self.gender]
+        if self.stage == "bud":
+            min_fraction = _gp(flower, "minFractionOfOptimalBiomassToOpenFlower_frn", 0.5)
+            optimal = _gp(flower, "optimalBiomass_pctMPB", 1.0)
+            reached = self.liveBiomass_pctMPB >= min_fraction * optimal
+            deadline = self.age > _gp(flower, "maxDaysToGrowIfOverMinFraction", 30)
+            if (reached or deadline) and self.age > _gp(flower, "minDaysToOpenFlower", 3):
+                self.stage = "open"
                 self.isOpen = True
-        if not self.hasSetFruit:
-            minDays = _gp(p, "minDaysBeforeSettingFruit", 3)
-            minFract = _gp(p, "minFractionOfOptimalBiomassToCreateFruit_frn", 0.8)
-            biomassReached = self.liveBiomass_pctMPB >= _gp(p, "optimalBiomass_pctMPB") * minFract
-            deadlineReached = self.age > _gp(p, "maxDaysToGrowIfOverMinFraction", 30)
-            if self.age >= minDays and (biomassReached or deadlineReached):
+                self.daysOpen = 0
+        elif self.stage == "open":
+            self.daysOpen = getattr(self, "daysOpen", 0) + 1
+            min_days = _gp(flower, "minDaysBeforeSettingFruit", 3)
+            min_days_optimal = (
+                self.age > _gp(flower, "minDaysToGrow", 3)
+                and self.liveBiomass_pctMPB >= _gp(flower, "optimalBiomass_pctMPB", 1.0)
+            )
+            min_fraction = _gp(flower, "minFractionOfOptimalBiomassToCreateFruit_frn", 0.8)
+            fruit_deadline = self.age > _gp(flower, "maxDaysToGrowIfOverMinFraction", 30)
+            fruit_threshold = self.liveBiomass_pctMPB >= min_fraction * _gp(
+                flower, "optimalBiomass_pctMPB", 1.0)
+            if self.gender != 1 and self.age > min_days and (min_days_optimal or fruit_deadline or fruit_threshold):
+                self.stage = "unripe_fruit"
                 self.hasSetFruit = True
+                self.isRipe = False
                 self.daysAccumulatingFruitBiomass = 0
-        elif not self.isRipe:
-            daysToRipen = self._days_to_ripen()
-            if self.daysAccumulatingFruitBiomass >= daysToRipen:
+                # Anthesis transfers half of the flower biomass into the
+                # developing ovary, matching PlantStudio's stage transition.
+                anthesis_loss = self.liveBiomass_pctMPB * 0.5
+                self.liveBiomass_pctMPB -= anthesis_loss
+                self.deadBiomass_pctMPB += anthesis_loss
+        elif self.stage == "unripe_fruit":
+            if self.daysAccumulatingFruitBiomass >= self._days_to_ripen():
+                self.stage = "ripe_fruit"
                 self.isRipe = True
+            self.daysAccumulatingFruitBiomass += 1
+        elif self.stage == "ripe_fruit":
             self.daysAccumulatingFruitBiomass += 1
 
     def _days_to_ripen(self):
@@ -61,13 +85,28 @@ class PdFlowerFruit(PdPlantPart):
         if mode == kActivityNextDay:
             self.nextDay()
         elif mode == kActivityDemandReproductive:
-            # The original flower demand has NO age cap — it demands toward
-            # the flower's own optimal biomass every day until it is reached
-            # (linearGrowthResult returns 0 once current >= optimal).
-            p = self.plant.pFlower[self.gender]
-            self.biomassDemand_pctMPB = umath.linearGrowthResult(
-                self.liveBiomass_pctMPB, _gp(p, "optimalBiomass_pctMPB"),
-                _gp(p, "minDaysToGrow", 3))
+            if self.stage in ("bud", "open"):
+                p = self.plant.pFlower[self.gender]
+                self.biomassDemand_pctMPB = umath.linearGrowthResult(
+                    self.liveBiomass_pctMPB, _gp(p, "optimalBiomass_pctMPB", 1.0),
+                    _gp(p, "minDaysToGrow", 3))
+            else:
+                p = self.plant.params.pFruit
+                if self.daysAccumulatingFruitBiomass > _gp(p, "maxDaysToGrow", 20):
+                    self.biomassDemand_pctMPB = 0.0
+                else:
+                    max_days = max(1, _gp(p, "maxDaysToGrow", 20))
+                    fraction = umath.safedivExcept(
+                        self.daysAccumulatingFruitBiomass + 1, max_days, 0.0)
+                    curve = getattr(p, "sCurveParams", None)
+                    if curve is None:
+                        wanted = fraction
+                    else:
+                        wanted = umath.scurve(fraction, curve.c1, curve.c2)
+                    target = umath.max(0.0, umath.min(1.0, wanted)) * _gp(
+                        p, "optimalBiomass_pctMPB", 5.0)
+                    self.biomassDemand_pctMPB = umath.linearGrowthResult(
+                        self.liveBiomass_pctMPB, target, 1)
             traverser.total += self.biomassDemand_pctMPB
         elif mode == kActivityGrowReproductive:
             newBiomass = self.biomassDemand_pctMPB * traverser.fractionOfPotentialBiomass
@@ -124,9 +163,10 @@ class PdInflorescence(PdPlantPart):
             _gp(p, "minFractionOfOptimalBiomassToCreateInflorescence_frn", 0.2)
 
     def nextDay(self):
+        # Flowers are advanced by traverseActivity before this method is
+        # called. Advancing them here as well skips the open stage for fast
+        # flowering species.
         super().nextDay()
-        for flower in list(self.flowers):
-            flower.nextDay()
         p = self.plant.pInflor[self.gender]
         biomassToMakeFlowers = _gp(p, "minFractionOfOptimalBiomassToMakeFlowers_frn", 0.5) \
             * _gp(p, "optimalBiomass_pctMPB")

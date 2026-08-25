@@ -384,6 +384,15 @@ def normalize_fruit(params):
     if not hasattr(f, "tdoParams"):
         from .params import TdoParams
         f.tdoParams = TdoParams()
+    _ensure(f, "optimalBiomass_pctMPB",
+            float(_get(f, "optimalBiomass_pctMPB", default=5.0)))
+    _ensure(f, "minDaysToGrow",
+            int(_get(f, "MinDaysToGrow", default=7)))
+    _ensure(f, "maxDaysToGrow",
+            int(_get(f, "MaxDaysToGrow", default=20)))
+    if not hasattr(f, "sCurveParams") or not isinstance(getattr(f, "sCurveParams"), SCurve):
+        f.sCurveParams = _parse_scurve(_get(f, "sCurveParams",
+                                              default="0.25 0.1 0.65 0.85"))
     _ensure(f, "daysToRipen", float(_get(f, "DaysToRipen", default=5)))
 
 

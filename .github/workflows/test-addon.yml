@@ -1,9 +1,9 @@
-name: PlantStudio Addon Core Tests
+name: PlantStudio-Blender Core Tests
 
 on:
   push:
     paths:
-      - "blender_addon/**"
+      - "plantstudio_blender/**"
   workflow_dispatch:
 
 jobs:
@@ -25,4 +25,4 @@ jobs:
         run: pip install pytest
 
       - name: Run core tests
-        run: python -m pytest blender_addon/tests/ -v
+        run: python -m pytest plantstudio_blender/tests/ -v

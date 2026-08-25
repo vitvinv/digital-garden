@@ -155,7 +155,45 @@ class PdPlant:
         self.age += 1
         self.needToRecalculateColors = True
 
+    def reset(self):
+        """Discard simulated parts and restore the initial deterministic state."""
+        self.age = 0
+        self.firstPhytomer = None
+        self.partsCreated = 0
+        self.totalBiomass_pctMPB = 0.0
+        self.shootBiomass_pctMPB = 0.0
+        self.reproBiomass_pctMPB = 0.0
+        self.changeInShootBiomassToday_pctMPB = 0.0
+        self.changeInReproBiomassToday_pctMPB = 0.0
+        self.unallocatedNewVegetativeBiomass_pctMPB = 0.0
+        self.unallocatedNewReproductiveBiomass_pctMPB = 0.0
+        self.unremovedDeadVegetativeBiomass_pctMPB = 0.0
+        self.unremovedDeadReproductiveBiomass_pctMPB = 0.0
+        self.floweringHasStarted = False
+        self.ageAtWhichFloweringStarted = 0
+        self.ageOfYoungestPhytomer = 0
+        self.needToRecalculateColors = True
+        self._apicalMeristemCount = 0
+        self._axillaryMeristemCount = 0
+        self.numApicalActiveReproductiveMeristemsOrInflorescences = 0
+        self.numAxillaryActiveReproductiveMeristemsOrInflorescences = 0
+        self.numApicalInactiveReproductiveMeristems = 0
+        self.numAxillaryInactiveReproductiveMeristems = 0
+        # Drawing and growth both consume the same deterministic stream.
+        self.randomNumberGenerator.setSeed(self.seed)
+
+    def setAge(self, newAge):
+        """Set age by rebuilding the plant, matching PlantStudio semantics."""
+        maturity = int(getattr(self.pGeneral, "ageAtMaturity", newAge))
+        target = max(0, min(maturity, int(newAge)))
+        self.reset()
+        while self.age < target:
+            self.nextDay()
+        return self
+
     def growTo(self, day):
+        if day < self.age:
+            return self.setAge(day)
         while self.age < day:
             self.nextDay()
         return self

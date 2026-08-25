@@ -12,12 +12,24 @@ class MeshBuffer:
         self.vertices = []   # list of (x, y, z)
         self.faces = []      # list of [i, j, k]
         self.face_colors = []  # list of (r, g, b) 0-255 per face
+        # Diagnostic records are deliberately lightweight and remain available
+        # to the headless audit without affecting exported mesh data.
+        self.pipe_records = []
+        self.triangle_set_records = []
+        # Semantic records identify plant parts independently of mesh topology.
+        # They are diagnostic only and do not affect exported geometry.
+        self.semantic_records = []
         self._index = {}
 
     def clear(self):
         self.vertices = []
         self.faces = []
         self.face_colors = []
+        self.pipe_records = []
+        self.triangle_set_records = []
+        # Semantic records identify plant parts independently of mesh topology.
+        # They are diagnostic only and do not affect exported geometry.
+        self.semantic_records = []
         self._index = {}
 
     def add_point(self, x, y, z, color):
@@ -77,7 +89,9 @@ class MeshBuffer:
         return pts
 
     def add_pipe(self, center_start, center_end, radius_start, radius_end, faces, color,
-                 basis_start=None, basis_end=None, cap_start=True, cap_end=True):
+                 basis_start=None, basis_end=None, cap_start=True, cap_end=True,
+                 part_id=None, segment_index=None, segment_count=None,
+                 stroke_id=None):
         """Cylinder/cone between two centers. faces = number of side quads.
 
         basis_start/basis_end: optional (px,py,pz, qx,qy,qz) ring orientations.
@@ -87,6 +101,19 @@ class MeshBuffer:
         if radius_start <= 0 and radius_end <= 0:
             return
         n = max(3, faces)
+        self.pipe_records.append({
+            "start": tuple(float(v) for v in center_start),
+            "end": tuple(float(v) for v in center_end),
+            "radius_start": float(radius_start),
+            "radius_end": float(radius_end),
+            "faces": n,
+            "part_id": part_id,
+            "segment_index": segment_index,
+            "segment_count": segment_count,
+            "stroke_id": stroke_id,
+            "cap_start": bool(cap_start),
+            "cap_end": bool(cap_end),
+        })
         dx = center_end[0] - center_start[0]
         dy = center_end[1] - center_start[1]
         dz = center_end[2] - center_start[2]
