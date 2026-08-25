@@ -95,6 +95,17 @@ class TestPipeOptimization:
         # n=3: 3 side quads (6 tris) + 2 caps (1 tri each) = 8
         assert faces == 8
 
+    def test_internal_pipe_joints_have_no_caps(self):
+        buf = MeshBuffer()
+        buf.add_pipe((0, 0, 0), (1, 0, 0), 0.5, 0.5, 3,
+                     (100, 200, 100), cap_start=False, cap_end=False,
+                     segment_index=0, segment_count=3)
+        _, faces = buf.stats()
+        # An internal segment is side quads only: 3 quads = 6 triangles.
+        assert faces == 6
+        assert buf.pipe_records[0]["cap_start"] is False
+        assert buf.pipe_records[0]["cap_end"] is False
+
     def test_bent_pipe_joint_is_welded(self):
         # Two consecutive pipes with different directions sharing a joint.
         # Frame continuity reuses the previous end-ring basis, so the joint
@@ -112,6 +123,70 @@ class TestPipeOptimization:
         # start ring (3) + shared joint ring (3) + end ring (3) = 9 verts.
         # Without welding the joint would be 2n=6 -> 12 total.
         assert len(buf.vertices) == 9
+
+
+class TestGrowthGeometryConsistency:
+    def test_campanula_age_round_trip_matches_direct_orthographic_render(self, tmp_path):
+        from blender_addon.tools.compare_campanula import compare_campanula
+
+        result = compare_campanula(output_path=str(tmp_path / "campanula.ppm"))
+        assert result["mesh_equal"]
+        assert result["direct"]["stages"] == result["round_trip"]["stages"]
+        assert result["direct"]["flower_scales"] == result["round_trip"]["flower_scales"]
+        assert result["direct"]["flower_triangles"] == result["round_trip"]["flower_triangles"]
+        assert (tmp_path / "campanula.ppm").read_text(encoding="ascii").startswith("P3\n")
+
+    def test_campanula_keeps_detailed_flower_until_fruit_stage(self):
+        lib = SpeciesLibrary(DATA_DIR)
+        species = lib.get("campanula")
+        assert species is not None
+        tdo_lib = TdoLibrary.from_file(TDO_PATH)
+
+        def render(day):
+            plant = grow_species(species, day, seed=280, tdo_library=tdo_lib)
+            flowers = []
+            stack = [plant.firstPhytomer]
+            seen = set()
+            while stack:
+                part = stack.pop()
+                if part is None or id(part) in seen:
+                    continue
+                seen.add(id(part))
+                if type(part).__name__ == "PdFlowerFruit":
+                    flowers.append(part)
+                stack.extend([
+                    getattr(part, "leftBranchPlantPart", None),
+                    getattr(part, "rightBranchPlantPart", None),
+                    getattr(part, "nextPlantPart", None),
+                ])
+                stack.extend(getattr(part, "flowers", []) or [])
+            buffer = MeshBuffer()
+            turtle = MeshTurtle(buffer)
+            turtle.setScale_pixelsPerMm(0.001)
+            draw_plant(plant, turtle)
+            return flowers, buffer
+
+        flowers, open_buffer = render(80)
+        assert flowers and all(f.stage == "open" for f in flowers)
+        assert any(record["points"] > 8 for record in open_buffer.triangle_set_records)
+
+        flowers, fruit_buffer = render(150)
+        assert flowers and any(f.stage in ("unripe_fruit", "ripe_fruit") for f in flowers)
+        assert all(f.stage != "bud" for f in flowers)
+        assert fruit_buffer.stats()[1] < open_buffer.stats()[1]
+
+    def test_pipe_records_have_continuous_segment_indices(self):
+        buf, _ = mesh_for("maiden grass", 60)
+        grouped = {}
+        for record in buf.pipe_records:
+            count = record["segment_count"]
+            if count is None:
+                continue
+            key = (record["stroke_id"], count)
+            grouped.setdefault(key, []).append(record["segment_index"])
+        assert grouped
+        assert all(sorted(indices) == list(range(count))
+                   for (_, count), indices in grouped.items())
 
 
 class TestTdoEmbedding:
@@ -183,11 +258,8 @@ class TestFruitRipeness:
     """P3a: unripe fruit draws with alternateFaceColor, ripe with faceColor."""
 
     def test_unripe_fruit_uses_alternate_color(self):
-        # tomato: first fruit sets ~day 75 (after the linearGrowthResult fix
-        # restored the original's realistic growth); at day 75 every fruit is
-        # unripe, so the mesh must contain the alternate (unripe) color, not
-        # the ripe one.
-        buf, plant = mesh_for("tomato", 75)
+        # The first tomato fruit is visible by day 77 and is still unripe.
+        buf, plant = mesh_for("tomato", 77)
         colors = set(buf.face_colors)
         alt = plant.params.pFruit.tdoParams.alternateFaceColor
         face = plant.params.pFruit.tdoParams.faceColor
@@ -196,8 +268,9 @@ class TestFruitRipeness:
         assert face not in colors, "no fruit should be ripe yet at day 75"
 
     def test_ripe_fruit_uses_face_color(self):
-        # all tomato fruit is ripe by day 90: unripe color gone, ripe present
-        buf, plant = mesh_for("tomato", 90)
+        # By day 100 all tomato fruit has ripened, so only the ripe color
+        # should remain among fruit faces.
+        buf, plant = mesh_for("tomato", 100)
         colors = set(buf.face_colors)
         alt = plant.params.pFruit.tdoParams.alternateFaceColor
         face = plant.params.pFruit.tdoParams.faceColor

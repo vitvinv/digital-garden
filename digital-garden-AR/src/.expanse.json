@@ -24,7 +24,7 @@
       "components": {},
       "name": "Garden",
       "imageTarget": {
-        "name": "garden-sticker"
+        "name": "ENG-digital-garden-sticker"
       },
       "order": 2.150211680966083,
       "hidden": false
@@ -35,7 +35,8 @@
       "id": "ac1989e3-3b71-49e2-a05f-e682aeb18c36",
       "light": {
         "intensity": 1,
-        "type": "directional"
+        "type": "directional",
+        "followCamera": false
       },
       "material": null,
       "name": "Directional Light",
@@ -45,15 +46,15 @@
         10
       ],
       "rotation": [
-        0,
-        0,
-        0,
-        1
+        -0.07314584187673298,
+        -0.7522930560020477,
+        -0.08475530502862431,
+        0.6492467804900914
       ],
       "scale": [
         1,
-        1,
-        1
+        0.9999999999999998,
+        0.9999999999999998
       ],
       "parentId": "88453035-dc0f-486d-868a-8ff7c2fda864",
       "order": 0.6644431107322474,
@@ -122,41 +123,6 @@
       "parentId": "88453035-dc0f-486d-868a-8ff7c2fda864",
       "order": 1.0308214152219775
     },
-    "daa72afa-34cc-405f-86bc-3b6570019359": {
-      "id": "daa72afa-34cc-405f-86bc-3b6570019359",
-      "position": [
-        0.06896756484853156,
-        -0.5,
-        -0.6022857902833563
-      ],
-      "rotation": [
-        0,
-        0,
-        0,
-        1
-      ],
-      "scale": [
-        2,
-        2,
-        2
-      ],
-      "geometry": null,
-      "material": null,
-      "parentId": "28878a86-3de0-4d09-a97d-e2aca00f534b",
-      "components": {},
-      "gltfModel": {
-        "src": {
-          "type": "asset",
-          "asset": "assets/daylily.glb"
-        },
-        "animationClip": "",
-        "loop": true
-      },
-      "name": "daylily.glb",
-      "order": 10.72532899999749,
-      "disabled": true,
-      "hidden": true
-    },
     "47699d9e-18a5-4f88-a4f9-b8be92e8f74a": {
       "components": {},
       "geometry": null,
@@ -178,9 +144,9 @@
         1
       ],
       "scale": [
-        1,
-        1,
-        1
+        0.9999999999999997,
+        0.9999999999999998,
+        0.9999999999999998
       ],
       "parentId": "88453035-dc0f-486d-868a-8ff7c2fda864",
       "order": 0.4038940050501252,
@@ -257,12 +223,12 @@
       "order": 8.09098464309628,
       "hidden": false
     },
-    "20c8b5b1-ff71-4cf4-8aa5-80e21cf655c7": {
-      "id": "20c8b5b1-ff71-4cf4-8aa5-80e21cf655c7",
+    "2745af53-4602-4da3-a488-cef4261b11b0": {
+      "id": "2745af53-4602-4da3-a488-cef4261b11b0",
       "position": [
         0,
         -0.5,
-        -0.5
+        -0.19345651913569645
       ],
       "rotation": [
         0,
@@ -282,13 +248,13 @@
       "gltfModel": {
         "src": {
           "type": "asset",
-          "asset": "assets/plants/phlox_280.glb"
+          "asset": "assets/plants/digital-garden.glb"
         },
         "animationClip": "",
         "loop": true
       },
-      "name": "phlox_280.glb",
-      "order": 9.33674760250539
+      "name": "digital-garden.glb",
+      "order": 9.689531900345047
     }
   },
   "spaces": {
@@ -297,10 +263,7 @@
       "name": "Garden",
       "activeCamera": "a608ddd9-9379-464d-966f-5d8d8674c83c",
       "includedSpaces": [],
-      "reflections": {
-        "type": "url",
-        "url": "https://cdn.8thwall.com/web/assets/envmap/basic_env_map-m9hqpneh.jpg"
-      }
+      "reflections": null
     }
   },
   "entrySpaceId": "88453035-dc0f-486d-868a-8ff7c2fda864",

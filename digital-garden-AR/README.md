@@ -22,6 +22,26 @@ Scan the garden sticker image with your phone camera.
 6. When importing your own targets, please see [this guide](https://8thwall.org/docs/studio/guides/xr/image-targets) for more information
 7. Recommended: Track your files using [git](https://git-scm.com/about) to avoid losing progress
 
+### Visual effects
+
+Bloom and PS-1-style pixelation are configured in [`src/fx-config.json`](./src/fx-config.json), so each garden project can keep its own settings. The effects are enabled by default and the internal resolution is based on `pixelSize` in CSS pixels, keeping the block size consistent across device resolutions.
+
+While testing in the Desktop App simulator, use the browser console:
+
+```js
+window.FX.getConfig()
+window.FX.applyConfig({
+  enabled: true,
+  pixelate: {enabled: true, pixelSize: 4, maxInternalWidth: 960, smoothUpscale: false},
+  bloom: {enabled: true, intensity: 0.8, threshold: 0.85, radius: 0.8},
+})
+window.FX.copyConfig()
+```
+
+`applyConfig()` replaces the full settings object live. `copyConfig()` logs the current JSON and attempts to copy it to the clipboard for saving back into `src/fx-config.json`. URL overrides are also available for quick tests, for example `?pixelSize=6&bloom=1.2&pixelate=off`.
+
+For bloom diagnosis, add `?bloomDebug=bright` to show the extracted bright pixels or `?bloomDebug=blur` to show the blurred bloom texture. The console command `window.FX.getDiagnostics()` reports whether the main render was intercepted, bypassed because a non-default render target was active, or disabled after an error.
+
 ## Deployment
 
 This project contains Github Actions configuration for deployment to Github Pages, which triggers automatically by pushing the `main` branch. You can also follow the publishing instructions here: https://8thwall.org/docs/getting-started/publishing to publish to any other web host.

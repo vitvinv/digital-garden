@@ -121,6 +121,29 @@ class TestSimulation:
             plant = grow_species(species, 50)
             assert plant.age == 50, f"{name} failed"
 
+    def test_flower_stage_waits_for_biomass_or_deadline(self, lib):
+        species = lib.get("campanula")
+        plant = grow_species(species, 80, seed=280)
+        flowers = list(iter_flowers(plant))
+        assert flowers
+        assert all(f.stage == "open" for f in flowers)
+        plant = grow_species(species, 150, seed=280)
+        flowers = list(iter_flowers(plant))
+        assert any(f.stage in ("unripe_fruit", "ripe_fruit") for f in flowers)
+
+    @pytest.mark.parametrize("name", ["tomato", "This way - that way plant"])
+    def test_fast_flowers_pass_through_open_stage(self, lib, name):
+        """A fast reproductive cycle must not skip the visible open stage."""
+        species = lib.get(name)
+        assert species is not None, f"species {name!r} not found"
+        stages_by_day = []
+        for day in (49, 54, 59) if name == "This way - that way plant" else (74, 77, 95):
+            plant = grow_species(species, day, seed=280)
+            stages_by_day.append({flower.stage for flower in iter_flowers(plant)})
+        assert any("open" in stages for stages in stages_by_day)
+        assert any("unripe_fruit" in stages for stages in stages_by_day)
+        assert any("ripe_fruit" in stages for stages in stages_by_day)
+
     @pytest.mark.parametrize("name", ["corn", "tomato", "gilia"])
     def test_fruit_sets_by_deadline(self, lib, name):
         """P1 regression: fruit must set even when biomass stays below the

@@ -1,0 +1,23 @@
+{
+  "type": "PLANAR",
+  "properties": {
+    "top": 55,
+    "left": 0,
+    "width": 480,
+    "height": 640,
+    "isRotated": false,
+    "originalWidth": 480,
+    "originalHeight": 696
+  },
+  "imagePath": "image-targets/ENG-digital-garden-sticker_luminance.png",
+  "metadata": null,
+  "name": "ENG-digital-garden-sticker",
+  "resources": {
+    "originalImage": "ENG-digital-garden-sticker_original.png",
+    "croppedImage": "ENG-digital-garden-sticker_cropped.png",
+    "thumbnailImage": "ENG-digital-garden-sticker_thumbnail.png",
+    "luminanceImage": "ENG-digital-garden-sticker_luminance.png"
+  },
+  "created": 1787646695426,
+  "updated": 1787646731266
+}

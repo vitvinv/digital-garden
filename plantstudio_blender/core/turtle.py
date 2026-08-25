@@ -21,6 +21,7 @@ class MeshTurtle:
         self.currentColor = (100, 200, 100)
         self.currentLineWidth = 1.0
         self.lineDivisions = 3
+        self._stroke_counter = 0
 
     def reset(self):
         self.matrixStack = []
@@ -29,6 +30,13 @@ class MeshTurtle:
         self.matrixStack.append(self.currentMatrix)
         self.numMatrixesUsed = 1
         self.scale_pixelsPerMm = 1.0
+        self._stroke_counter = 0
+
+    def next_stroke_id(self):
+        """Return a stable id for one logical stem/pipe draw call."""
+        stroke_id = self._stroke_counter
+        self._stroke_counter += 1
+        return stroke_id
 
     # ── matrix stack ──
 
@@ -94,7 +102,8 @@ class MeshTurtle:
         m = self.currentMatrix
         return (m.a1, m.b1, m.c1, m.a2, m.b2, m.c2)
 
-    def drawInMillimeters(self, mm, partID=0):
+    def drawInMillimeters(self, mm, partID=0, cap_start=True, cap_end=True,
+                          segment_index=None, segment_count=None, stroke_id=None):
         """Draw a line segment of the current width as a pipe."""
         start = self.position()
         self.currentMatrix.move(mm * self.scale_pixelsPerMm)
@@ -103,17 +112,24 @@ class MeshTurtle:
         self.mesh_buffer.add_pipe(
             (start.x, start.y, start.z),
             (end.x, end.y, end.z),
-            radius, radius, PIPE_FACES, self.currentColor)
+            radius, radius, PIPE_FACES, self.currentColor,
+            cap_start=cap_start, cap_end=cap_end, part_id=partID,
+            segment_index=segment_index, segment_count=segment_count,
+            stroke_id=stroke_id)
         return None
 
     def drawPipe(self, start, end, radiusStart, radiusEnd, faces, color,
-                 basis_start=None, basis_end=None, cap_start=True, cap_end=True):
+                 basis_start=None, basis_end=None, cap_start=True, cap_end=True,
+                 part_id=None, segment_index=None, segment_count=None,
+                 stroke_id=None):
         self.mesh_buffer.add_pipe(
             (start.x, start.y, start.z),
             (end.x, end.y, end.z),
             radiusStart, radiusEnd, faces, color,
             basis_start=basis_start, basis_end=basis_end,
-            cap_start=cap_start, cap_end=cap_end)
+            cap_start=cap_start, cap_end=cap_end, part_id=part_id,
+            segment_index=segment_index, segment_count=segment_count,
+            stroke_id=stroke_id)
 
     def drawPolygon(self, points, color):
         """Triangulate a polygon (list of KfPoint3D) into the buffer."""
@@ -132,13 +148,22 @@ class MeshTurtle:
         for i in range(1, len(pts) - 1):
             self.mesh_buffer.add_triangle(pts[0], pts[i], pts[i + 1], color)
 
-    def drawTriangleSet(self, tdo_points, triangles, scale, color):
+    def drawTriangleSet(self, tdo_points, triangles, scale, color, part_id=None,
+                         part_key=None, lifecycle_stage=None):
         """Draw a TDO mesh (points + 1-based triangle indices) transformed.
 
         Points are in mm × scale; the matrix position is in meters
         (moveInMillimeters applies scale_pixelsPerMm). Convert to meters
         BEFORE the transform so rotation doesn't amplify ~1000x.
         """
+        self.mesh_buffer.triangle_set_records.append({
+            "scale": float(scale),
+            "part_id": part_id,
+            "part_key": part_key,
+            "lifecycle_stage": lifecycle_stage,
+            "points": len(tdo_points),
+            "triangles": len(triangles),
+        })
         transformed = []
         for p in tdo_points:
             tp = KfPoint3D(p[0] * scale * self.scale_pixelsPerMm,
