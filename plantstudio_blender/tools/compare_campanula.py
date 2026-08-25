@@ -15,14 +15,14 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 if ROOT not in sys.path:
     sys.path.insert(0, ROOT)
 
-from blender_addon.core.draw import draw_plant, kExportPartFlower
-from blender_addon.core.factory import create_plant, grow_species
-from blender_addon.core.mesh_buffer import MeshBuffer
-from blender_addon.core.plant_library import SpeciesLibrary
-from blender_addon.core.tdo_parser import TdoLibrary
-from blender_addon.core.turtle import MeshTurtle
+from plantstudio_blender.core.draw import draw_plant, kExportPartFlower
+from plantstudio_blender.core.factory import create_plant, grow_species
+from plantstudio_blender.core.mesh_buffer import MeshBuffer
+from plantstudio_blender.core.plant_library import SpeciesLibrary
+from plantstudio_blender.core.tdo_parser import TdoLibrary
+from plantstudio_blender.core.turtle import MeshTurtle
 
-DATA_DIR = os.path.join(ROOT, "blender_addon", "data")
+DATA_DIR = os.path.join(ROOT, "plantstudio_blender", "data")
 TDO_PATH = os.path.join(DATA_DIR, "3D object library.tdo")
 
 

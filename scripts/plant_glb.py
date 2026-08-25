@@ -3,7 +3,7 @@ Headless plant GLB regenerator (PlantStudio core, no Blender).
 
 Reads per-plant JSON configs from `digital-garden-AR/src/assets/plants/*.json`,
 grows each plant deterministically at `day = today - planted_date` using the
-pure-Python PlantStudio core (blender_addon/core), and writes one GLB per
+pure-Python PlantStudio core (plantstudio_blender/core), and writes one GLB per
 plant to `digital-garden-AR/src/assets/plants/{plant_id}.glb`.
 
 Per-plant JSON schema:
@@ -43,14 +43,14 @@ sys.path.insert(0, str(ROOT))
 import numpy as np
 import trimesh
 
-from blender_addon.core.factory import grow_species
-from blender_addon.core.plant_library import SpeciesLibrary
-from blender_addon.core.mesh_buffer import MeshBuffer
-from blender_addon.core.turtle import MeshTurtle
-from blender_addon.core.draw import draw_plant
-from blender_addon.core.tdo_parser import TdoLibrary
+from plantstudio_blender.core.factory import grow_species
+from plantstudio_blender.core.plant_library import SpeciesLibrary
+from plantstudio_blender.core.mesh_buffer import MeshBuffer
+from plantstudio_blender.core.turtle import MeshTurtle
+from plantstudio_blender.core.draw import draw_plant
+from plantstudio_blender.core.tdo_parser import TdoLibrary
 
-DATA_DIR = ROOT / "blender_addon" / "data"
+DATA_DIR = ROOT / "plantstudio_blender" / "data"
 DEFAULT_PLANTS_DIR = ROOT / "digital-garden-AR" / "src" / "assets" / "plants"
 
 

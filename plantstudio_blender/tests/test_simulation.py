@@ -4,15 +4,14 @@ import os
 import sys
 import pytest
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
-from blender_addon.core.factory import create_plant, grow_species
-from blender_addon.core.plant_library import SpeciesLibrary
-from blender_addon.core.normalize import registry_default
-from blender_addon.core.params import PlantParams
+from plantstudio_blender.core.factory import create_plant, grow_species
+from plantstudio_blender.core.plant_library import SpeciesLibrary
+from plantstudio_blender.core.normalize import registry_default
+from plantstudio_blender.core.params import PlantParams
 
-DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "..",
-                        "examples", "PlantStudio-master", "for-olpc-python")
+DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "data")
 
 
 @pytest.fixture(scope="module")
@@ -190,7 +189,7 @@ class TestRegistryDefaults:
 
     def test_from_scratch_params_get_registry_defaults(self):
         params = PlantParams()
-        from blender_addon.core.normalize import normalize_params
+        from plantstudio_blender.core.normalize import normalize_params
         normalize_params(params)
         assert params.pGeneral.lineDivisions == 3
         assert params.pGeneral.ageAtMaturity == 100
@@ -199,7 +198,7 @@ class TestRegistryDefaults:
     def test_wrong_registry_defaults_overridden(self):
         # registry says 30/0, but a from-scratch plant needs 1.0/1
         params = PlantParams()
-        from blender_addon.core.normalize import normalize_params
+        from plantstudio_blender.core.normalize import normalize_params
         normalize_params(params)
         assert params.pMeristem.determinateProbability == 1.0
         assert params.pLeaf.compoundNumLeaflets == 1

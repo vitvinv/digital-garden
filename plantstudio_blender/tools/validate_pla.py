@@ -3,8 +3,8 @@
 import glob
 import os
 
-from blender_addon.core.pla_parser import parse_pla_file
-from blender_addon.core.tdo_parser import TdoLibrary
+from plantstudio_blender.core.pla_parser import parse_pla_file
+from plantstudio_blender.core.tdo_parser import TdoLibrary
 
 
 def _iter_values(value):

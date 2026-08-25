@@ -1,6 +1,6 @@
 """Compare every ported species against the original 1997 PlantStudio data.
 
-The .pla/.tdo files in blender_addon/data are byte-identical to the 1997
+The .pla/.tdo files in plantstudio_blender/data are byte-identical to the 1997
 collection (examples/PlantStudio2). The port must therefore interpret every
 parameter exactly as the original did. This script iterates all species and
 reports:
@@ -24,14 +24,14 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 
-from blender_addon.core.plant_library import SpeciesLibrary
-from blender_addon.core.tdo_parser import TdoLibrary
-from blender_addon.core.factory import grow_species
-from blender_addon.core.mesh_buffer import MeshBuffer
-from blender_addon.core.turtle import MeshTurtle
-from blender_addon.core.draw import draw_plant
+from plantstudio_blender.core.plant_library import SpeciesLibrary
+from plantstudio_blender.core.tdo_parser import TdoLibrary
+from plantstudio_blender.core.factory import grow_species
+from plantstudio_blender.core.mesh_buffer import MeshBuffer
+from plantstudio_blender.core.turtle import MeshTurtle
+from plantstudio_blender.core.draw import draw_plant
 
-DATA_DIR = os.path.join(ROOT, "blender_addon", "data")
+DATA_DIR = os.path.join(ROOT, "plantstudio_blender", "data")
 TDO_PATH = os.path.join(DATA_DIR, "3D object library.tdo")
 
 
@@ -104,7 +104,7 @@ def main():
         inf_raw = r.get("kInflorescenceBiomassRequiredFemale")
         # Normalize so the lowercase aliases exist exactly as the draw/sim
         # pipeline sees them.
-        from blender_addon.core.normalize import normalize_params
+        from plantstudio_blender.core.normalize import normalize_params
         normalize_params(sp.params)
         pf = sp.params.flowers.get("kGenderFemale", {})
         pi = sp.params.inflors.get("kGenderFemale", {})

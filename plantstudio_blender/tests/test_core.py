@@ -3,15 +3,14 @@ import os
 import sys
 import pytest
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
-from blender_addon.core.rng import PdRandom
-from blender_addon.core.tdo_parser import parse_tdo_file
-from blender_addon.core.pla_parser import parse_pla_file
-from blender_addon.core.plant_library import SpeciesLibrary
+from plantstudio_blender.core.rng import PdRandom
+from plantstudio_blender.core.tdo_parser import parse_tdo_file
+from plantstudio_blender.core.pla_parser import parse_pla_file
+from plantstudio_blender.core.plant_library import SpeciesLibrary
 
-DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "..",
-                        "examples", "PlantStudio-master", "for-olpc-python")
+DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "data")
 TDO_PATH = os.path.join(DATA_DIR, "3D object library.tdo")
 
 
@@ -69,7 +68,7 @@ class TestTdoParser:
             assert k <= len(t.points)
 
     def test_parse_compact(self):
-        from blender_addon.core.tdo_parser import parse_tdo_compact
+        from plantstudio_blender.core.tdo_parser import parse_tdo_compact
         t = parse_tdo_compact("N[Default 3D object],P[134 245 150],T[1 2 3]")
         assert t is not None
         assert t.name == "Default 3D object"
@@ -84,15 +83,15 @@ class TestOriginalDefaults:
     default parameter values (umakepm.py / parameters.tab)."""
 
     def test_defaults_cover_registry(self):
-        from blender_addon.core.defaults import DEFAULT_PARAMS
-        from blender_addon.core.pla_parser import registry_by_id
+        from plantstudio_blender.core.defaults import DEFAULT_PARAMS
+        from plantstudio_blender.core.pla_parser import registry_by_id
         reg = registry_by_id()
         # every default must map onto a registry entry so it can be applied
         assert set(DEFAULT_PARAMS) <= set(reg)
         assert len(DEFAULT_PARAMS) >= 300
 
     def test_default_params_are_complete(self):
-        from blender_addon.core.defaults import make_default_params
+        from plantstudio_blender.core.defaults import make_default_params
         p = make_default_params()
         assert p.leafTdoParams.object3D is not None
         assert p.leafTdoParams.scaleAtFullSize == 30.0
@@ -104,12 +103,12 @@ class TestOriginalDefaults:
         assert p.pFruit.tdoParams.object3D is not None
 
     def test_defaults_plant_draws(self):
-        from blender_addon.core.factory import grow_species
-        from blender_addon.core.defaults import make_default_params
-        from blender_addon.core.mesh_buffer import MeshBuffer
-        from blender_addon.core.turtle import MeshTurtle
-        from blender_addon.core.draw import draw_plant
-        from blender_addon.core.tdo_parser import TdoLibrary
+        from plantstudio_blender.core.factory import grow_species
+        from plantstudio_blender.core.defaults import make_default_params
+        from plantstudio_blender.core.mesh_buffer import MeshBuffer
+        from plantstudio_blender.core.turtle import MeshTurtle
+        from plantstudio_blender.core.draw import draw_plant
+        from plantstudio_blender.core.tdo_parser import TdoLibrary
         plant = grow_species(make_default_params(), 120, seed=280,
                              tdo_library=TdoLibrary.from_file(TDO_PATH))
         buf = MeshBuffer()
@@ -134,7 +133,7 @@ class TestPlaParser:
         assert total >= 60
 
     def test_general_params_parsed(self):
-        path = os.path.join(DATA_DIR, "test.pla")
+        path = os.path.join(DATA_DIR, "Garden flowers.pla")
         species = parse_pla_file(path)
         assert len(species) >= 1
         p = species[0].params
@@ -143,7 +142,7 @@ class TestPlaParser:
         assert p.pGeneral.phyllotacticRotationAngle is not None
 
     def test_embedded_tdos(self):
-        path = os.path.join(DATA_DIR, "test.pla")
+        path = os.path.join(DATA_DIR, "Garden flowers.pla")
         species = parse_pla_file(path)
         p = species[0].params
         # leaves have a 3D object

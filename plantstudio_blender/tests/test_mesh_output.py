@@ -4,18 +4,17 @@ import os
 import sys
 import pytest
 
-sys.path.insert(0, os.path.join(os.path.dirname(__file__), ".."))
+sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", ".."))
 
-from blender_addon.core.factory import grow_species
-from blender_addon.core.plant_library import SpeciesLibrary
-from blender_addon.core.mesh_buffer import MeshBuffer
-from blender_addon.core.turtle import MeshTurtle
-from blender_addon.core.draw import draw_plant
-from blender_addon.core.mesh_buffer import PIPE_FACES
-from blender_addon.core.tdo_parser import TdoLibrary, Tdo, AssetError
+from plantstudio_blender.core.factory import grow_species
+from plantstudio_blender.core.plant_library import SpeciesLibrary
+from plantstudio_blender.core.mesh_buffer import MeshBuffer
+from plantstudio_blender.core.turtle import MeshTurtle
+from plantstudio_blender.core.draw import draw_plant
+from plantstudio_blender.core.mesh_buffer import PIPE_FACES
+from plantstudio_blender.core.tdo_parser import TdoLibrary, Tdo, AssetError
 
-DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "..",
-                        "examples", "PlantStudio-master", "for-olpc-python")
+DATA_DIR = os.path.join(os.path.dirname(__file__), "..", "data")
 TDO_PATH = os.path.join(DATA_DIR, "3D object library.tdo")
 
 
@@ -127,7 +126,7 @@ class TestPipeOptimization:
 
 class TestGrowthGeometryConsistency:
     def test_campanula_age_round_trip_matches_direct_orthographic_render(self, tmp_path):
-        from blender_addon.tools.compare_campanula import compare_campanula
+        from plantstudio_blender.tools.compare_campanula import compare_campanula
 
         result = compare_campanula(output_path=str(tmp_path / "campanula.ppm"))
         assert result["mesh_equal"]
@@ -243,8 +242,8 @@ class TestTdoEmbedding:
 
     def test_k_activity_free_does_not_crash(self):
         # kActivityFree was referenced but not imported in inflorescence.py
-        from blender_addon.core.traverser import PdTraverser
-        from blender_addon.core.meristem import kActivityFree
+        from plantstudio_blender.core.traverser import PdTraverser
+        from plantstudio_blender.core.meristem import kActivityFree
         lib = SpeciesLibrary(self.DATA_DIR)
         sp = lib.get("violet")
         tdo_lib = TdoLibrary.from_file(TDO_PATH)
@@ -285,7 +284,7 @@ class TestInflorescenceBranching:
 
     def test_branched_inflorescence_mesh_is_non_degenerate(self):
         import copy
-        from blender_addon.core.factory import create_plant
+        from plantstudio_blender.core.factory import create_plant
 
         lib = SpeciesLibrary(DATA_DIR)
         sp = lib.get("gilia")
@@ -326,7 +325,7 @@ class TestPlaValidation:
                             "3D object library.tdo")
 
     def test_no_unresolved_tdo_refs(self):
-        from blender_addon.tools.validate_pla import (iter_tdo_refs,
+        from plantstudio_blender.tools.validate_pla import (iter_tdo_refs,
                                                       validate_dir)
         tdo_lib = TdoLibrary.from_file(self.TDO_PATH)
         unresolved = []
