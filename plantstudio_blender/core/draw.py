@@ -195,9 +195,49 @@ def _draw_stem_segment(part, length, width, angleZ, angleY, color, taperIndex, d
 
 # ── leaf drawing ──
 
+def _semantic_leaf_record(leaf):
+    """Create a topology-independent diagnostic record for one leaf draw."""
+    plant = leaf.plant
+    turtle = getattr(plant, "turtle", None)
+    if turtle is None or not hasattr(turtle, "mesh_buffer"):
+        return None
+    if not hasattr(leaf, "_semantic_id"):
+        counter = getattr(plant, "_semantic_counter", 0) + 1
+        plant._semantic_counter = counter
+        leaf._semantic_id = f"leaf-{counter}"
+    record = {
+        "semantic_id": leaf._semantic_id,
+        "kind": "seedling_leaf" if leaf.isSeedlingLeaf else "leaf",
+        "status": "draw_started",
+        "has_fallen_off": bool(leaf.hasFallenOff),
+        "is_seedling": bool(leaf.isSeedlingLeaf),
+    }
+    turtle.mesh_buffer.semantic_records.append(record)
+    return record
+
+
+def _finish_semantic_leaf_record(leaf, record):
+    if record is None:
+        return
+    turtle = getattr(leaf.plant, "turtle", None)
+    records = getattr(getattr(turtle, "mesh_buffer", None), "triangle_set_records", [])
+    emitted = any(
+        item.get("semantic_id") == record["semantic_id"]
+        and item.get("part_id") == kExportPartLeaf
+        and item.get("scale", 0) > 0
+        and item.get("triangles", 0) > 0
+        for item in records
+    )
+    record["has_geometry"] = emitted
+    record["status"] = "visible" if emitted else "suppressed_draw"
+
+
 def draw_leaf(leaf, direction):
+    record = _semantic_leaf_record(leaf)
     turtle = leaf.plant.turtle
     if turtle is None or leaf.hasFallenOff:
+        if record is not None:
+            record["status"] = "suppressed_fallen"
         return
     turtle.push()
     if direction == kDirectionRight:
@@ -234,6 +274,7 @@ def draw_leaf(leaf, direction):
         else:
             _draw_compound_leaf(leaf, length, width, angle, petioleColor)
     turtle.pop()
+    _finish_semantic_leaf_record(leaf, record)
 
 
 def _draw_leaf_tdo(leaf, scale):
@@ -260,7 +301,8 @@ def _draw_leaf_tdo(leaf, scale):
     r_tdo = resolve_tdo(leaf.plant, tdo.object3D,
                         owner=f"species '{leaf.plant.name}' leafTdoParams.object3D")
     turtle.drawTriangleSet(r_tdo.points, r_tdo.triangles, scale, faceColor,
-                            part_id=kExportPartLeaf)
+                            part_id=kExportPartLeaf,
+                            semantic_id=getattr(leaf, "_semantic_id", None))
 
 
 def _draw_stipule(leaf):
@@ -331,7 +373,8 @@ def _draw_leaflet(leaf, scale):
     faceColor = require_color(tdo.faceColor,
                               f"species '{leaf.plant.name}' leafTdoParams.faceColor")
     turtle.drawTriangleSet(r_tdo.points, r_tdo.triangles, scale, faceColor,
-                            part_id=kExportPartLeaf)
+                            part_id=kExportPartLeaf,
+                            semantic_id=getattr(leaf, "_semantic_id", None))
 
 
 def _draw_compound_leaf(leaf, length, width, angle, petioleColor):

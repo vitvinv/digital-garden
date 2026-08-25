@@ -149,7 +149,7 @@ class MeshTurtle:
             self.mesh_buffer.add_triangle(pts[0], pts[i], pts[i + 1], color)
 
     def drawTriangleSet(self, tdo_points, triangles, scale, color, part_id=None,
-                         part_key=None, lifecycle_stage=None):
+                         part_key=None, lifecycle_stage=None, semantic_id=None):
         """Draw a TDO mesh (points + 1-based triangle indices) transformed.
 
         Points are in mm × scale; the matrix position is in meters
@@ -161,6 +161,7 @@ class MeshTurtle:
             "part_id": part_id,
             "part_key": part_key,
             "lifecycle_stage": lifecycle_stage,
+            "semantic_id": semantic_id,
             "points": len(tdo_points),
             "triangles": len(triangles),
         })

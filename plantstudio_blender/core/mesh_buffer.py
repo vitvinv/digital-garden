@@ -16,6 +16,9 @@ class MeshBuffer:
         # to the headless audit without affecting exported mesh data.
         self.pipe_records = []
         self.triangle_set_records = []
+        # Semantic records identify plant parts independently of mesh topology.
+        # They are diagnostic only and do not affect exported geometry.
+        self.semantic_records = []
         self._index = {}
 
     def clear(self):
@@ -24,6 +27,9 @@ class MeshBuffer:
         self.face_colors = []
         self.pipe_records = []
         self.triangle_set_records = []
+        # Semantic records identify plant parts independently of mesh topology.
+        # They are diagnostic only and do not affect exported geometry.
+        self.semantic_records = []
         self._index = {}
 
     def add_point(self, x, y, z, color):
