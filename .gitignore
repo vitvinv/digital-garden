@@ -7,7 +7,6 @@ __pycache__/
 # (needed by the CI growth script); keep the Blender-only UI files local.
 plantstudio_blender/*
 !plantstudio_blender/__init__.py
-!plantstudio_blender/*.py
 !plantstudio_blender/blender_manifest.toml
 !plantstudio_blender/core/
 !plantstudio_blender/core/**
