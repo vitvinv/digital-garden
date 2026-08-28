@@ -5,6 +5,8 @@ import json
 import shutil
 from pathlib import Path
 
+import pytest
+
 from scripts.compare_plant_settings import (
     LONG_COLUMNS,
     SUMMARY_COLUMNS,
@@ -20,6 +22,13 @@ from plantstudio_blender.core.tdo_parser import TdoLibrary
 
 ROOT = Path(__file__).resolve().parents[2]
 ORIGINAL_DIR = ROOT / "examples" / "PlantStudio2"
+
+if not ORIGINAL_DIR.is_dir():
+    pytest.skip(
+        "original PlantStudio2 reference data is not committed (examples/ is kept "
+        "out of the public repo); run these audit tests locally with the data on disk",
+        allow_module_level=True,
+    )
 ADDON_DIR = ROOT / "plantstudio_blender" / "data"
 REGISTRY_PATH = ADDON_DIR.parent / "core" / "param_registry.json"
 TDO_PATH = ADDON_DIR / "3D object library.tdo"

@@ -13,7 +13,7 @@ this project to function — keep them on disk only, outside git.
 - Secrets: `.env`, `.env.*`, keys, tokens, passwords, `local_config.py`
 - Build artifacts: `*.zip`, `dist/`, `build/`, `node_modules/`
 - Local caches and databases: `__pycache__/`, `.pytest_cache/`, `.hypothesis/`, `*.db`, `*.sqlite`
-- Vendored copies and drafts with no references from code/scripts (e.g. `examples/PlantStudio-master`)
+- Vendored upstream source/binary copies (reference data lives only in `plantstudio_blender/data/`)
 
 ## Commit workflow
 

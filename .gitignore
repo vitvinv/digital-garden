@@ -32,9 +32,6 @@ IMPROVEMENT_PLAN.md
 .claude/
 .cursor/
 .graphify/
-# Vendored upstream binary junk (keep .pla/.tdo/.html reference data for tests)
-examples/PlantStudio2/*.exe
-examples/PlantStudio2/*.hlp
-examples/PlantStudio2/*.cnt
-examples/PlantStudio2/UNINST*.000
+# Reference data for compare tests stays on disk only — never committed
+examples/
 plan.md
