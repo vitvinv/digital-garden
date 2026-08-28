@@ -33,5 +33,9 @@ IMPROVEMENT_PLAN.md
 .cursor/
 .graphify/
 .expanse.json
-examples/
+# Vendored upstream binary junk (keep .pla/.tdo/.html reference data for tests)
+examples/PlantStudio2/*.exe
+examples/PlantStudio2/*.hlp
+examples/PlantStudio2/*.cnt
+examples/PlantStudio2/UNINST*.000
 plan.md
