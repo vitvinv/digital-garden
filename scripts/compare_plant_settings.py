@@ -747,7 +747,7 @@ def _html_table(rows: list[dict[str, str]], columns: list[str], status_column: s
         elif status in {"numeric_tolerance", "format_only", "equivalent_nonexact"}:
             class_name = "nonexact"
         searchable = " ".join(str(row.get(column, "")) for column in columns).lower()
-        cells = "".join(f"<td>{html.escape(str(row.get(column, "")))}</td>" for column in columns)
+        cells = "".join(f"<td>{html.escape(str(row.get(column, '')))}</td>" for column in columns)
         body_parts.append(f'<tr class="{class_name}" data-status="{html.escape(status)}" data-search="{html.escape(searchable)}">{cells}</tr>')
     return f"<table><thead><tr>{head}</tr></thead><tbody>{''.join(body_parts)}</tbody></table>"
 

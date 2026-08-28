@@ -693,14 +693,18 @@ def write_html(path: Path, long_rows: list[dict[str, str]], summary_rows: list[d
     summary_head = "".join(f"<th>{html.escape(column)}</th>" for column in SUMMARY_COLUMNS)
     summary_body = "".join(
         f'<tr class="{html.escape(row["overall_status"])}">'
-        + "".join(f"<td>{html.escape(row.get(column, ""))}</td>" for column in SUMMARY_COLUMNS)
+        + "".join(f'<td>{html.escape(row.get(column, ""))}</td>' for column in SUMMARY_COLUMNS)
         + "</tr>"
         for row in summary_rows
     )
     detail_head = "".join(f"<th>{html.escape(column)}</th>" for column in LONG_COLUMNS)
+
+    def _row_search(row):
+        return " ".join(row.get(column, "") for column in LONG_COLUMNS).lower()
+
     detail_body = "".join(
-        f'<tr data-status="{html.escape(row["status"])}" data-search="{html.escape(" ".join(row.get(column, "") for column in LONG_COLUMNS).lower())}">'
-        + "".join(f"<td>{html.escape(row.get(column, ""))}</td>" for column in LONG_COLUMNS)
+        f'<tr data-status="{html.escape(row["status"])}" data-search="{html.escape(_row_search(row))}">'
+        + "".join(f'<td>{html.escape(row.get(column, ""))}</td>' for column in LONG_COLUMNS)
         + "</tr>"
         for row in long_rows
     )
