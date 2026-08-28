@@ -1,6 +1,6 @@
-# Digital Garden AR
+# Digital Garden
 
-An 8th Wall Image Target project that anchors a virtual garden plant to the `garden-sticker` image target in the real world.
+This is my art project (work in progress). Each garden is a sticker placed in public space. Anyone can scan this sticker with a phone camera and see a 3D garden inside it, that grows as days are passing by. You can walk past that sticker every day and see the garden growing. I am also planning to add a feature to "water" this garden to speed up its growth or perhaps support its life.
 
 ![Preview of the garden image target project open in the editor](./src/assets/preview.png)
 
@@ -8,7 +8,7 @@ An 8th Wall Image Target project that anchors a virtual garden plant to the `gar
 
 Scan the garden sticker image with your phone camera.
 
-<img alt="Garden Sticker Image Target" src="./image-targets/garden-sticker_original.png" width=400 />
+<img alt="Garden Sticker Image Target" src="./image-targets/digital-garden-sticker_original.png" width=400 />
 
 </details>
 
