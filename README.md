@@ -1,9 +1,12 @@
-# Digital Garden
+# Digital Garden ⚘
 
-An algorithmic digital garden: plants are grown with a meristem growth
-simulation (PlantStudio) and viewed as a WebAR experience.
+This is my art project (work in progress). Each garden is a sticker placed in a public space. Anyone can scan this sticker with a phone camera and see a 3D garden inside it, that grows as days are passing by. I am also planning to add a feature to "water" this garden to speed up its growth or perhaps support its life.
 
-**Live:** https://vitvinv.github.io/digital-garden/
+**Live:** https://garden.v-e-v.org/
+
+The engine of this garden is a 1997 PlantStudio by Cynthia F. Kurtz and Paul D. Fernhout. I have used a coding agent to update the code and make it work both in headless mode (for growth simulation on server) and as a Blender addon (for plant arrangement)
+
+The AR is built with 8th Wall.
 
 ## What it is
 
