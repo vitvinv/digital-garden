@@ -33,3 +33,5 @@ IMPROVEMENT_PLAN.md
 .cursor/
 .graphify/
 .expanse.json
+examples/
+plan.md
