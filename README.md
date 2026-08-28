@@ -4,9 +4,7 @@ This is my art project (work in progress). Each garden is a sticker placed in a 
 
 **Live:** https://garden.v-e-v.org/
 
-The engine of this garden is a 1997 PlantStudio by Cynthia F. Kurtz and Paul D. Fernhout. I have used a coding agent to update the code and make it work both in headless mode (for growth simulation on server) and as a Blender addon (for plant arrangement)
-
-The AR is built with 8th Wall.
+The core of this garden is a rewritten 1997 PlantStudio by Cynthia F. Kurtz and Paul D. Fernhout. I have used a coding agent to update the code and make it work both in headless mode (for growth simulation on server) and as a Blender addon (for plant arrangement). Then I brought it to life with 8th Wall.
 
 ## What it is
 
