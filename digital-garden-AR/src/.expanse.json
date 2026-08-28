@@ -1,0 +1,275 @@
+{
+  "objects": {
+    "a8f21946-b2fe-4589-9302-6232ec649775": {
+      "id": "a8f21946-b2fe-4589-9302-6232ec649775",
+      "position": [
+        0,
+        0.25,
+        0.25
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        0.5,
+        0.5,
+        0.5
+      ],
+      "geometry": null,
+      "material": null,
+      "parentId": "88453035-dc0f-486d-868a-8ff7c2fda864",
+      "components": {},
+      "name": "Garden",
+      "imageTarget": {
+        "name": "ENG-digital-garden-sticker"
+      },
+      "order": 2.150211680966083,
+      "hidden": false
+    },
+    "ac1989e3-3b71-49e2-a05f-e682aeb18c36": {
+      "components": {},
+      "geometry": null,
+      "id": "ac1989e3-3b71-49e2-a05f-e682aeb18c36",
+      "light": {
+        "intensity": 1,
+        "type": "directional",
+        "followCamera": false
+      },
+      "material": null,
+      "name": "Directional Light",
+      "position": [
+        20,
+        20,
+        10
+      ],
+      "rotation": [
+        -0.07314584187673298,
+        -0.7522930560020477,
+        -0.08475530502862431,
+        0.6492467804900914
+      ],
+      "scale": [
+        1,
+        0.9999999999999998,
+        0.9999999999999998
+      ],
+      "parentId": "88453035-dc0f-486d-868a-8ff7c2fda864",
+      "order": 0.6644431107322474,
+      "hidden": false
+    },
+    "28878a86-3de0-4d09-a97d-e2aca00f534b": {
+      "id": "28878a86-3de0-4d09-a97d-e2aca00f534b",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "geometry": null,
+      "material": null,
+      "parentId": "a8f21946-b2fe-4589-9302-6232ec649775",
+      "components": {},
+      "name": "Card",
+      "hidden": false,
+      "order": 0.5066866515427442
+    },
+    "a608ddd9-9379-464d-966f-5d8d8674c83c": {
+      "camera": {
+        "type": "perspective",
+        "xr": {
+          "desktop": "disabled",
+          "xrCameraType": "world",
+          "headset": "AR",
+          "phone": "AR",
+          "world": {
+            "disableWorldTracking": true
+          }
+        }
+      },
+      "components": {},
+      "geometry": null,
+      "id": "a608ddd9-9379-464d-966f-5d8d8674c83c",
+      "material": null,
+      "name": "Camera",
+      "position": [
+        0,
+        5,
+        5
+      ],
+      "rotation": [
+        -1.8412919444518387e-17,
+        0.9537169517857893,
+        -0.30070579621354565,
+        -5.839832572618051e-17
+      ],
+      "scale": [
+        0.9999998646558023,
+        0.9999999931513284,
+        0.9999998715044741
+      ],
+      "parentId": "88453035-dc0f-486d-868a-8ff7c2fda864",
+      "order": 1.0308214152219775
+    },
+    "47699d9e-18a5-4f88-a4f9-b8be92e8f74a": {
+      "components": {},
+      "geometry": null,
+      "id": "47699d9e-18a5-4f88-a4f9-b8be92e8f74a",
+      "light": {
+        "type": "ambient"
+      },
+      "material": null,
+      "name": "Ambient Light",
+      "position": [
+        10,
+        5,
+        5
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        0.9999999999999997,
+        0.9999999999999998,
+        0.9999999999999998
+      ],
+      "parentId": "88453035-dc0f-486d-868a-8ff7c2fda864",
+      "order": 0.4038940050501252,
+      "hidden": false
+    },
+    "fe94a232-c9e5-445c-a352-1862b294bd49": {
+      "id": "fe94a232-c9e5-445c-a352-1862b294bd49",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        0.9999999999999998,
+        0.9999999999999998
+      ],
+      "geometry": null,
+      "material": {
+        "type": "hider"
+      },
+      "parentId": "3dc09bb6-6d20-44ca-ae23-20aad615fde4",
+      "components": {},
+      "gltfModel": {
+        "src": {
+          "type": "asset",
+          "asset": "assets/hider.glb"
+        },
+        "animationClip": "",
+        "loop": true
+      },
+      "name": "hider.glb",
+      "order": 8.09098464309628,
+      "hidden": false
+    },
+    "2745af53-4602-4da3-a488-cef4261b11b0": {
+      "id": "2745af53-4602-4da3-a488-cef4261b11b0",
+      "position": [
+        0,
+        -0.5,
+        -0.11236245331362177
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        2,
+        2,
+        2
+      ],
+      "geometry": null,
+      "material": null,
+      "parentId": "28878a86-3de0-4d09-a97d-e2aca00f534b",
+      "components": {},
+      "gltfModel": {
+        "src": {
+          "type": "asset",
+          "asset": "assets/plants/digital-garden.glb"
+        },
+        "animationClip": "",
+        "loop": true
+      },
+      "name": "digital-garden.glb",
+      "order": 9.689531900345047
+    },
+    "3dc09bb6-6d20-44ca-ae23-20aad615fde4": {
+      "id": "3dc09bb6-6d20-44ca-ae23-20aad615fde4",
+      "position": [
+        0,
+        -0.498,
+        -0.2
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1.99,
+        1.9900000000000007,
+        1.9900000000000007
+      ],
+      "geometry": null,
+      "material": null,
+      "parentId": "28878a86-3de0-4d09-a97d-e2aca00f534b",
+      "components": {},
+      "gltfModel": {
+        "src": {
+          "type": "asset",
+          "asset": "assets/background.glb"
+        },
+        "animationClip": "",
+        "loop": true
+      },
+      "name": "background.glb",
+      "order": 10.721912036999043
+    }
+  },
+  "spaces": {
+    "88453035-dc0f-486d-868a-8ff7c2fda864": {
+      "id": "88453035-dc0f-486d-868a-8ff7c2fda864",
+      "name": "Garden",
+      "activeCamera": "a608ddd9-9379-464d-966f-5d8d8674c83c",
+      "includedSpaces": [],
+      "reflections": null
+    }
+  },
+  "entrySpaceId": "88453035-dc0f-486d-868a-8ff7c2fda864",
+  "runtimeVersion": {
+    "type": "version",
+    "level": "major",
+    "major": 2,
+    "minor": 0,
+    "patch": 0
+  }
+}
