@@ -20,8 +20,16 @@ plantstudio_blender/**/__pycache__/
 plantstudio_blender/**/*.pyc
 plantstudio_blender/**/.pytest_cache/
 PlantStudio-Blender.zip
+plantstudio_blender.zip
 
-# Plan documents (tracked in .kilo/plans/ working notes only)
+# Agent / IDE workspaces — never commit
 IMPROVEMENT_PLAN.md
-.kilo/plans/
-.freebuff/worktrees/eb4f4ad8-7512-4daf-ad51-debcfe4e86b8
+.kilo/
+.freebuff/
+.agents/
+.agentmemory/
+.hermes/
+.claude/
+.cursor/
+.graphify/
+.expanse.json
