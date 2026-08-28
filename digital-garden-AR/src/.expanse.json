@@ -152,8 +152,8 @@
       "order": 0.4038940050501252,
       "hidden": false
     },
-    "952648a6-36ee-43cf-816f-b294fc546b3b": {
-      "id": "952648a6-36ee-43cf-816f-b294fc546b3b",
+    "fe94a232-c9e5-445c-a352-1862b294bd49": {
+      "id": "fe94a232-c9e5-445c-a352-1862b294bd49",
       "position": [
         0,
         0,
@@ -167,49 +167,14 @@
       ],
       "scale": [
         1,
-        1.0000000000000004,
-        1
-      ],
-      "material": {
-        "type": "basic",
-        "color": "#FFFFFF"
-      },
-      "parentId": "28878a86-3de0-4d09-a97d-e2aca00f534b",
-      "components": {},
-      "name": "background",
-      "order": 6.561487971911548,
-      "gltfModel": {
-        "src": {
-          "type": "asset",
-          "asset": "assets/hider-1.glb"
-        },
-        "animationClip": "",
-        "loop": true
-      }
-    },
-    "fe94a232-c9e5-445c-a352-1862b294bd49": {
-      "id": "fe94a232-c9e5-445c-a352-1862b294bd49",
-      "position": [
-        0,
-        0,
-        -2.7755575615628914e-17
-      ],
-      "rotation": [
-        0,
-        0,
-        0,
-        1
-      ],
-      "scale": [
-        1,
-        1,
-        1
+        0.9999999999999998,
+        0.9999999999999998
       ],
       "geometry": null,
       "material": {
         "type": "hider"
       },
-      "parentId": "28878a86-3de0-4d09-a97d-e2aca00f534b",
+      "parentId": "3dc09bb6-6d20-44ca-ae23-20aad615fde4",
       "components": {},
       "gltfModel": {
         "src": {
@@ -228,7 +193,7 @@
       "position": [
         0,
         -0.5,
-        -0.19345651913569645
+        -0.11236245331362177
       ],
       "rotation": [
         0,
@@ -255,6 +220,39 @@
       },
       "name": "digital-garden.glb",
       "order": 9.689531900345047
+    },
+    "3dc09bb6-6d20-44ca-ae23-20aad615fde4": {
+      "id": "3dc09bb6-6d20-44ca-ae23-20aad615fde4",
+      "position": [
+        0,
+        -0.498,
+        -0.2
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1.99,
+        1.9900000000000007,
+        1.9900000000000007
+      ],
+      "geometry": null,
+      "material": null,
+      "parentId": "28878a86-3de0-4d09-a97d-e2aca00f534b",
+      "components": {},
+      "gltfModel": {
+        "src": {
+          "type": "asset",
+          "asset": "assets/background.glb"
+        },
+        "animationClip": "",
+        "loop": true
+      },
+      "name": "background.glb",
+      "order": 10.721912036999043
     }
   },
   "spaces": {

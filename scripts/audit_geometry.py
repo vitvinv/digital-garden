@@ -2,7 +2,8 @@
 
 The report is intentionally data-oriented: it catches stage transitions,
 part-scale collapses, thin pipe divisions, and oversized final bounds without
-requiring Blender to be installed.
+requiring Blender to be installed. `--ratio` applies the headless decimator
+(default 1.0 = off) so the face budget can be checked at a chosen reduction.
 """
 
 import argparse
@@ -13,6 +14,7 @@ import sys
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.insert(0, ROOT)
 
+from plantstudio_blender.core.decimate import simplify_mesh
 from plantstudio_blender.core.draw import draw_plant
 from plantstudio_blender.core.factory import grow_species
 from plantstudio_blender.core.mesh_buffer import MeshBuffer
@@ -98,7 +100,7 @@ def radius_anomalies(buffer):
     return anomalies
 
 
-def transition_report(species, tdo_library):
+def transition_report(species, tdo_library, ratio=1.0):
     ages = [0, 20, 35, 39, 40, 41, 43, 45, 50, 60, 80, 120, 200]
     rows = []
     previous = None
@@ -106,18 +108,22 @@ def transition_report(species, tdo_library):
         plant, buffer = draw(species, age, tdo_library)
         current_flowers = flowers(plant)
         open_count = sum(1 for flower in current_flowers if flower.isOpen)
+        data = buffer.to_mesh_data()
+        if ratio < 1.0:
+            data = simplify_mesh(data["vertices"], data["faces"],
+                                 data["face_colors"], ratio=ratio)
         row = {
             "age": age,
             "flowers": len(current_flowers),
             "open": open_count,
             "flower_triangles": sum(record["triangles"]
                                      for record in buffer.triangle_set_records),
-            "vertices": len(buffer.vertices),
-            "faces": len(buffer.faces),
-            "bounds": bounds(buffer.vertices),
+            "vertices": len(data["vertices"]),
+            "faces": len(data["faces"]),
+            "bounds": bounds(data["vertices"]),
         }
         if previous is not None:
-            row["vertex_ratio"] = (len(buffer.vertices) /
+            row["vertex_ratio"] = (len(data["vertices"]) /
                                     max(1, previous["vertices"]))
         rows.append(row)
         previous = row
@@ -127,16 +133,23 @@ def transition_report(species, tdo_library):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--strict", action="store_true")
+    parser.add_argument("--ratio", type=float, default=1.0,
+                        help="Decimation ratio applied via simplify_mesh "
+                             "(default 1.0 = off, e.g. 0.2)")
     args = parser.parse_args()
     library = SpeciesLibrary(DATA_DIR)
     tdo_library = TdoLibrary.from_file(TDO_PATH)
     problems = 0
 
-    print("species\tday\twidth\tdepth\theight\tvertices\tfaces\tthin_pipes")
+    print("species\tday\twidth\tdepth\theight\tvertices\tfaces\tthin_pipes\tratio")
     for species in library.species:
         plant, buffer = draw(species, 200, tdo_library)
         width, depth, height = bounds(buffer.vertices)
         thin = radius_anomalies(buffer)
+        data = buffer.to_mesh_data()
+        if args.ratio < 1.0:
+            data = simplify_mesh(data["vertices"], data["faces"],
+                                 data["face_colors"], ratio=args.ratio)
         # Global dimensions are reported for review, not rejected: the
         # catalog intentionally contains tall corn and shrubs. Strict checks
         # are limited to empty meshes and non-monotonic within-stroke widths.
@@ -144,15 +157,17 @@ def main():
         if bad or thin:
             problems += 1
         print(f"{species.name}\t200\t{width:.6f}\t{depth:.6f}\t"
-              f"{height:.6f}\t{len(buffer.vertices)}\t{len(buffer.faces)}\t{len(thin)}")
+              f"{height:.6f}\t{len(data['vertices'])}\t{len(data['faces'])}\t"
+              f"{len(thin)}\t{args.ratio}")
         if args.strict and thin:
             for record in thin[:5]:
                 print("  thin", record)
 
     campanula = library.get("campanula")
     if campanula is not None:
-        print("\nCampanula transitions")
-        for row in transition_report(campanula, tdo_library):
+        print(f"\nCampanula transitions (ratio {args.ratio})")
+        for row in transition_report(campanula, tdo_library,
+                                     ratio=args.ratio):
             print(row)
 
     print(f"\n=== {len(library)} species checked, {problems} problem(s) ===")

@@ -1,8 +1,11 @@
 name: Daily Garden Growth
 
+# Growth is intentionally DISABLED (static garden): plants were exported
+# decimated from Blender and committed to the 8th Wall project. Re-enable by
+# restoring the schedule below.
 on:
-  schedule:
-    - cron: "0 6 * * *"
+  # schedule:
+  #   - cron: "0 6 * * *"
   workflow_dispatch:
 
 permissions:

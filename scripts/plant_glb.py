@@ -27,6 +27,7 @@ Output matches the Blender addon's export conventions:
 
 Usage:
     python scripts/plant_glb.py [--plants-dir DIR] [--day YYYY-MM-DD] [--no-compress]
+                                [--no-decimate]
 """
 
 import argparse
@@ -49,9 +50,13 @@ from plantstudio_blender.core.mesh_buffer import MeshBuffer
 from plantstudio_blender.core.turtle import MeshTurtle
 from plantstudio_blender.core.draw import draw_plant
 from plantstudio_blender.core.tdo_parser import TdoLibrary
+from plantstudio_blender.core.decimate import simplify_mesh
 
 DATA_DIR = ROOT / "plantstudio_blender" / "data"
 DEFAULT_PLANTS_DIR = ROOT / "digital-garden-AR" / "src" / "assets" / "plants"
+
+# Hard-coded per decision; change here to pick a different reduction.
+DECIMATE_RATIO = 0.5
 
 
 def orient_vertices(vertices):
@@ -89,7 +94,7 @@ def build_trimesh(data):
         exploded_verts.append(verts[face[0]])
         exploded_verts.append(verts[face[1]])
         exploded_verts.append(verts[face[2]])
-        exploded_colors.append((color[0], color[1], color[2], 255))
+        exploded_colors.extend([(color[0], color[1], color[2], 255)] * 3)
         exploded_faces.append([base, base + 1, base + 2])
 
     mesh = trimesh.Trimesh(
@@ -120,7 +125,7 @@ def run_draco_compression(src, dst):
 
 
 def regenerate_plant(config, plants_dir, day_override=None, compress=True,
-                     lib=None, tdo_lib=None):
+                     decimate=True, lib=None, tdo_lib=None):
     plant_id = config.get("plant_id")
     species_name = config.get("species")
     seed = config.get("seed", 0)
@@ -152,6 +157,11 @@ def regenerate_plant(config, plants_dir, day_override=None, compress=True,
         return None
 
     data = buffer.to_mesh_data()
+    full_faces = len(data["faces"])
+    if decimate:
+        data = simplify_mesh(data["vertices"], data["faces"],
+                             data["face_colors"], DECIMATE_RATIO)
+    lod_faces = len(data["faces"])
     mesh = build_trimesh(data)
 
     out_path = plants_dir / f"{plant_id}.glb"
@@ -165,7 +175,11 @@ def regenerate_plant(config, plants_dir, day_override=None, compress=True,
 
     bounds = mesh.bounds
     size_kb = out_path.stat().st_size / 1024
-    print(f"  [{plant_id}] ({species_name}): day {day_n}, {verts}v/{faces}f, "
+    if decimate:
+        face_stats = f"{full_faces}f -> {lod_faces}f (ratio {DECIMATE_RATIO})"
+    else:
+        face_stats = f"{full_faces}f"
+    print(f"  [{plant_id}] ({species_name}): day {day_n}, {verts}v/{face_stats}, "
           f"bounds y {bounds[0][1]:.2f}..{bounds[1][1]:.2f}m, {size_kb:.0f} KB")
     return out_path
 
@@ -178,6 +192,8 @@ def main():
                         help="Override 'today' as YYYY-MM-DD (for determinism tests)")
     parser.add_argument("--no-compress", action="store_true",
                         help="Skip Draco compression")
+    parser.add_argument("--no-decimate", action="store_true",
+                        help="Export full-detail meshes (skip decimation)")
     args = parser.parse_args()
 
     plants_dir = Path(args.plants_dir)
@@ -205,7 +221,9 @@ def main():
             config = json.load(f)
         try:
             regenerate_plant(config, plants_dir, day_override=day_override,
-                             compress=not args.no_compress, lib=lib, tdo_lib=tdo_lib)
+                             compress=not args.no_compress,
+                             decimate=not args.no_decimate,
+                             lib=lib, tdo_lib=tdo_lib)
         except Exception as e:
             failed += 1
             print(f"  [{config_path.name}] ERROR: {e}")
