@@ -10,7 +10,7 @@ const DEFAULT_CONFIG = {
   bloom: {
     enabled: true,
     intensity: 0.8,
-    threshold: 0.85,
+    threshold: 0.4,
     radius: 0.8,
   },
 }
@@ -248,11 +248,15 @@ const COMPOSITE_FRAGMENT = `
 
     if (uDebugMode > 0) {
       gl_FragColor = vec4(bloomSample.rgb * uDebugBoost, 1.0);
-      return;
+    } else {
+      vec3 bloom = bloomSample.rgb * uBloomIntensity;
+      float bloomAlpha = clamp(bloomSample.a * uBloomIntensity, 0.0, 1.0);
+      gl_FragColor = vec4(scene.rgb + bloom, max(scene.a, bloomAlpha));
     }
-    vec3 bloom = bloomSample.rgb * uBloomIntensity;
-    float bloomAlpha = clamp(bloomSample.a * uBloomIntensity, 0.0, 1.0);
-    gl_FragColor = vec4(scene.rgb + bloom, max(scene.a, bloomAlpha));
+    // The scene is accumulated in a linear render target, so convert the final
+    // composite to the output color space (sRGB canvas) here. Without this the
+    // whole image is written as raw linear values and appears far too dark.
+    #include <colorspace_fragment>
   }
 `
 

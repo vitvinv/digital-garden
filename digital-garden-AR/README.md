@@ -33,7 +33,7 @@ window.FX.getConfig()
 window.FX.applyConfig({
   enabled: true,
   pixelate: {enabled: true, pixelSize: 4, maxInternalWidth: 960, smoothUpscale: false},
-  bloom: {enabled: true, intensity: 0.8, threshold: 0.85, radius: 0.8},
+  bloom: {enabled: true, intensity: 0.8, threshold: 0.4, radius: 0.8},
 })
 window.FX.copyConfig()
 ```

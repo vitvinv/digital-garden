@@ -8,8 +8,8 @@
   },
   "bloom": {
     "enabled": true,
-    "intensity": 2,
-    "threshold": 0.85,
+    "intensity": 1,
+    "threshold": 0.4,
     "radius": 0.8
   }
 }
