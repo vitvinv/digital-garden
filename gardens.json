@@ -1,0 +1,17 @@
+{
+  "gardens": [
+    {
+      "dir": "digital-garden-AR",
+      "slug": "digital-garden",
+      "title": "Digital Garden",
+      "welcome": false
+    },
+    {
+      "dir": "thesunkenblimp-garden",
+      "slug": "thesunkenblimp",
+      "title": "The Sunken Blimp Garden",
+      "welcome": true,
+      "growth": { "mode": "stages", "count": 10, "window_minutes": 30 }
+    }
+  ]
+}

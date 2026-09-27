@@ -28,20 +28,32 @@ jobs:
         with:
           node-version: 20
           cache: npm
-          cache-dependency-path: digital-garden-AR/package-lock.json
 
-      - name: Install dependencies
-        working-directory: digital-garden-AR
-        run: npm ci
-
-      - name: Build
-        working-directory: digital-garden-AR
-        run: npm run build
+      - name: Build gardens
+        run: |
+          SITE=site
+          rm -rf "$SITE" && mkdir -p "$SITE"
+          jq -c '.gardens[]' gardens.json | while read -r garden; do
+            DIR=$(echo "$garden" | jq -r .dir)
+            SLUG=$(echo "$garden" | jq -r .slug)
+            TITLE=$(echo "$garden" | jq -r '.title // .slug')
+            WELCOME=$(echo "$garden" | jq -r '.welcome // false')
+            echo "Building $SLUG from $DIR"
+            (cd "$DIR" && npm ci && npm run build)
+            mkdir -p "$SITE/$SLUG"
+            cp -r "$DIR/dist/." "$SITE/$SLUG/"
+            if [ "$WELCOME" = "true" ]; then
+              mv "$SITE/$SLUG/index.html" "$SITE/$SLUG/app.html"
+              sed -e "s/{{TITLE}}/$TITLE/g" -e "s/{{SLUG}}/$SLUG/g" \
+                scripts/site/welcome.html > "$SITE/$SLUG/index.html"
+            fi
+          done
+          cp scripts/site/root-index.html "$SITE/index.html"
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: digital-garden-AR/dist
+          path: site
 
   deploy:
     environment:

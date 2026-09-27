@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{{TITLE}}</title>
+<style>
+  :root { color-scheme: light; }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0; background: #ffffff; color: #111111;
+    font-family: Arial, Helvetica, sans-serif;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    min-height: 100vh; padding: 24px; text-align: center;
+  }
+  h1 { font-size: 28px; font-weight: 700; margin: 0 0 16px; }
+  p { max-width: 34em; line-height: 1.55; font-size: 16px; margin: 8px 0; }
+  .note { color: #555555; font-size: 14px; }
+  button {
+    margin-top: 28px; padding: 16px 36px; font-size: 18px; font-family: inherit;
+    background: #111111; color: #ffffff; border: none; border-radius: 999px; cursor: pointer;
+  }
+  button:active { transform: scale(0.98); }
+  .progress { margin-top: 18px; font-size: 14px; color: #555555; }
+</style>
+</head>
+<body>
+  <h1>{{TITLE}}</h1>
+  <p>This sticker is a living garden. Plant it, then point your phone camera at the sticker — the garden grows in augmented reality, right on the sticker.</p>
+  <p class="note">Planting starts a 5-hour growth cycle: the garden begins at 10% and reaches full bloom in about five hours. It keeps growing while you are away — come back anytime.</p>
+  <p class="note">You will be asked to allow camera access. The camera is used only to find the sticker; nothing is recorded or uploaded.</p>
+  <button id="ok">OK — plant seeds &amp; grant camera access</button>
+  <div class="progress" id="progress"></div>
+  <script>
+    (function () {
+      var KEY = 'garden_planted_{{SLUG}}';
+      var TOTAL_MS = 5 * 60 * 60 * 1000;
+      var btn = document.getElementById('ok');
+      var progress = document.getElementById('progress');
+      var planted = null;
+      try { planted = Number(localStorage.getItem(KEY)) || null; } catch (e) {}
+      if (planted) {
+        btn.textContent = 'Continue to your garden';
+        var pct = Math.min(100, Math.floor(((Date.now() - planted) / TOTAL_MS) * 100));
+        progress.textContent = 'Your garden is ' + pct + '% grown.';
+      }
+      btn.addEventListener('click', function () {
+        if (!planted) {
+          try { localStorage.setItem(KEY, String(Date.now())); } catch (e) {}
+        }
+        window.location.href = 'app.html';
+      });
+    })();
+  </script>
+</body>
+</html>
