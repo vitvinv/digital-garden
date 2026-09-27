@@ -22,6 +22,12 @@
   }
   button:active { transform: scale(0.98); }
   .progress { margin-top: 18px; font-size: 14px; color: #555555; }
+  #loader { display: none; margin-top: 28px; }
+  #loader .bar {
+    width: 220px; height: 6px; margin: 0 auto 10px;
+    background: #e5e5e5; border-radius: 999px; overflow: hidden;
+  }
+  #loader .fill { width: 0%; height: 100%; background: #111111; border-radius: 999px; }
 </style>
 </head>
 <body>
@@ -30,25 +36,99 @@
   <p class="note">Planting starts a 5-hour growth cycle: the garden begins at 10% and reaches full bloom in about five hours. It keeps growing while you are away — come back anytime.</p>
   <p class="note">You will be asked to allow camera access. The camera is used only to find the sticker; nothing is recorded or uploaded.</p>
   <button id="ok">OK — plant seeds &amp; grant camera access</button>
+  <div id="loader">
+    <div class="bar"><div class="fill" id="fill"></div></div>
+    <div class="progress" id="pct">Planting seeds… 0%</div>
+  </div>
   <div class="progress" id="progress"></div>
   <script>
     (function () {
       var KEY = 'garden_planted_{{SLUG}}';
       var TOTAL_MS = 5 * 60 * 60 * 1000;
+      var STAGE_COUNT = 10;
+      var STAGE_WINDOW_MS = 30 * 60 * 1000; // keep in sync with app.js
       var btn = document.getElementById('ok');
       var progress = document.getElementById('progress');
+      var loader = document.getElementById('loader');
+      var fill = document.getElementById('fill');
+      var pct = document.getElementById('pct');
       var planted = null;
       try { planted = Number(localStorage.getItem(KEY)) || null; } catch (e) {}
       if (planted) {
         btn.textContent = 'Continue to your garden';
-        var pct = Math.min(100, Math.floor(((Date.now() - planted) / TOTAL_MS) * 100));
-        progress.textContent = 'Your garden is ' + pct + '% grown.';
+        var pctNow = Math.min(100, Math.floor(((Date.now() - planted) / TOTAL_MS) * 100));
+        progress.textContent = 'Your garden is ' + pctNow + '% grown.';
       }
+
+      function stageNow() {
+        if (!planted) return 1;
+        return Math.min(STAGE_COUNT, 1 + Math.floor((Date.now() - planted) / STAGE_WINDOW_MS));
+      }
+
+      // Stream a file and fold its bytes into the shared progress meter.
+      var received = 0, total = 0;
+      function fetchOne(url, weight) {
+        return fetch(url).then(function (res) {
+          var len = Number(res.headers.get('content-length')) || weight;
+          total += len;
+          if (!res.body || !res.body.getReader) {
+            received += len;
+            return null;
+          }
+          var reader = res.body.getReader();
+          function step(state) {
+            received += (state.value || {length: 0}).length;
+            render();
+            return reader.read().then(function (next) {
+              return next.done ? null : step(next);
+            });
+          }
+          render();
+          return step({});
+        }).catch(function () { total += weight; received += weight; render(); });
+      }
+
+      var lastPct = -1;
+      function render() {
+        var p = total ? Math.min(100, Math.floor((received / total) * 100)) : 0;
+        if (p === lastPct) return;
+        lastPct = p;
+        fill.style.width = p + '%';
+        pct.textContent = 'Planting seeds… ' + p + '%';
+      }
+
+      var navigated = false;
+      function go() {
+        if (navigated) return;
+        navigated = true;
+        window.location.href = 'app.html';
+      }
+
       btn.addEventListener('click', function () {
+        if (navigated) return;
         if (!planted) {
           try { localStorage.setItem(KEY, String(Date.now())); } catch (e) {}
         }
-        window.location.href = 'app.html';
+        btn.style.display = 'none';
+        progress.textContent = '';
+        loader.style.display = 'block';
+        // Warm the browser cache with the heavy files the AR page needs,
+        // so app.html boots from cache instead of a blank screen.
+        // ponytail: engine resources/ (fonts, splat) are not warmed — the AR
+        // landing UI covers them; add explicit names here if the gap annoys.
+        var files = [
+          'external/runtime/runtime.js',
+          'assets/gardens/garden_stage_' + ('0' + stageNow()).slice(-2) + '.glb',
+          'assets/background.glb',
+          'assets/hider.glb'
+        ];
+        setTimeout(go, 20000); // never trap the user on the loader
+        Promise.all(files.map(function (url, i) {
+          return fetchOne(url, i === 0 ? 4200000 : 150000);
+        })).then(render).then(function () {
+          pct.textContent = 'Planting seeds… done';
+          go();
+        });
       });
     })();
   </script>
