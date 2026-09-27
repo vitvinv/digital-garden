@@ -59,6 +59,39 @@ def find_new_set(targets_dir: Path, canonical: str) -> str:
     return candidates[0][1]
 
 
+def repair_missing_resources(targets_dir: Path, canonical: str, dry_run: bool) -> int:
+    """Rewrite resources entries that point at missing files to existing
+    canonical-named files. Handles Studio's 'update from source' variant that
+    versions the resource FILES (-1) but keeps the canonical target name."""
+    json_path = targets_dir / f"{canonical}.json"
+    target = json.loads(json_path.read_text(encoding="utf-8"))
+    fixed = 0
+    for key, file_name in target.get("resources", {}).items():
+        if (targets_dir / file_name).exists():
+            continue
+        suffix = Path(file_name).suffix
+        canonical_file = f"{canonical}_{key.replace('Image', '').lower()}{suffix}"
+        if not (targets_dir / canonical_file).exists():
+            print(f"ERROR: neither {file_name} nor {canonical_file} exists in {targets_dir}/")
+            return 1
+        print(f"  {key}: {file_name} -> {canonical_file} (file was missing)")
+        target["resources"][key] = canonical_file
+        fixed += 1
+    if target.get("imagePath") and not (garden_dir_path(targets_dir) / target["imagePath"]).exists():
+        target["imagePath"] = f"image-targets/{target['resources']['luminanceImage']}"
+        print(f"  imagePath -> {target['imagePath']}")
+        fixed += 1
+    if fixed and not dry_run:
+        target["updated"] = int(time.time() * 1000)
+        json_path.write_text(json.dumps(target, indent=2) + "\n", encoding="utf-8")
+    print(f"Repaired {fixed} reference(s)." if fixed else "Nothing to repair — all resources resolve.")
+    return 0
+
+
+def garden_dir_path(targets_dir: Path) -> Path:
+    return targets_dir.parent
+
+
 def main() -> int:
     args = sys.argv[1:]
     dry_run = "--dry-run" in args
@@ -72,6 +105,9 @@ def main() -> int:
     if not (targets_dir / f"{canonical}.json").exists():
         print(f"ERROR: {targets_dir / (canonical + '.json')} not found.")
         return 1
+
+    if "--repair" in args:
+        return repair_missing_resources(targets_dir, canonical, dry_run)
 
     new_base = args[2] if len(args) > 2 else find_new_set(targets_dir, canonical)
     new_json_path = targets_dir / f"{new_base}.json"
