@@ -63,16 +63,16 @@ const updateCountdown = () => {
   }
   const remaining = TOTAL_MS - (Date.now() - planted)
   if (remaining <= 0) {
-    infoCountdown.textContent = 'In full bloom.'
+    infoCountdown.textContent = 'in full bloom.'
   } else if (remaining < 60 * 1000) {
-    infoCountdown.textContent = 'Full bloom any minute now.'
+    infoCountdown.textContent = 'full bloom any minute now.'
   } else {
     const mins = Math.max(1, Math.round(remaining / (60 * 1000)))
     const h = Math.floor(mins / 60)
     const m = mins % 60
     infoCountdown.textContent = h === 0
-      ? `Full bloom in ${m} min.`
-      : (m === 0 ? `Full bloom in ${h} h.` : `Full bloom in ${h} h ${m} min.`)
+      ? `full bloom in ${m} min.`
+      : (m === 0 ? `full bloom in ${h} h.` : `full bloom in ${h} h ${m} min.`)
   }
   infoCountdown.style.display = 'block'
 }
