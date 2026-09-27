@@ -1,0 +1,15 @@
+{
+  "enabled": true,
+  "pixelate": {
+    "enabled": false,
+    "pixelSize": 4,
+    "maxInternalWidth": 960,
+    "smoothUpscale": false
+  },
+  "bloom": {
+    "enabled": true,
+    "intensity": 1,
+    "threshold": 0.4,
+    "radius": 0.8
+  }
+}

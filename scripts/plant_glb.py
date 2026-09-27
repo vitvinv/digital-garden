@@ -1,5 +1,5 @@
 """
-Headless plant GLB regenerator (PlantStudio core, no Blender).
+Headless plant GLB regenerator (PlantStudio core + headless Blender decimation).
 
 Reads per-plant JSON configs from `digital-garden-AR/src/assets/plants/*.json`,
 grows each plant deterministically at `day = today - planted_date` using the
@@ -27,14 +27,21 @@ Output matches the Blender addon's export conventions:
 
 Usage:
     python scripts/plant_glb.py [--plants-dir DIR] [--day YYYY-MM-DD] [--no-compress]
-                                [--no-decimate]
+                                [--no-decimate] [--blender PATH]
+
+Decimation is done by a headless Blender instance running
+scripts/blender_decimate.py (Decimate modifier, COLLAPSE mode). If no Blender
+binary is found, the script falls back to the pure-Python QEM decimator so the
+pipeline keeps working in CI.
 """
 
 import argparse
 import json
+import os
 import shutil
 import subprocess
 import sys
+import tempfile
 from datetime import date, datetime
 from pathlib import Path
 
@@ -54,9 +61,32 @@ from plantstudio_blender.core.decimate import simplify_mesh
 
 DATA_DIR = ROOT / "plantstudio_blender" / "data"
 DEFAULT_PLANTS_DIR = ROOT / "digital-garden-AR" / "src" / "assets" / "plants"
+BLENDER_SCRIPT = ROOT / "scripts" / "blender_decimate.py"
 
-# Hard-coded per decision; change here to pick a different reduction.
-DECIMATE_RATIO = 0.5
+# Headless Blender Decimate modifier settings.
+DECIMATE_MODE = "COLLAPSE"
+DECIMATE_RATIO = 0.2
+
+# Common places Blender installs; overridable via BLENDER_EXE or --blender.
+BLENDER_CANDIDATES = [
+    str(Path.home() / "Documents" / "stable" / "blender-5.2.1-lts.9e2066aef7ef" / "blender.exe"),
+    str(Path.home() / "Documents" / "stable" / "blender-4.5.13-lts.daeeeca98fb0" / "blender.exe"),
+    "/usr/bin/blender",
+    "/usr/local/bin/blender",
+]
+
+
+def find_blender(explicit=None):
+    """Resolve the Blender executable for headless decimation."""
+    if explicit:
+        return explicit if Path(explicit).exists() else None
+    env = os.environ.get("BLENDER_EXE")
+    if env and Path(env).exists():
+        return env
+    for candidate in BLENDER_CANDIDATES:
+        if Path(candidate).exists():
+            return candidate
+    return shutil.which("blender")
 
 
 def orient_vertices(vertices):
@@ -124,8 +154,78 @@ def run_draco_compression(src, dst):
         return False
 
 
+def run_blender_decimate(blender_path, vertices, faces, ratio=DECIMATE_RATIO,
+                         mode=DECIMATE_MODE):
+    """Decimate a mesh by shelling out to a headless Blender instance.
+
+    Returns {"vertices": [...], "faces": [...]} for the decimated mesh.
+    Raises subprocess.CalledProcessError if Blender fails.
+    """
+    with tempfile.TemporaryDirectory(prefix="plant_decimate_") as tmp:
+        tmp_dir = Path(tmp)
+        in_path = tmp_dir / "mesh_in.json"
+        out_path = tmp_dir / "mesh_out.json"
+        in_path.write_text(json.dumps(
+            {"vertices": [list(v) for v in vertices],
+             "faces": [list(f) for f in faces]}), encoding="utf-8")
+        cmd = [
+            blender_path, "--background", "--factory-startup",
+            "--python", str(BLENDER_SCRIPT), "--",
+            str(in_path), str(out_path), "--ratio", str(ratio),
+            "--mode", mode,
+        ]
+        subprocess.run(cmd, check=True, capture_output=True, text=True,
+                       timeout=600)
+        return json.loads(out_path.read_text(encoding="utf-8"))
+
+
+def rebake_face_colors(orig_verts, orig_faces, orig_colors, new_verts,
+                       new_faces):
+    """Color each decimated face from its nearest original face centroid.
+
+    Blender's Decimate modifier merges vertices, so exact per-face color
+    mapping is lost. For each new face we take the color of the original face
+    whose centroid is nearest — deterministic, palette-preserving, and keeps
+    the exploded-per-face-color output convention of this pipeline.
+    """
+    ov = np.asarray(orig_verts, dtype=np.float64)
+    nv = np.asarray(new_verts, dtype=np.float64)
+    orig_centroids = ov[np.asarray(orig_faces, dtype=np.int64)].mean(axis=1)
+    new_centroids = nv[np.asarray(new_faces, dtype=np.int64)].mean(axis=1)
+
+    colors = np.zeros((len(new_centroids), 3), dtype=np.int64)
+    chunk = 64
+    for start in range(0, len(new_centroids), chunk):
+        block = new_centroids[start:start + chunk]
+        dist2 = ((block[:, None, :] - orig_centroids[None, :, :]) ** 2).sum(axis=2)
+        nearest = np.argmin(dist2, axis=1)
+        colors[start:start + chunk] = np.asarray(orig_colors, dtype=np.int64)[nearest]
+    return [tuple(int(c) for c in row) for row in colors]
+
+
+def decimate_data(data, blender_path=None):
+    """Decimate a {vertices, faces, face_colors} mesh dict.
+
+    Prefers a headless Blender instance (Decimate modifier, COLLAPSE ratio
+    0.2); falls back to the pure-Python QEM decimator when no Blender binary
+    is available so CI stays green.
+    """
+    if blender_path:
+        decimated = run_blender_decimate(blender_path, data["vertices"],
+                                         data["faces"])
+        data = dict(data)
+        data["face_colors"] = rebake_face_colors(
+            data["vertices"], data["faces"], data["face_colors"],
+            decimated["vertices"], decimated["faces"])
+        data["vertices"] = decimated["vertices"]
+        data["faces"] = decimated["faces"]
+        return data
+    return simplify_mesh(data["vertices"], data["faces"], data["face_colors"],
+                         DECIMATE_RATIO)
+
+
 def regenerate_plant(config, plants_dir, day_override=None, compress=True,
-                     decimate=True, lib=None, tdo_lib=None):
+                     decimate=True, lib=None, tdo_lib=None, blender_path=None):
     plant_id = config.get("plant_id")
     species_name = config.get("species")
     seed = config.get("seed", 0)
@@ -159,8 +259,7 @@ def regenerate_plant(config, plants_dir, day_override=None, compress=True,
     data = buffer.to_mesh_data()
     full_faces = len(data["faces"])
     if decimate:
-        data = simplify_mesh(data["vertices"], data["faces"],
-                             data["face_colors"], DECIMATE_RATIO)
+        data = decimate_data(data, blender_path=blender_path)
     lod_faces = len(data["faces"])
     mesh = build_trimesh(data)
 
@@ -194,7 +293,19 @@ def main():
                         help="Skip Draco compression")
     parser.add_argument("--no-decimate", action="store_true",
                         help="Export full-detail meshes (skip decimation)")
+    parser.add_argument("--blender", type=str, default=None,
+                        help="Path to the Blender executable used for "
+                             "decimation (default: BLENDER_EXE, common install "
+                             "paths, or blender on PATH)")
     args = parser.parse_args()
+
+    blender_path = find_blender(args.blender)
+    if not args.no_decimate and blender_path:
+        print(f"Decimator: headless Blender ({Path(blender_path).name}), "
+              f"mode {DECIMATE_MODE}, ratio {DECIMATE_RATIO}")
+    elif not args.no_decimate:
+        print("WARNING: no Blender binary found; decimation falls back to the "
+              "pure-Python QEM decimator")
 
     plants_dir = Path(args.plants_dir)
     if not plants_dir.is_dir():
@@ -223,7 +334,8 @@ def main():
             regenerate_plant(config, plants_dir, day_override=day_override,
                              compress=not args.no_compress,
                              decimate=not args.no_decimate,
-                             lib=lib, tdo_lib=tdo_lib)
+                             lib=lib, tdo_lib=tdo_lib,
+                             blender_path=blender_path)
         except Exception as e:
             failed += 1
             print(f"  [{config_path.name}] ERROR: {e}")

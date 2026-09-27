@@ -1,0 +1,23 @@
+{
+  "type": "PLANAR",
+  "properties": {
+    "top": 34,
+    "left": 0,
+    "width": 962,
+    "height": 1282,
+    "isRotated": false,
+    "originalWidth": 962,
+    "originalHeight": 1351
+  },
+  "imagePath": "image-targets/thesunkengarden-target_luminance.jpg",
+  "metadata": null,
+  "name": "thesunkengarden-target",
+  "resources": {
+    "originalImage": "thesunkengarden-target_original.jpg",
+    "croppedImage": "thesunkengarden-target_cropped.jpg",
+    "thumbnailImage": "thesunkengarden-target_thumbnail.jpg",
+    "luminanceImage": "thesunkengarden-target_luminance.jpg"
+  },
+  "created": 1790505547068,
+  "updated": 1790505547068
+}
