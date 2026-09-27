@@ -19,16 +19,26 @@ const currentStage = () => {
   return Math.min(STAGE_COUNT, 1 + Math.floor((Date.now() - planted) / STAGE_WINDOW_MS))
 }
 
-const gardenObject = Object.values(scene.objects || {}).find((obj) => {
+const stage = currentStage()
+const wantAsset = `assets/gardens/garden_stage_${String(stage).padStart(2, '0')}.glb`
+const stageObjects = Object.values(scene.objects || {}).filter((obj) => {
   const asset = obj && obj.gltfModel && obj.gltfModel.src && obj.gltfModel.src.asset
   return typeof asset === 'string' && GARDEN_GLB_RE.test(asset)
 })
-if (gardenObject) {
-  const stage = currentStage()
-  gardenObject.gltfModel.src.asset = `assets/gardens/garden_stage_${String(stage).padStart(2, '0')}.glb`
-  console.info(`[Garden] growth stage ${stage}/${STAGE_COUNT}`)
+if (stageObjects.length) {
+  // Keep exactly one stage object (the current stage); drop the rest before
+  // ecs init so they neither render nor preload their GLBs.
+  let kept = stageObjects.find((obj) => obj.gltfModel.src.asset === wantAsset)
+  if (!kept) {
+    kept = stageObjects[0]
+    kept.gltfModel.src.asset = wantAsset
+  }
+  for (const obj of stageObjects) {
+    if (obj !== kept) delete scene.objects[obj.id]
+  }
+  console.info(`[Garden] growth stage ${stage}/${STAGE_COUNT} (${wantAsset})`)
 } else {
-  console.warn('[Garden] no garden_stage_*.glb model in scene — growth stage not applied')
+  console.warn('[Garden] no garden_stage_*.glb objects in scene — growth stage not applied')
 }
 
 // If the tab stays open across a stage boundary, reload into the next stage.
@@ -75,7 +85,7 @@ const initPostFX = () => {
 const onxrloaded = () => {
   XR8.XrController.configure({
     imageTargetData: [
-      require('../image-targets/ENG-digital-garden-sticker.json'),
+      require('../image-targets/thesunkengarden-target.json'),
     ],
   })
   XR8.addCameraPipelineModule(LandingPage.pipelineModule())

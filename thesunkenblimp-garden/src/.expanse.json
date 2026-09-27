@@ -65,7 +65,7 @@
       "position": [
         0,
         0,
-        0
+        0.005316584659951884
       ],
       "rotation": [
         0,
@@ -188,45 +188,12 @@
       "order": 8.09098464309628,
       "hidden": false
     },
-    "2745af53-4602-4da3-a488-cef4261b11b0": {
-      "id": "2745af53-4602-4da3-a488-cef4261b11b0",
-      "position": [
-        0,
-        -0.5,
-        -0.11236245331362177
-      ],
-      "rotation": [
-        0,
-        0,
-        0,
-        1
-      ],
-      "scale": [
-        2,
-        2,
-        2
-      ],
-      "geometry": null,
-      "material": null,
-      "parentId": "28878a86-3de0-4d09-a97d-e2aca00f534b",
-      "components": {},
-      "gltfModel": {
-        "src": {
-          "type": "asset",
-          "asset": "assets/plants/digital-garden.glb"
-        },
-        "animationClip": "",
-        "loop": true
-      },
-      "name": "digital-garden.glb",
-      "order": 9.689531900345047
-    },
     "3dc09bb6-6d20-44ca-ae23-20aad615fde4": {
       "id": "3dc09bb6-6d20-44ca-ae23-20aad615fde4",
       "position": [
         0,
-        -0.498,
-        -0.2
+        -0.4398670088877348,
+        -0.28943866815511243
       ],
       "rotation": [
         0,
@@ -235,9 +202,9 @@
         1
       ],
       "scale": [
-        1.99,
-        1.9900000000000007,
-        1.9900000000000007
+        2.11,
+        2.1,
+        2.0500000000000003
       ],
       "geometry": null,
       "material": null,
@@ -253,6 +220,361 @@
       },
       "name": "background.glb",
       "order": 10.721912036999043
+    },
+    "c49a1670-6a89-4f6e-93d9-e43f375f2d5d": {
+      "id": "c49a1670-6a89-4f6e-93d9-e43f375f2d5d",
+      "position": [
+        0,
+        -0.42883049450930466,
+        -0.12696090879174604
+      ],
+      "rotation": [
+        0,
+        0.7313537016191726,
+        0,
+        0.6819983600624963
+      ],
+      "scale": [
+        2.000000000000011,
+        2,
+        2.000000000000011
+      ],
+      "geometry": null,
+      "material": null,
+      "parentId": "28878a86-3de0-4d09-a97d-e2aca00f534b",
+      "components": {},
+      "name": "garden-controller",
+      "order": 12.280034902457842
+    },
+    "c2147ae1-2f4a-4357-8864-b7495e6a7ec8": {
+      "id": "c2147ae1-2f4a-4357-8864-b7495e6a7ec8",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "geometry": null,
+      "material": null,
+      "parentId": "c49a1670-6a89-4f6e-93d9-e43f375f2d5d",
+      "components": {},
+      "gltfModel": {
+        "src": {
+          "type": "asset",
+          "asset": "assets/gardens/garden_stage_01.glb"
+        },
+        "animationClip": "",
+        "loop": true
+      },
+      "name": "garden_stage_01.glb",
+      "order": 1.3017469167393219
+    },
+    "4dce9a36-817e-4141-862b-92ba81769407": {
+      "id": "4dce9a36-817e-4141-862b-92ba81769407",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "geometry": null,
+      "material": null,
+      "parentId": "c49a1670-6a89-4f6e-93d9-e43f375f2d5d",
+      "components": {},
+      "gltfModel": {
+        "src": {
+          "type": "asset",
+          "asset": "assets/gardens/garden_stage_02.glb"
+        },
+        "animationClip": "",
+        "loop": true
+      },
+      "name": "garden_stage_02.glb",
+      "order": 2.689501052391636
+    },
+    "944504f9-7686-4765-8c36-a53fd0472455": {
+      "id": "944504f9-7686-4765-8c36-a53fd0472455",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "geometry": null,
+      "material": null,
+      "parentId": "c49a1670-6a89-4f6e-93d9-e43f375f2d5d",
+      "components": {},
+      "gltfModel": {
+        "src": {
+          "type": "asset",
+          "asset": "assets/gardens/garden_stage_03.glb"
+        },
+        "animationClip": "",
+        "loop": true
+      },
+      "name": "garden_stage_03.glb",
+      "order": 3.932388767468554
+    },
+    "c6e4007e-bfe8-4d70-9d69-faabdb260359": {
+      "id": "c6e4007e-bfe8-4d70-9d69-faabdb260359",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "geometry": null,
+      "material": null,
+      "parentId": "c49a1670-6a89-4f6e-93d9-e43f375f2d5d",
+      "components": {},
+      "gltfModel": {
+        "src": {
+          "type": "asset",
+          "asset": "assets/gardens/garden_stage_04.glb"
+        },
+        "animationClip": "",
+        "loop": true
+      },
+      "name": "garden_stage_04.glb",
+      "order": 5.910143604100506
+    },
+    "2b4cbf03-dd90-4a1f-abc9-e3379fd4c786": {
+      "id": "2b4cbf03-dd90-4a1f-abc9-e3379fd4c786",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "geometry": null,
+      "material": null,
+      "parentId": "c49a1670-6a89-4f6e-93d9-e43f375f2d5d",
+      "components": {},
+      "gltfModel": {
+        "src": {
+          "type": "asset",
+          "asset": "assets/gardens/garden_stage_05.glb"
+        },
+        "animationClip": "",
+        "loop": true
+      },
+      "name": "garden_stage_05.glb",
+      "order": 7.424008810686499
+    },
+    "7ee931bb-1dbf-498e-9a8e-dee9acb8db30": {
+      "id": "7ee931bb-1dbf-498e-9a8e-dee9acb8db30",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "geometry": null,
+      "material": null,
+      "parentId": "c49a1670-6a89-4f6e-93d9-e43f375f2d5d",
+      "components": {},
+      "gltfModel": {
+        "src": {
+          "type": "asset",
+          "asset": "assets/gardens/garden_stage_06.glb"
+        },
+        "animationClip": "",
+        "loop": true
+      },
+      "name": "garden_stage_06.glb",
+      "order": 8.985415439422763
+    },
+    "d8d33986-fe55-454a-8cfa-b43632cd8f0c": {
+      "id": "d8d33986-fe55-454a-8cfa-b43632cd8f0c",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "geometry": null,
+      "material": null,
+      "parentId": "c49a1670-6a89-4f6e-93d9-e43f375f2d5d",
+      "components": {},
+      "gltfModel": {
+        "src": {
+          "type": "asset",
+          "asset": "assets/gardens/garden_stage_07.glb"
+        },
+        "animationClip": "",
+        "loop": true
+      },
+      "name": "garden_stage_07.glb",
+      "order": 10.153315858627183
+    },
+    "0cccd26e-3ad6-4edb-b013-32136e8ebf65": {
+      "id": "0cccd26e-3ad6-4edb-b013-32136e8ebf65",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "geometry": null,
+      "material": null,
+      "parentId": "c49a1670-6a89-4f6e-93d9-e43f375f2d5d",
+      "components": {},
+      "gltfModel": {
+        "src": {
+          "type": "asset",
+          "asset": "assets/gardens/garden_stage_08.glb"
+        },
+        "animationClip": "",
+        "loop": true
+      },
+      "name": "garden_stage_08.glb",
+      "order": 11.827676133340871
+    },
+    "bab5f947-5fd5-4765-8cc5-1786073cbf68": {
+      "id": "bab5f947-5fd5-4765-8cc5-1786073cbf68",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "geometry": null,
+      "material": null,
+      "parentId": "c49a1670-6a89-4f6e-93d9-e43f375f2d5d",
+      "components": {},
+      "gltfModel": {
+        "src": {
+          "type": "asset",
+          "asset": "assets/gardens/garden_stage_09.glb"
+        },
+        "animationClip": "",
+        "loop": true
+      },
+      "name": "garden_stage_09.glb",
+      "order": 13.381750720308778
+    },
+    "2ee381c6-3135-4afb-84bb-0932f7d518ec": {
+      "id": "2ee381c6-3135-4afb-84bb-0932f7d518ec",
+      "position": [
+        0,
+        0,
+        0
+      ],
+      "rotation": [
+        0,
+        0,
+        0,
+        1
+      ],
+      "scale": [
+        1,
+        1,
+        1
+      ],
+      "geometry": null,
+      "material": null,
+      "parentId": "c49a1670-6a89-4f6e-93d9-e43f375f2d5d",
+      "components": {},
+      "gltfModel": {
+        "src": {
+          "type": "asset",
+          "asset": "assets/gardens/garden_stage_10.glb"
+        },
+        "animationClip": "",
+        "loop": true
+      },
+      "name": "garden_stage_10.glb",
+      "order": 14.77425290815044
     }
   },
   "spaces": {
