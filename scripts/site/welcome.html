@@ -47,6 +47,10 @@
       var TOTAL_MS = 5 * 60 * 60 * 1000;
       var STAGE_COUNT = 10;
       var STAGE_WINDOW_MS = 30 * 60 * 1000; // keep in sync with app.js
+      // ?reset=1 clears the growth timer — lets a tester re-plant from scratch
+      if (window.location.search.indexOf('reset=1') !== -1) {
+        try { localStorage.removeItem(KEY); } catch (e) {}
+      }
       var btn = document.getElementById('ok');
       var progress = document.getElementById('progress');
       var loader = document.getElementById('loader');
