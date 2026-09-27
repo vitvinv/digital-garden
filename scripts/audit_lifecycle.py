@@ -15,9 +15,12 @@ sys.path.insert(0, ROOT)
 
 from plantstudio_blender.core.draw import (
     draw_plant,
-    kExportPartFlower,
-    kExportPartFruit,
 )
+from plantstudio_blender.core import draw
+
+# ponytail: range assumes ids 7..30 contiguous; explicit set if taxonomy reorders
+FLOWER_PARTS = frozenset(range(draw.kExportPartInflorescenceStalkFemale, draw.kExportPartSepalsMale + 1))
+FRUIT_PARTS = frozenset((draw.kExportPartUnripeFruit, draw.kExportPartRipeFruit))
 from plantstudio_blender.core.factory import create_plant, grow_species
 from plantstudio_blender.core.mesh_buffer import MeshBuffer
 from plantstudio_blender.core.plant_library import SpeciesLibrary
@@ -105,11 +108,11 @@ def render_snapshot(species, day, tdo_library):
     turtle.setScale_pixelsPerMm(0.001)
     draw_plant(plant, turtle)
     flower_records = [record for record in buffer.triangle_set_records
-                      if record.get("part_id") == kExportPartFlower]
+                      if record.get("part_id") in FLOWER_PARTS]
     open_flower_records = [record for record in flower_records
                            if record.get("lifecycle_stage") == "open"]
     fruit_records = [record for record in buffer.triangle_set_records
-                     if record.get("part_id") == kExportPartFruit]
+                     if record.get("part_id") in FRUIT_PARTS]
     return {
         "day": day,
         "plant": plant,

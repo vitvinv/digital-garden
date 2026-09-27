@@ -32,7 +32,12 @@ ROOT = Path(__file__).resolve().parent.parent
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from plantstudio_blender.core.draw import kExportPartFlower, kExportPartFruit, kExportPartLeaf
+from plantstudio_blender.core import draw
+from plantstudio_blender.core.draw import kExportPartLeaf
+
+# ponytail: range assumes ids 7..30 stay contiguous; switch to an explicit set if the taxonomy reorders
+FLOWER_PARTS = frozenset(range(draw.kExportPartInflorescenceStalkFemale, draw.kExportPartSepalsMale + 1))
+FRUIT_PARTS = frozenset((draw.kExportPartUnripeFruit, draw.kExportPartRipeFruit))
 from plantstudio_blender.core.factory import grow_species
 from plantstudio_blender.core.mesh_buffer import MeshBuffer
 from plantstudio_blender.core.plant_library import SpeciesLibrary
@@ -245,12 +250,12 @@ def _addon_measurement(species, age: int, seed: int, tdo_library: TdoLibrary) ->
             "flower_triangle_record_count_info": sum(
                 record.get("triangles", 0)
                 for record in buffer.triangle_set_records
-                if record.get("part_id") == kExportPartFlower
+                if record.get("part_id") in FLOWER_PARTS
             ),
             "fruit_triangle_record_count_info": sum(
                 record.get("triangles", 0)
                 for record in buffer.triangle_set_records
-                if record.get("part_id") == kExportPartFruit
+                if record.get("part_id") in FRUIT_PARTS
             ),
         })
         return AddonMeasurement(part_counts, [], "")
