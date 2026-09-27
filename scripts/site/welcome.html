@@ -22,15 +22,6 @@
   }
   button:active { transform: scale(0.98); }
   .progress { margin-top: 18px; font-size: 14px; color: #555555; }
-  #bulb {
-    position: fixed; top: 16px; right: 16px; z-index: 10;
-    width: 44px; height: 44px; margin: 0; padding: 0;
-    font-size: 20px; line-height: 40px;
-    background: #ffffff; color: #111111;
-    border: 1.5px solid #111111; border-radius: 999px; cursor: pointer;
-  }
-  #bulb:active { transform: scale(0.95); }
-  #how.hidden { display: none; }
   #loader { display: none; margin-top: 28px; }
   #loader .bar {
     width: 220px; height: 6px; margin: 0 auto 10px;
@@ -40,13 +31,10 @@
 </style>
 </head>
 <body>
-  <button id="bulb" title="How it works">💡</button>
   <h1>{{TITLE}}</h1>
-  <div id="how">
-    <p>This sticker is a living garden. Plant it, then point your phone camera at the sticker — the garden grows in augmented reality, right on the sticker.</p>
-    <p class="note">Planting starts a 5-hour growth cycle: the garden begins at 10% and reaches full bloom in about five hours. It keeps growing while you are away — come back anytime.</p>
-    <p class="note">You will be asked to allow camera access. The camera is used only to find the sticker; nothing is recorded or uploaded.</p>
-  </div>
+  <p>This sticker is a living garden. Plant it, then point your phone camera at the sticker — the garden grows in augmented reality, right on the sticker.</p>
+  <p class="note">Planting starts a 5-hour growth cycle: the garden begins at 10% and reaches full bloom in about five hours. It keeps growing while you are away — come back anytime.</p>
+  <p class="note">You will be asked to allow camera access. The camera is used only to find the sticker; nothing is recorded or uploaded.</p>
   <button id="ok">to garden</button>
   <div id="loader">
     <div class="bar"><div class="fill" id="fill"></div></div>
@@ -64,8 +52,6 @@
         try { localStorage.removeItem(KEY); } catch (e) {}
       }
       var btn = document.getElementById('ok');
-      var how = document.getElementById('how');
-      var bulb = document.getElementById('bulb');
       var progress = document.getElementById('progress');
       var loader = document.getElementById('loader');
       var fill = document.getElementById('fill');
@@ -73,15 +59,9 @@
       var planted = null;
       try { planted = Number(localStorage.getItem(KEY)) || null; } catch (e) {}
       if (planted) {
-        btn.textContent = 'continue to your garden';
-        how.classList.add('hidden'); // bulb re-opens it
         var pctNow = Math.min(100, Math.floor(((Date.now() - planted) / TOTAL_MS) * 100));
         progress.textContent = 'Your garden is ' + pctNow + '% grown.';
       }
-
-      bulb.addEventListener('click', function () {
-        how.classList.toggle('hidden');
-      });
 
       function stageNow() {
         if (!planted) return 1;
@@ -133,7 +113,6 @@
           try { localStorage.setItem(KEY, String(Date.now())); } catch (e) {}
         }
         btn.style.display = 'none';
-        how.classList.add('hidden'); // bulb brings it back
         progress.textContent = '';
         loader.style.display = 'block';
         // Warm the browser cache with the heavy files the AR page needs,
