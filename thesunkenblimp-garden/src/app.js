@@ -41,11 +41,43 @@ if (stageObjects.length) {
   console.warn('[Garden] no garden_stage_*.glb objects in scene — growth stage not applied')
 }
 
-// If the tab stays open across a stage boundary, reload into the next stage.
+// If the user returns to the tab in a later growth stage, reload into it.
+// Gating on visibilitychange means a reload only fires when the tab becomes
+// visible again — never mid-session, so the camera pipeline is not restarted
+// while AR is running (a restarted feed can come up flipped).
 const bootStage = currentStage()
-window.setInterval(() => {
-  if (currentStage() !== bootStage) window.location.reload()
-}, 60 * 1000)
+document.addEventListener('visibilitychange', () => {
+  if (!document.hidden && currentStage() !== bootStage) window.location.reload()
+})
+
+// Info pill: countdown to full bloom (same wording/format as the welcome page).
+const TOTAL_MS = STAGE_WINDOW_MS * STAGE_COUNT
+const infoCountdown = document.getElementById('garden-countdown')
+const updateCountdown = () => {
+  if (!infoCountdown) return
+  let planted = null
+  try { planted = Number(window.localStorage.getItem(PLANTED_KEY)) || null } catch (e) { planted = null }
+  if (!planted) {
+    infoCountdown.style.display = 'none'
+    return
+  }
+  const remaining = TOTAL_MS - (Date.now() - planted)
+  if (remaining <= 0) {
+    infoCountdown.textContent = 'In full bloom.'
+  } else if (remaining < 60 * 1000) {
+    infoCountdown.textContent = 'Full bloom any minute now.'
+  } else {
+    const mins = Math.max(1, Math.round(remaining / (60 * 1000)))
+    const h = Math.floor(mins / 60)
+    const m = mins % 60
+    infoCountdown.textContent = h === 0
+      ? `Full bloom in ${m} min.`
+      : (m === 0 ? `Full bloom in ${h} h.` : `Full bloom in ${h} h ${m} min.`)
+  }
+  infoCountdown.style.display = 'block'
+}
+updateCountdown()
+window.setInterval(updateCountdown, 60 * 1000)
 
 let postFXInitializing = false
 
@@ -88,7 +120,20 @@ const onxrloaded = () => {
       require('../image-targets/thesunkengarden-target.json'),
     ],
   })
-  XR8.addCameraPipelineModule(LandingPage.pipelineModule())
+  // Camera-error guard: the only error UI the removed LandingPage provided.
+  // The browser's own permission grant persists per site on HTTPS, so the
+  // per-visit confirmation is gone; this overlay only appears on failure.
+  XR8.addCameraPipelineModule({
+    name: 'garden-camera-guard',
+    onCameraStatusChange: ({ status }) => {
+      if (status !== 'error' || document.getElementById('garden-camera-error')) return
+      const el = document.createElement('div')
+      el.id = 'garden-camera-error'
+      el.textContent = 'Camera access is needed to see the garden. Allow it in browser site settings, then reload.'
+      el.style.cssText = 'position:fixed;left:50%;bottom:24px;transform:translateX(-50%);max-width:92vw;background:rgba(255,255,255,.85);color:#111111;font-family:Arial,Helvetica,sans-serif;font-size:11px;line-height:1.4;padding:6px 12px;border-radius:999px;z-index:9999;text-align:center;'
+      document.body.appendChild(el)
+    },
+  })
 }
 
 window.addEventListener('ecsInit', initPostFX)

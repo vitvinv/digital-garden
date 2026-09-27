@@ -58,9 +58,19 @@
       var pct = document.getElementById('pct');
       var planted = null;
       try { planted = Number(localStorage.getItem(KEY)) || null; } catch (e) {}
+      // Same growth math as app.js: full bloom at TOTAL_MS after planting.
+      function countdownText() {
+        var remaining = TOTAL_MS - (Date.now() - planted);
+        if (remaining <= 0) return 'In full bloom.';
+        if (remaining < 60 * 1000) return 'Full bloom any minute now.';
+        var mins = Math.max(1, Math.round(remaining / (60 * 1000)));
+        var h = Math.floor(mins / 60), m = mins % 60;
+        if (h === 0) return 'Full bloom in ' + m + ' min.';
+        return m === 0 ? 'Full bloom in ' + h + ' h.' : 'Full bloom in ' + h + ' h ' + m + ' min.';
+      }
       if (planted) {
-        var pctNow = Math.min(100, Math.floor(((Date.now() - planted) / TOTAL_MS) * 100));
-        progress.textContent = 'Your garden is ' + pctNow + '% grown.';
+        progress.textContent = countdownText();
+        setInterval(function () { progress.textContent = countdownText(); }, 30 * 1000);
       }
 
       function stageNow() {
