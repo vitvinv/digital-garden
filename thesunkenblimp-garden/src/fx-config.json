@@ -9,7 +9,12 @@
   "bloom": {
     "enabled": true,
     "intensity": 1,
-    "threshold": 0.4,
+    "threshold": 0.75,
     "radius": 0.8
+  },
+  "toneMap": {
+    "enabled": true,
+    "exposure": 1.0,
+    "contrast": 0.3
   }
 }

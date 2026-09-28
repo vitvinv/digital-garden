@@ -13,6 +13,11 @@ const DEFAULT_CONFIG = {
     threshold: 0.4,
     radius: 0.8,
   },
+  toneMap: {
+    enabled: true,
+    exposure: 1.0,
+    contrast: 0.3,
+  },
 }
 
 const CONFIG_LIMITS = {
@@ -21,6 +26,8 @@ const CONFIG_LIMITS = {
   intensity: [0, 4],
   threshold: [0, 4],
   radius: [0, 1],
+  exposure: [0.1, 4],
+  contrast: [0, 1],
 }
 
 const clamp = (value, min, max) => Math.min(max, Math.max(min, value))
@@ -35,12 +42,14 @@ const cloneConfig = config => ({
   debugView: config.debugView,
   pixelate: {...config.pixelate},
   bloom: {...config.bloom},
+  toneMap: {...config.toneMap},
 })
 
 const normalizeConfig = (input = {}) => {
   const source = input || {}
   const pixelate = source.pixelate || {}
   const bloom = source.bloom || {}
+  const toneMap = source.toneMap || {}
 
   return {
     enabled: source.enabled !== false,
@@ -72,6 +81,17 @@ const normalizeConfig = (input = {}) => {
         ...CONFIG_LIMITS.radius
       ),
     },
+    toneMap: {
+      enabled: toneMap.enabled !== false,
+      exposure: clamp(
+        numberOr(toneMap.exposure, DEFAULT_CONFIG.toneMap.exposure),
+        ...CONFIG_LIMITS.exposure
+      ),
+      contrast: clamp(
+        numberOr(toneMap.contrast, DEFAULT_CONFIG.toneMap.contrast),
+        ...CONFIG_LIMITS.contrast
+      ),
+    },
   }
 }
 
@@ -85,6 +105,10 @@ const mergeConfig = (base, override) => normalizeConfig({
   bloom: {
     ...base.bloom,
     ...(override && override.bloom),
+  },
+  toneMap: {
+    ...base.toneMap,
+    ...(override && override.toneMap),
   },
 })
 
@@ -106,6 +130,7 @@ const getUrlOverrides = () => {
   const pixelate = parseBoolean(params.get('pixelate'))
   const bloom = parseBoolean(params.get('bloomEnabled'))
   const enabled = parseBoolean(params.get('fx'))
+  const tonemap = parseBoolean(params.get('fxTonemap'))
   const debugView = params.get('bloomDebug')
   const override = {}
 
@@ -140,6 +165,30 @@ const getUrlOverrides = () => {
     }
     if (params.has('bloomRadius')) {
       override.bloom.radius = params.get('bloomRadius')
+    }
+  }
+  if (tonemap !== undefined || params.has('fxExposure') || params.has('fxContrast')) {
+    override.toneMap = {}
+    if (tonemap !== undefined) {
+      override.toneMap.enabled = tonemap
+    }
+    if (params.has('fxExposure')) {
+      override.toneMap.exposure = params.get('fxExposure')
+    }
+    if (params.has('fxContrast')) {
+      override.toneMap.contrast = params.get('fxContrast')
+    }
+  }
+  if (tonemap !== undefined || params.has('fxExposure') || params.has('fxContrast')) {
+    override.toneMap = {}
+    if (tonemap !== undefined) {
+      override.toneMap.enabled = tonemap
+    }
+    if (params.has('fxExposure')) {
+      override.toneMap.exposure = params.get('fxExposure')
+    }
+    if (params.has('fxContrast')) {
+      override.toneMap.contrast = params.get('fxContrast')
     }
   }
 
@@ -240,6 +289,8 @@ const COMPOSITE_FRAGMENT = `
   uniform bool uHasBloom;
   uniform int uDebugMode;
   uniform float uDebugBoost;
+  uniform float uExposure;
+  uniform float uContrast;
   varying vec2 vUv;
 
   void main() {
@@ -251,7 +302,14 @@ const COMPOSITE_FRAGMENT = `
     } else {
       vec3 bloom = bloomSample.rgb * uBloomIntensity;
       float bloomAlpha = clamp(bloomSample.a * uBloomIntensity, 0.0, 1.0);
-      gl_FragColor = vec4(scene.rgb + bloom, max(scene.a, bloomAlpha));
+      vec3 color = (scene.rgb + bloom) * uExposure;
+      // AgX tone curve (renderer.toneMapping == AgXToneMapping during this
+      // pass): compresses highlights the same way Blender's default AgX view
+      // transform does, so vertex colors no longer clip to pastel.
+      #include <tonemapping_fragment>
+      // Display-space S-curve toward Blender's "AgX - High Contrast" feel.
+      color = mix(color, smoothstep(vec3(0.0), vec3(1.0), color), uContrast);
+      gl_FragColor = vec4(color, max(scene.a, bloomAlpha));
     }
     // The scene is accumulated in a linear render target, so convert the final
     // composite to the output color space (sRGB canvas) here. Without this the
@@ -269,7 +327,7 @@ const createMaterial = (THREE, fragmentShader, uniforms, options = {}) => {
     blending: options.blending || THREE.NoBlending,
     depthTest: false,
     depthWrite: false,
-    toneMapped: false,
+    toneMapped: options.toneMapped === true,
   })
   material.needsUpdate = true
   return material
@@ -348,9 +406,12 @@ export const createPostFX = (world, initialConfig = {}) => {
     uHasBloom: {value: config.bloom.enabled && config.bloom.intensity > 0},
     uDebugMode: {value: config.debugView === 'bright' || config.debugView === 'blur' ? 1 : 0},
     uDebugBoost: {value: 4},
+    uExposure: {value: config.toneMap.enabled && THREE.AgXToneMapping !== undefined ? config.toneMap.exposure : 1.0},
+    uContrast: {value: config.toneMap.contrast},
   }, {
     transparent: true,
     blending: THREE.NormalBlending,
+    toneMapped: true,
   })
 
   const brightPass = makeScene(THREE, brightMaterial)
@@ -446,6 +507,10 @@ export const createPostFX = (world, initialConfig = {}) => {
     compositeMaterial.uniforms.uBloomIntensity.value = config.bloom.intensity
     compositeMaterial.uniforms.uHasBloom.value = config.bloom.enabled && config.bloom.intensity > 0
     compositeMaterial.uniforms.uDebugMode.value = getDebugMode()
+    compositeMaterial.uniforms.uExposure.value = config.toneMap.enabled && THREE.AgXToneMapping !== undefined
+      ? config.toneMap.exposure
+      : 1.0
+    compositeMaterial.uniforms.uContrast.value = config.toneMap.contrast
     setTextureFilter(sceneTarget && sceneTarget.texture, THREE, config.pixelate.smoothUpscale)
   }
 
@@ -472,8 +537,13 @@ export const createPostFX = (world, initialConfig = {}) => {
     const previousScissor = new THREE.Vector4()
     renderer.getViewport(previousViewport)
     renderer.getScissor(previousScissor)
+    const previousToneMapping = renderer.toneMapping
 
     try {
+      // Scene renders raw-linear into sceneTarget; the AgX curve is applied
+      // once, in display space, by the composite pass below.
+      renderer.toneMapping = THREE.NoToneMapping
+      const agxAvailable = config.toneMap.enabled && THREE.AgXToneMapping !== undefined
       renderer.setClearColor(0x000000, 0)
       renderer.autoClear = true
       renderer.autoClearColor = true
@@ -513,8 +583,11 @@ export const createPostFX = (world, initialConfig = {}) => {
       renderer.autoClear = false
       renderer.autoClearColor = false
       renderer.clear(false, true, false)
+      renderer.toneMapping = agxAvailable ? THREE.AgXToneMapping : THREE.NoToneMapping
       originalRender(compositePass.scene, compositePass.camera)
+      renderer.toneMapping = THREE.NoToneMapping
     } finally {
+      renderer.toneMapping = previousToneMapping
       renderer.setRenderTarget(previousTarget)
       renderer.autoClear = previousAutoClear
       renderer.autoClearColor = previousAutoClearColor

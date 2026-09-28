@@ -103,6 +103,10 @@ const initPostFX = () => {
         ...fxConfig.bloom,
         ...urlOverrides.bloom,
       },
+      toneMap: {
+        ...fxConfig.toneMap,
+        ...urlOverrides.toneMap,
+      },
     })
 
     window.FX = fx
