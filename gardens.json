@@ -11,7 +11,7 @@
       "slug": "thesunkenblimp",
       "title": "The Sunken Blimp Garden",
       "welcome": true,
-      "growth": { "mode": "stages", "count": 10, "window_minutes": 30 }
+      "growth": { "mode": "stages", "count": 10, "window_minutes": 6 }
     }
   ]
 }

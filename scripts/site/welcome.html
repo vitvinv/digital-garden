@@ -36,8 +36,8 @@
 <body>
   <h1>Hi! I made a garden for you.</h1>
   <p>Point your phone camera at the sticker — the garden will be open inside.</p>
-  <p class="note">Proceed to start the cycle: the garden will bloom in about five hours. It keeps growing while you are away — come back anytime.</p>
-  <p class="note">You will be asked to allow camera access. Don't worry! Nothing is recorded or uploaded.</p>
+  <p class="note">Proceed to start the cycle: the garden will take one hour to bloom. It keeps growing while you are away — come back anytime.</p>
+  <p class="note"><i>You will be asked to allow camera access. Don't worry! Nothing is recorded or uploaded.</i></p>
   <button id="ok">to garden</button>
   <div id="loader">
     <div class="bar"><div class="fill" id="fill"></div></div>
@@ -47,9 +47,9 @@
   <script>
     (function () {
       var KEY = 'garden_planted_{{SLUG}}';
-      var TOTAL_MS = 5 * 60 * 60 * 1000;
+      var TOTAL_MS = 1 * 60 * 60 * 1000;
       var STAGE_COUNT = 10;
-      var STAGE_WINDOW_MS = 30 * 60 * 1000; // keep in sync with app.js
+      var STAGE_WINDOW_MS = 6 * 60 * 1000; // keep in sync with app.js
       // ?reset=1 clears the growth timer — lets a tester re-plant from scratch
       if (window.location.search.indexOf('reset=1') !== -1) {
         try { localStorage.removeItem(KEY); } catch (e) {}

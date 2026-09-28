@@ -8,7 +8,7 @@ import {createPostFX, getPostFXUrlOverrides} from './postfx.js'
 // The Garden object's model must point at assets/gardens/garden_stage_01.glb
 // (set in 8th Wall Studio); this code rewrites the stage by elapsed time.
 const STAGE_COUNT = 10
-const STAGE_WINDOW_MS = 30 * 60 * 1000 // 30 min per stage → full bloom in 5 h
+const STAGE_WINDOW_MS = 6 * 60 * 1000 // 6 min per stage → full bloom in 1 h
 const PLANTED_KEY = 'garden_planted_thesunkenblimp' // set by the welcome page
 const GARDEN_GLB_RE = /assets\/gardens\/garden_stage_\d+\.glb$/
 
